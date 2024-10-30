@@ -1,10 +1,27 @@
 
 
-
+#' 
+#' 
+#' @examples
+#' x <- seq(from=0,to=1,length.out=100)
+#' y <- logit(x=x)
+#' graphics::plot(x=x,y=y,type="l")
+#' graphics::abline(v=0.5,lty=2)
+#' graphics::abline(h=0,lty=2)
+#' 
 logit <- function(x){
+  if(any(x<0|x>1)){stop("x must be in unit interval")}
   log(x/(1-x))
 }
 
+#' 
+#' @examples
+#' x <- seq(from=-3,to=3,length.out=100)
+#' y <- sigmoid(x)
+#' graphics::plot(x=x,y=y,type="l")
+#' graphics::abline(v=0,lty=2)
+#' graphics::abline(h=0.5,lty=2)
+#' 
 sigmoid <- function(x){
   1/(1+exp(-x))
 }
