@@ -1202,6 +1202,9 @@ count_matrix <- function(truth,estim){
   return(rate)
 }
 
+#' @param truth vector of length p with entries in -1, 0, 1
+#' @param estim vector of length p with entries -1, 0, 1
+#' 
 count_vector <- function(truth,estim){
   if(!is.vector(truth)){stop()}
   if(length(truth)!=length(estim)){stop()}
@@ -1627,6 +1630,17 @@ change <- function(x,y0,y1,main="",increase=TRUE){
 # (multi-task learning and transfer learning)
 # (using all folds for support problems in the case of transfer learning, using only training folds for all problems in the case of multi-target learning)
 
+
+#' @param w_int internal weights:
+#' numeric vector of length p with non-negative entries
+#' @param w_ext external weights:
+#' numeric vector of length p with non-negative entries
+#' @param v_int exponent for internal weights:
+#' non-negative scalar
+#' @param v_ext exponent for external weights:
+#' non-negative scalar
+#' @param type
+#' 
 construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
   if(type %in% c("geo","geo.con")){
     pf <- 1/((w_int^v_int)*(w_ext^v_ext))
@@ -1674,6 +1688,19 @@ plotWeight <- function(x,y){
   }
 }
 
+#' @title Sparse regression for related problems
+#' @param x n x p matrix (multi-task learning) 
+#' or list of n_k x p matrices (transfer learning)
+#' @param y n x q matrix (multi-task learning)
+#' or list of n_k-dimensional vectors (transfer learning)
+#' @param family character "gaussian" or "binomial"
+#' @param alpha.init elastic net mixing parameter for initial regressions,
+#' default: 0.95 (lasso-like elastic net)
+#' @param alpha elastic net mixing parameter of final regressions,
+#' default: 1 (lasso)
+#' @param nfolds number of cross-validation folds
+#' @param type character
+#' 
 glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,nfolds=10,type){ # was alpha.one=0.95 and alpha.two=1
   
   alpha.one <- alpha.init
@@ -1871,25 +1898,25 @@ glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,nfolds=10,type){ # was a
   return(list)
 }
 
-
-if(FALSE){
-  p <- 50
-  x <- stats::rbinom(n=p,size=1,prob=0.4)*stats::runif(n=p)  
-  y <- stats::rbinom(n=p,size=1,prob=0.4)*stats::runif(n=p)
-  #wx <- 0.0
-  #wy <- 0.0
-  #z <- wx*x + wy * y
-  #z <- x^wx + y^wy - (wx==0) - (wy==0) + (wx==0 & wy==0)
-  #z <- z/sum(z)
-  #graphics::par(mfrow=c(1,2))
-  w <- 0.0
-  #z <- w*x + (1-w)*y
-  z <- x^w + y^(1-w) - (w==0|w==1)
-  ymax <- max(z)
-  graphics::plot(x=x,y=z,ylim=c(0,ymax))
-  graphics::plot(x=y,y=z,ylim=c(0,ymax))
-  
-}
+# 
+# if(FALSE){
+#   p <- 50
+#   x <- stats::rbinom(n=p,size=1,prob=0.4)*stats::runif(n=p)  
+#   y <- stats::rbinom(n=p,size=1,prob=0.4)*stats::runif(n=p)
+#   #wx <- 0.0
+#   #wy <- 0.0
+#   #z <- wx*x + wy * y
+#   #z <- x^wx + y^wy - (wx==0) - (wy==0) + (wx==0 & wy==0)
+#   #z <- z/sum(z)
+#   #graphics::par(mfrow=c(1,2))
+#   w <- 0.0
+#   #z <- w*x + (1-w)*y
+#   z <- x^w + y^(1-w) - (w==0|w==1)
+#   ymax <- max(z)
+#   graphics::plot(x=x,y=z,ylim=c(0,ymax))
+#   graphics::plot(x=y,y=z,ylim=c(0,ymax))
+#   
+# }
 
 
 if(TRUE){

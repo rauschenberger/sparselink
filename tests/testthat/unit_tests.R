@@ -128,4 +128,50 @@ testthat::test_that("fusing target works",{
   fuse <- fuse.data(x=NULL,y=split)
   testthat::expect_true(all(data$y_train==fuse$y))
 })
+
+#--- sensitivity, specificity, precision ---
+
+truth <- sample(x=c(-1,0,1),size=n,replace=TRUE)
+
+testthat::test_that("sens=spec=prec=1 if estim=truth",{
+  estim <- truth
+  metric <- count_vector(truth=truth,estim=estim)
+  testthat::expect_true(all(metric==1))
+})
+
+testthat::test_that("prec=0 if estim=1",{
+  estim <- rep(x=1,times=n)
+  metric <- count_vector(truth=truth,estim=estim)
+  testthat::expect_true(metric["specificity"]==0)
+})
+
+testthat::test_that("prec=1 if estim=0",{
+  estim <- rep(x=0,times=n)
+  metric <- count_vector(truth=truth,estim=estim)
+  testthat::expect_true(metric["specificity"]==1)
+})
+
+testthat::test_that("sens=prec=0 and spec=1 if estim=-truth",{
+  estim <- -truth
+  metric <- count_vector(truth=truth,estim=estim)
+  testthat::expect_true(all(metric[c("sensitivity","precision")]==0) & metric["specificity"]==1)
+})
+
+
+#--- construct penalty factors ---
+
+w_int <- stats::runif(n=n)
+w_ext <- stats::runif(n=n)
+
+testthat::test_that("w_tot=w_int-1 if v_int=1 and v_ext=0",{
+  w_tot <- construct_pf(w_int=w_int,w_ext=w_ext,v_int=1,v_ext=0,type="exp")
+  testthat::expect_true(all(abs(1/w_tot-1-w_int)<eps))
+})
+
+testthat::test_that("w_tot=w_ext if v_int=1 and v_ext=0",{
+  w_tot <- construct_pf(w_int=w_int,w_ext=w_ext,v_int=0,v_ext=1,type="exp")
+  testthat::expect_true(all(abs(1/w_tot-1-w_ext)<eps))
+})
+
+
   
