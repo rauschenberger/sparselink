@@ -1,6 +1,5 @@
 
-
-#' 
+#' @param x numeric vector with values in unit interval
 #' 
 #' @examples
 #' x <- seq(from=0,to=1,length.out=100)
@@ -14,6 +13,7 @@ logit <- function(x){
   log(x/(1-x))
 }
 
+#' @param x numeric vector
 #' 
 #' @examples
 #' x <- seq(from=-3,to=3,length.out=100)
@@ -26,6 +26,43 @@ sigmoid <- function(x){
   1/(1+exp(-x))
 }
 
+#' @param mu numeric vector (with values in unit interval if family="binomial")
+#' @param family character "gaussian" or "binomial"
+#'
+#' @examples
+#' family <- "binomial"
+#' from <- ifelse(family=="binomial",0,-3)
+#' to <- ifelse(family=="binomial",1,3)
+#' mu <- seq(from=from,to=to,length.out=100)
+#' eta <- link.function(mu=mu,family=family)
+#' graphics::plot(x=mu,y=eta,type="l",main=family)
+#' v <- ifelse(family=="binomial",0.5,0)
+#' graphics::abline(v=v,lty=2)
+#' graphics::abline(h=0,lty=2)
+#' 
+link.function <- function(mu,family){
+  if(family=="gaussian"){
+    eta <- mu
+  } else if(family=="binomial"){
+    eta <- logit(mu)
+  } else {
+    stop("family=\"",family,"\" not implemented")
+  }
+  return(eta)
+}
+
+#' @param eta numeric vector
+#' @param family character "gaussian" or "binomial"
+#' 
+#' @examples
+#' family <- "binomial"
+#' eta <- seq(from=-3,to=3,length.out=100)
+#' mu <- mean.function(eta=eta,family=family)
+#' graphics::plot(x=eta,y=mu,type="l",main=family)
+#' graphics::abline(v=0,lty=2)
+#' h <- ifelse(family=="binomial",0.5,0)
+#' graphics::abline(h=h,lty=2)
+#' 
 mean.function <- function(eta,family){
   if(family=="gaussian"){
     mu <- eta
@@ -37,16 +74,6 @@ mean.function <- function(eta,family){
   return(mu)
 }
 
-link.function <- function(mu,family){
-  if(family=="gaussian"){
-    eta <- mu
-  } else if(family=="binomial"){
-    eta <- logit(mu)
-  } else {
-    stop("family=\"",family,"\" not implemented")
-  }
-  return(eta)
-}
 
 sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,200),n1=10000,p=200,family="gaussian"){
   n <- n0 + n1
