@@ -1129,6 +1129,8 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
   return(list)
 }
 
+
+# This cross-validation function only works for transfer learning (not for multi-task learning).
 crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","transfer","share","retry","common"),type){
   #if(is.matrix(y) & is.matrix(X)){
   #  mode <- "multiple"
@@ -1639,6 +1641,16 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
   return(pf)
 }
 
+
+#' @param x list with slots source and target
+#' @param y numeric vector
+#' 
+#' @examples
+#' values <- seq(from=0,to=1,by=0.2)
+#' x <- expand.grid(source=values,target=values)
+#' y <- stats::rexp(n=length(values)*length(values))
+#' plotWeight(x=x,y=y)
+#' 
 plotWeight <- function(x,y){
   if(cor(x$source,x$target)==-1){
     graphics::plot(x=x$source,y=y,type="o",xlab="weight source = 1 - weight target")
@@ -1654,6 +1666,11 @@ plotWeight <- function(x,y){
     for(i in seq_len(nrow(x))){
       graphics::points(x=x$source[i],y=x$target[i],col="black",bg=col[i],pch=21,cex=3)
     }
+    id <- which.min(x=y)
+    graphics::points(x=x$source[id],y=x$target[id],pch=4,col="red",lwd=2,cex=2)
+    diagonal <- x$source+x$target==1
+    id <- which(y==min(y[diagonal]) & diagonal)
+    graphics::points(x=x$source[id],y=x$target[id],pch=1,col="red",lwd=2,cex=1)
   }
 }
 
