@@ -1,0 +1,1734 @@
+
+
+
+logit <- function(x){
+  log(x/(1-x))
+}
+
+sigmoid <- function(x){
+  1/(1+exp(-x))
+}
+
+mean.function <- function(eta,family){
+  if(family=="gaussian"){
+    mu <- eta
+  } else if(family=="binomial"){
+    mu <- sigmoid(eta)
+  } else {
+    stop("family=\"",family,"\" not implemented")
+  }
+  return(mu)
+}
+
+link.function <- function(mu,family){
+  if(family=="gaussian"){
+    eta <- mu
+  } else if(family=="binomial"){
+    eta <- logit(mu)
+  } else {
+    stop("family=\"",family,"\" not implemented")
+  }
+  return(eta)
+}
+
+sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,200),n1=10000,p=200,family="gaussian"){
+  n <- n0 + n1
+  theta <- stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.common)
+  X <- beta <- y <- foldid <- list()
+  beta <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    X[[i]] <- matrix(data=stats::rnorm(n[i]*p),nrow=n[i],ncol=p)
+    beta[,i] <- theta + stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.separate)
+    y[[i]] <- X[[i]] %*% beta[,i] + stats::rnorm(n=n[[i]])
+    if(family=="binomial"){
+      y[[i]] <- 1*(y[[i]]>=0)
+    }
+    foldid[[i]] <- rep(x=c(0,1),times=c(n0[i],n1))
+  }
+  y_train <- X_train <- y_test <- X_test <- list()
+  for(i in seq_len(q)){
+    cond <- foldid[[i]]==0
+    y_train[[i]] <- y[[i]][cond]
+    y_test[[i]] <- y[[i]][!cond]
+    X_train[[i]] <- X[[i]][cond,]
+    X_test[[i]] <- X[[i]][!cond,]
+  }
+  list <- list(y_train=y_train,X_train=X_train,y_test=y_test,X_test=X_test,beta=beta)
+  return(list)
+}
+
+sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=10000,p=200,family="gaussian"){
+  n <- n0 + n1
+  theta <- stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.common)
+  X <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
+  y <- matrix(data=NA,nrow=n,ncol=q)
+  beta <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    beta[,i] <- theta + stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.separate)
+    y[,i] <- X %*% beta[,i] + stats::rnorm(n=n)
+    if(family=="binomial"){
+      y[,i] <- 1*(y[,i]>=0)
+    }
+  }
+  foldid <- rep(x=c(0,1),times=c(n0,n1))
+  
+  cond <- foldid==0
+  y_train <- y[cond,]
+  y_test <- y[!cond,]
+  X_train <- X[cond,]
+  X_test <- X[!cond,]
+  #y_train <- apply(y[cond,],2,function(x) x,simplify=FALSE)
+  #y_test <- apply(y[!cond,],2,function(x) x,simplify=FALSE)
+  #X_train <- replicate(n=q,expr=X[cond,],simplify=FALSE)
+  #X_test <- replicate(n=q,expr=X[!cond,],simplify=FALSE)
+  list <- list(y_train=y_train,X_train=X_train,y_test=y_test,X_test=X_test,beta=beta)
+  return(list)
+}
+
+
+calc.metric <- function(y,y_hat,family){
+  if(length(y)!=length(y_hat)){
+    stop("incompatible lengths")  
+  }
+  if(family=="gaussian"){
+    metric <- mean((y-y_hat)^2)
+  } else if(family=="binomial"){
+    if(any(y!=0&y!=1)){stop("range")}
+    if(any(y_hat<0|y_hat>1)){stop("range")}
+    eps <- 1e-06
+    metric <- mean(-y*log(pmax(y_hat,eps))-(1-y)*log(1-pmin(y_hat,1-eps)))
+  } else {
+    stop("family=\"",family,"\" not implemented")
+  }
+  return(metric)
+}
+
+# folds for multi-target learning
+if(FALSE){
+  n <- 50
+  q <- 4
+  y <-  matrix(data=stats::rbinom(n=n*q,size=1,prob=0.2),nrow=n,ncol=q)
+}
+
+make.folds.multi <- function(y,family,nfolds=10){
+  n <- nrow(y)
+  q <- ncol(y)
+  if(length(family)==1){
+    family <- rep(x=family,times=q) 
+  }
+  if(is.infinite(nfolds)){
+    foldid <- sample(seq_len(n))
+  } else if(all(family=="gaussian")){
+    foldid <- sample(rep(x=seq_len(nfolds),length.out=n))
+  } else {
+    codes <- apply(y[,family=="binomial",drop=FALSE],1,function(x) paste(x,collapse=""))
+    unique <- unique(codes)
+    foldid <- rep(x=NA,times=n)
+    for(i in unique){
+      cond <- codes==i
+      if(sum(cond)<nfolds){
+        cands <- sample(x=seq_len(nfolds),size=sum(cond))
+      } else {
+        cands <- seq_len(length.out=nfolds)
+      }
+      if(sum(cond)==1){
+        foldid[cond] <- cands
+      } else {
+        foldid[cond] <- sample(x=rep(x=cands,length.out=sum(cond)))
+      }
+    }
+  }
+  return(foldid)
+}
+
+# folds for transfer learning
+make.folds.trans <- function(y,family,nfolds=10){
+  q <- length(y)
+  if(length(family)==1){
+    family <- rep(x=family,times=q) 
+  }
+  foldid <- list()
+  for(i in seq_len(q)){
+    if(is.infinite(nfolds)){
+      foldid[[i]] <- sample(seq_along(y[[i]]))
+    } else {
+      if(family[i]=="binomial"){
+        foldid[[i]] <- rep(x=NA,times=length(y[[i]]))
+        foldid[[i]][y[[i]]==0] <- sample(rep(x=seq_len(nfolds),length.out=sum(y[[i]]==0)))
+        foldid[[i]][y[[i]]==1] <- sample(rep(x=seq_len(nfolds),length.out=sum(y[[i]]==1)))
+      } else {
+        foldid[[i]] <- sample(rep(x=seq_len(nfolds),length.out=length(y[[i]])))
+      }
+    }
+  }
+  return(foldid)
+}
+
+get.info <- function(x,y,family){
+  if(length(x)!=length(y)){stop("different q")}
+  if(any(sapply(X=x,FUN=base::nrow)!=sapply(X=y,FUN=base::length))){stop("different n")}
+  if(any(diff(sapply(X=x,FUN=base::ncol))!=0)){stop("different p")}
+  q <- length(x)
+  n <- sapply(X=x,FUN=base::nrow)
+  p <- ncol(x[[1]])
+  list <- list(q=q,n=n,p=p)
+  return(list)
+}
+
+fuse.data <- function(x,y=NULL,foldid=NULL){
+  list <- list()
+  if(!is.null(x)){
+    list$x <- do.call(what="rbind",args=x)
+  }
+  if(!is.null(y)){
+    list$y <- do.call(what="c",args=y)
+  }
+  if(!is.null(foldid)){
+    list$foldid <- do.call(what="c",args=foldid)
+  }
+  q <- length(x)
+  n <- sapply(X=x,FUN=base::nrow)
+  list$index <- rep(x=seq_len(q),times=n)
+  return(list)
+}
+
+glm.shrink <- function(x,y,family,trial=TRUE){
+  info <- get.info(x=x,y=y,family=family)
+  
+  nfolds <- 10
+  foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+  fuse <- fuse.data(x=x,y=y,foldid=foldid)
+  
+  if(trial){
+    penalty.factor <- 1/abs(stats::cor(x=fuse$x,y=fuse$y,method="spearman"))
+    penalty.factor[is.na(penalty.factor)] <- Inf
+  } else {
+    penalty.factor <- rep(x=1,times=ncol(fuse$x))
+  }
+  glm.com.ext <- glmnet::cv.glmnet(x=fuse$x,y=fuse$y,family=family,penalty.factor=penalty.factor)
+  # To be used above: The adaptive lasso has been implemented in another file.
+  coef.com.ext <- coef(object=glm.com.ext,s="lambda.min")[-1]
+  glm.sep.ext <- list()
+  for(i in seq_len(info$q)){
+    offset <- x[[i]] %*% coef.com.ext
+    glm.sep.ext[[i]] <- glmnet::glmnet(x=x[[i]],y=y[[i]],family=family,offset=offset)
+  }
+  
+  y_hat <- list()
+  for(i in seq_len(info$q)){
+    nlambda <- length(glm.sep.ext[[i]]$lambda)
+    y_hat[[i]] <- matrix(data=NA,nrow=info$n[i],ncol=nlambda)
+  }
+  
+  for(k in seq_len(nfolds)){
+    cond <- fuse$foldid==k
+    if(trial){
+      penalty.factor <- 1/abs(stats::cor(x=fuse$x[!cond,],y=fuse$y[!cond],method="spearman"))
+      penalty.factor[is.na(penalty.factor)] <- Inf
+    } else {
+      penalty.factor <- rep(x=1,times=ncol(fuse$x))
+    }
+    glm.com.int <- glmnet::glmnet(x=fuse$x[!cond,],y=fuse$y[!cond],family=family,penalty.factor=penalty.factor)
+    coef.com.int <- stats::coef(object=glm.com.int,s=glm.com.ext$lambda.min)[-1]
+    glm.sep.int <- list()
+    for(i in seq_len(info$q)){
+      cond <- foldid[[i]]==k
+      offset <- x[[i]] %*% coef.com.int
+      glm.sep.int[[i]] <- glmnet::glmnet(x=x[[i]][!cond,],y=y[[i]][!cond],family=family,offset=offset[!cond])
+      y_hat[[i]][cond,] <- stats::predict(object=glm.sep.int[[i]],newx=x[[i]][cond,],newoffset=offset[cond],s=glm.sep.ext[[i]]$lambda,type="response")
+    }
+  }
+  
+  metric <- list()
+  id.min <- lambda.min <- rep(x=NA,times=info$q)
+  for(i in seq_len(info$q)){
+    metric[[i]] <- apply(X=y_hat[[i]],MARGIN=2,FUN=function(x) calc.metric(y=y[[i]],y_hat=x,family=family))
+    id.min[i] <- which.min(metric[[i]])
+    lambda.min[i] <- glm.sep.ext[[i]]$lambda[id.min[i]]
+  }
+  id.min <- sapply(X=metric,FUN=base::which.min)
+  
+  list <- list(glm.com=glm.com.ext,glm.sep=glm.sep.ext,lambda.min=lambda.min,info=info)
+  class(list) <- "glm.shrink"
+  return(list)  
+}
+
+predict.glm.shrink <- function(object,newx){
+  q <- length(newx)
+  coef.com <- stats::coef(object=object$glm.com,s="lambda.min")[-1]
+  y_hat <- list()
+  for(i in seq_len(q)){
+    newoffset <- newx[[i]] %*% coef.com
+    y_hat[[i]] <- stats::predict(object=object$glm.sep[[i]],newx=newx[[i]],newoffset=newoffset,s=object$lambda.min[i],type="response")
+  }
+  return(y_hat)
+}
+
+coef.glm.shrink <- function(object){
+  coef.com <- as.numeric(stats::coef(object=object$glm.com,s="lambda.min"))
+  coef.tot <- matrix(data=NA,nrow=object$info$p+1,ncol=object$info$q)
+  for(i in seq_len(object$info$q)){
+    coef.tot[,i] <- as.numeric(stats::coef(object$glm.sep[[i]],s=object$lambda.min[i])) + coef.com
+  }
+  alpha <- coef.tot[1,]
+  beta <- coef.tot[-1,]
+  list <- list(alpha=alpha,beta=beta)
+  return(list)
+}
+
+#object <- glm.shrink(x=X_train,y=y_train,family=family)
+
+
+# This version uses the same set of weights for each problem.
+combcoef <- function(coef,weight){
+  weight <- weight/sum(weight)
+  #weight <- 0*weight + 1
+  #positive <- apply(X=coef,MARGIN=1,FUN=function(x) sum(weight*pmax(0,x))) # original
+  #negative <- abs(apply(X=coef,MARGIN=1,FUN=function(x) sum(weight*pmin(0,x)))) # original
+  positive <- apply(X=coef,MARGIN=1,FUN=function(x) max(c(0,weight*x)))
+  negative <- apply(X=coef,MARGIN=1,FUN=function(x) abs(min(c(0,weight*x))))
+  #warning("start test")
+  #positive <- apply(X=coef,MARGIN=1,FUN=function(x) max(c(0,x)))
+  #negative <- apply(X=coef,MARGIN=1,FUN=function(x) abs(min(c(0,x))))
+  #warning("end test")
+  lower.limits <- rep(c(0,-Inf),each=nrow(coef))
+  upper.limits <- rep(c(Inf,0),each=nrow(coef))
+  weight <- c(positive,negative)
+  penalty.factor <- 1/weight
+  list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight=weight,penalty.factor=penalty.factor)
+}
+
+
+comb_split <- function(coef,weight,id){
+  weight <- weight/sum(weight)
+  #--- source ---
+  positive <- apply(X=coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) max(c(0,weight[-id]*x)))
+  negative <- apply(X=coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) abs(min(c(0,weight[-id]*x))))
+  lower.limits <- rep(c(0,-Inf),each=nrow(coef))
+  upper.limits <- rep(c(Inf,0),each=nrow(coef))
+  weight.source <- c(positive,negative)
+  #--- target ---
+  positive <- pmax(0,coef[,id])
+  negative <- abs(pmin(0,coef[,id]))
+  weight.target <- c(positive,negative)
+  
+  #warning("start temporary")
+  if(any(weight.source!=0)){
+    weight.source <- weight.source/sum(weight.source)
+  }
+  if(any(weight.target!=0)){
+    weight.target <- weight.target/sum(weight.target)
+  }
+  #warning("end temporary")
+  
+  list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight.source=weight.source,weight.target=weight.target)
+}
+
+
+comb_split_trial <- function(coef,id){
+  
+  # #--- prediction ---
+  # metric <- numeric()
+  # for(i in seq_len(ncol(coef))){
+  #    eta <- x_sta[[id]] %*% coef[,i]
+  #    y_hat <- mean.function(eta=eta,family=family)
+  #    metric[i] <- calc.metric(y=y_sta[[id]],y_hat=y_hat,family=family)
+  # }
+  # mean <- rep(x=y_sta[[i]],times=length(y_sta[[i]]))
+  # metric.mean <- calc.metric(y=y_sta[[id]],y_hat=y_hat,family=family)
+  # cor <- 1*(metric[-id]<metric.mean)
+  
+  # #--- correlation ---
+  #cor <- stats::cor(x=coef[,id],y=coef[,-id])
+  #cor[is.na(cor)] <- 0
+  #cor[cor>0] <- 1
+  #cor[cor<0] <- 0
+  #cor <- matrix(data=cor,nrow=nrow(coef),ncol=length(cor),byrow=TRUE)
+  
+  #--- equality ---
+  cor <- 1
+  
+  #warning("remove binarisation!")
+  #coef <- sign(coef) # temporary trial
+  
+  #--- external weights ---
+  
+  warning("put back max/min (instead of sum)")
+  #positive <- apply(X=cor*coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) max(c(0,x)))
+  #negative <- apply(X=cor*coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) abs(min(c(0,x))))
+  
+  positive <- apply(X=cor*coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) sum(pmax(0,x)))
+  negative <- apply(X=cor*coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) sum(abs(pmin(0,x))))
+  
+  lower.limits <- rep(c(0,-Inf),each=nrow(coef))
+  upper.limits <- rep(c(Inf,0),each=nrow(coef))
+  weight.ext <- c(positive,negative)
+  
+  #--- internal weights ---
+  positive <- pmax(0,coef[,id])
+  negative <- abs(pmin(0,coef[,id]))
+  weight.int <- c(positive,negative)
+  
+  warning("removed weight standardisation")
+  #if(any(weight.ext!=0)){
+  #  weight.ext <- weight.ext/sum(weight.ext)
+  #}
+  #if(any(weight.int!=0)){
+  #  weight.int <- weight.int/sum(weight.int)
+  #}
+  #warning("end temporary")
+  
+  list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight.source=weight.ext,weight.target=weight.int)
+}
+
+
+combcoef_shrink <- function(coef,weight){
+  q <- ncol(coef)
+  source.weight <- weight/sum(weight)
+  #cor <- stats::cor(x=coef,method="spearman")
+  pvalue <- matrix(data=0,nrow=q,ncol=q)
+  for(i in 1:(ncol(coef)-1)){
+    for(j in (i+1):ncol(coef)){
+      pvalue[i,j] <- pvalue[j,i] <- stats::cor.test(x=coef[,i],y=coef[,j],method="spearman")$p.value
+    }
+  }
+  signif <- 1*(pvalue<=0.05) # rename to sign (here and below)
+  weight <- penalty.factor <- list()
+  for(i in seq_len(q)){
+    #positive <- apply(X=coef,MARGIN=1,FUN=function(x) sum(source.weight*pmax(0,signif[i,])*pmax(0,x)))
+    #negative <- abs(apply(X=coef,MARGIN=1,FUN=function(x) sum(source.weight*pmax(0,signif[i,])*pmin(0,x))))
+    positive <- apply(X=coef,MARGIN=1,FUN=function(x) max(c(0,signif[i,]*source.weight*x)))
+    negative <- apply(X=coef,MARGIN=1,FUN=function(x) abs(min(c(0,signif[i,]*source.weight*x))))
+    weight[[i]] <- c(positive,negative)
+    penalty.factor[[i]] <- 1/weight[[i]]
+  }
+  lower.limits <- rep(c(0,-Inf),each=nrow(coef))
+  upper.limits <- rep(c(Inf,0),each=nrow(coef))
+  list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight=weight,penalty.factor=penalty.factor)
+}
+# 
+# combcoef_corshrink <- function(coef,weight){
+#   q <- ncol(coef)
+#   shrink <- t(apply(coef,1,function(x) CorShrink::CorShrinkVector(corvec=x,nsamp_vec=weight)))
+#   
+#   weight <- weight/sum(weight)
+#   
+#   penalty.factor <- list()
+#   for(i in seq_len(q)){
+#     positive <- apply(X=coef,MARGIN=1,FUN=function(x) sum(weight*pmax(0,cor[i,])*pmax(0,x)))
+#     negative <- abs(apply(X=coef,MARGIN=1,FUN=function(x) sum(weight*pmax(0,cor[i,])*pmin(0,x))))
+#     penalty.factor[[i]] <- 1/c(positive,negative)
+#   }
+#   lower.limits <- rep(c(0,-Inf),each=nrow(coef))
+#   upper.limits <- rep(c(Inf,0),each=nrow(coef))
+#   list <- list(lower.limits=lower.limits,upper.limits=upper.limits,penalty.factor=penalty.factor)
+# }
+
+# This version imposes uniform signs.
+combcoef_trial <- function(coef,weight){
+  weight <- weight/sum(weight)
+  positive <- apply(X=coef,MARGIN=1,FUN=function(x) sum(weight*pmax(0,x)))
+  negative <- abs(apply(X=coef,MARGIN=1,FUN=function(x) sum(weight*pmin(0,x))))
+  lower.limits <- rep(c(0,-Inf),each=nrow(coef))
+  upper.limits <- rep(c(Inf,0),each=nrow(coef))
+  penalty.factor <- 1/c(positive,negative)
+  penalty.factor[c(negative>positive,positive>negative)] <- 0
+  list <- list(lower.limits=lower.limits,upper.limits=upper.limits,penalty.factor=penalty.factor)
+}
+
+# This version uses a different set of weights for each problem.
+combcoef2 <- function(alpha,beta,y,x,family){
+  q <- length(x)
+  p <- ncol(x[[1]])
+  n <- sapply(X=y,FUN=base::length)
+  n <- n/sum(n)
+  metric <- matrix(data=NA,nrow=q,ncol=q+1)
+  for(i in seq_len(q)){
+    for(j in seq_len(q)){
+      eta_hat <- alpha[j] + x[[i]] %*% beta[,j]
+      y_hat <- mean.function(eta=eta_hat,family=family)
+      metric[i,j] <- calc.metric(y=y[[i]],y_hat=y_hat,family=family)
+    }
+    metric[i,j+1] <- calc.metric(y=y[[i]],y_hat=rep(x=mean(y[[i]]),times=n[i]),family=family)
+  }
+  metric <- metric[,-(q+1)]/metric[,q+1]
+  select <- apply(X=metric,MARGIN=2,FUN=function(x) 1*(x<1))
+  penalty.factor <- weights <- list()
+  for(i in seq_len(q)){
+    weight <- select[i,]
+    positive <- apply(X=beta,MARGIN=1,FUN=function(x) max(0,weight*n*x))
+    negative <- abs(apply(X=beta,MARGIN=1,FUN=function(x) min(0,weight*n*x)))
+    weights[[i]] <- c(positive,negative)
+    penalty.factor[[i]] <- 1/weight[[i]]
+  }
+  lower.limits <- rep(c(0,-Inf),each=nrow(beta))
+  upper.limits <- rep(c(Inf,0),each=nrow(beta))
+  list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight=weights,penalty.factor=penalty.factor)
+  return(list)
+}
+
+combpval <- function(pval.inc,pval.dec){
+  p <- nrow(pval.inc)
+  q <- ncol(pval.dec)
+  #prob <- apply(rbind(pval.inc,pval.dec),2,function(x) mean(x<=0.05))
+  #pval.inc[] <- 
+  #pval.dec[] <- 
+  comb.inc <- apply(pval.inc,1,function(x) palasso:::.combine(x,method="fisher"))
+  comb.dec <- apply(pval.dec,1,function(x) palasso:::.combine(x,method="fisher"))
+  pvalue <- c(comb.inc,comb.dec)
+  weight <- -log10(pvalue)
+  weight[weight<=1e-06] <- 0
+  # CONSIDER CROSS-VALIDATING EXPONENTS!
+  penalty.factor <- 1/weight
+  penalty.factor[weight<=1e-06] <- Inf
+  lower.limits <- rep(c(0,-Inf),each=p)
+  upper.limits <- rep(c(Inf,0),each=p)
+  list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight=weight,penalty.factor=penalty.factor)
+  return(list)
+}
+
+signpval <- function(x,y){
+  # This function is under development.
+  temp <- apply(x,2,function(x) stats::cor.test(x,y,method="spearman",exact=FALSE))
+  temp.sign <- sapply(temp,function(x) sign(x$estimate))
+  temp.pval <- -log10(sapply(temp,function(x) x$p.value))
+  prior <- temp.sign*temp.pval
+  return(prior)
+}
+
+onesidecor <- function(x,y){
+  inc <- pmin(1,2*apply(x,MARGIN=2,FUN=function(x) stats::cor.test(x=x,y=y,method="spearman",exact=FALSE,alternative="greater")$p.value))
+  dec <- pmin(1,2*apply(X=x,MARGIN=2,FUN=function(x) stats::cor.test(x=x,y=y,method="spearman",exact=FALSE,alternative="less")$p.value))
+  #warning("start temporary")
+  #inc[inc>0.05] <- 1 # trial 2024-07-10
+  #dec[dec>0.05] <- 1 # trial 2024-07-10
+  #warning("end temporary")
+  list <- list(inc=inc,dec=dec)
+  return(list)
+}
+
+comb_calib <- function(y,x,coef,n,family){
+  n <- n/sum(n)
+  q <- length(x)
+  p <- ncol(x[[1]])
+  # calibration
+  prior <- list()
+  for(i in seq_len(q)){
+    prior[[i]] <- matrix(data=NA,nrow=p,ncol=q)
+    for(j in seq_len(q)){
+      prior[[i]][,j] <- transreg:::.exp.multiple(y=y[[i]],X=x[[i]],family=family,prior=coef[,j,drop=FALSE])$beta
+    }
+  }
+  # combination
+  weight <- penalty.factor <- list()
+  for(i in seq_len(q)){
+    positive <- apply(X=prior[[i]],MARGIN=1,FUN=function(x) max(c(0,n*x)))
+    negative <- apply(X=prior[[i]],MARGIN=1,FUN=function(x) abs(min(c(0,n*x))))
+    weight[[i]] <- c(positive,negative)
+    penalty.factor[[i]] <- 1/weight[[i]]
+  }
+  lower.limits <- rep(c(0,-Inf),each=p)
+  upper.limits <- rep(c(Inf,0),each=p)
+  list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight=weight,penalty.factor=penalty.factor)
+  return(list)
+}
+
+glm.share <- function(x,y,family,alpha.one=0.95,alpha.two=1,drop=FALSE,tune=TRUE){ # Change back to alpha.one=NA (correlation). Under tune=TRUE, alpha.one=Inf (transformed p-values) and alpha.one=0 (ridge) work equally well.
+  
+  if(!is.na(alpha.one)){warning("Not using correlation!")}
+  
+  #drop <- FALSE # was test <- FALSE # Use this to check whether a source is used.
+  
+  n <- sapply(X=y,FUN=base::length)
+  p <- ncol(x[[1]])
+  q <- length(x)
+  
+  nfolds <- 10
+  foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+  
+  # overall fit
+  glm.one.ext <- glm.two.ext <- list()
+  alpha.ext <- rep(x=NA,times=q)
+  beta.ext <- pval.ext.inc <- pval.ext.dec <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    if(is.na(alpha.one)){
+      beta.ext[,i] <- stats::cor(x=x[[i]],y=y[[i]],method="spearman")
+      beta.ext[,i][is.na(beta.ext[,i])] <- 0
+      #warning("start temporary")
+      #beta.ext[,i] <- signpval(x=x[[i]],y=y[[i]])
+      #warning("end temporary")
+    } else if(is.infinite(alpha.one)){
+      temp <- onesidecor(x=x[[i]],y=y[[i]])
+      pval.ext.inc[,i] <- temp$inc
+      pval.ext.dec[,i] <- temp$dec
+    } else {
+      glm.one.ext[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family,alpha=alpha.one) # use fixed foldid?
+      temp <- coef(object=glm.one.ext[[i]],s="lambda.min")
+      alpha.ext[i] <- temp[1]
+      beta.ext[,i] <- temp[-1]
+    }
+  }
+  
+  if(is.infinite(alpha.one)){
+    rest.ext <- combpval(pval.inc=pval.ext.inc,pval.dec=pval.ext.dec)
+  } else if(drop){
+    rest.ext <- combcoef2(alpha=alpha.ext,beta=beta.ext,y=y,x=x,family=family)
+    #rest.ext <- combcoef_shrink(coef=beta.ext,weight=n)
+    #rest.ext <- comb_calib(y=y,x=x,coef=beta.ext,n=n,family=family)
+  } else {
+    rest.ext <- combcoef(coef=beta.ext,weight=n)
+  }
+  
+  exponent <- seq(from=0,to=2,by=0.25) # verify range
+  #exponent <- seq(from=0,to=1,by=0.2) # trial
+  
+  for(i in seq_len(q)){
+    if(tune){
+      if(drop){
+        weight <- rest.ext$weight[[i]]
+      } else {
+        weight <- rest.ext$weight
+      }
+    } else {
+      if(drop){
+        penalty.factor <- rest.ext$penalty.factor[[i]]
+      } else {
+        penalty.factor <- rest.ext$penalty.factor
+      }
+    }
+    if(tune){
+      glm.two.ext[[i]] <- list()
+      for(l in seq_along(exponent)){
+        if(all(weight^exponent[l]==0)){
+          glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family,lambda=99e99,alpha=alpha.two)
+        } else {
+          glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family,lower.limits=rest.ext$lower.limits,upper.limits=rest.ext$upper.limits,penalty.factor=1/(weight^exponent[l]),alpha=alpha.two)
+        }
+      }
+    } else {
+      glm.two.ext[[i]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family,lower.limits=rest.ext$lower.limits,upper.limits=rest.ext$upper.limits,penalty.factor=penalty.factor,alpha=alpha.two)
+    }
+  }
+  
+  # cross-validation
+  y_hat <- list()
+  if(tune){
+    for(i in seq_len(q)){
+      y_hat[[i]] <- list()
+      for(l in seq_along(exponent)){
+        nlambda <- length(glm.two.ext[[i]][[l]]$lambda)
+        y_hat[[i]][[l]] <- matrix(data=NA,nrow=n[i],ncol=nlambda)
+      }
+    }
+  } else {
+    for(i in seq_len(q)){
+      nlambda <- length(glm.two.ext[[i]]$lambda)
+      y_hat[[i]] <- matrix(data=NA,nrow=n[i],ncol=nlambda)
+    }
+  }
+  
+  for(k in seq_len(nfolds)){
+    alpha.int <- rep(x=NA,times=q)
+    beta.int <- matrix(data=NA,nrow=p,ncol=q)
+    pval.int.inc <- pval.int.dec <- matrix(data=NA,nrow=p,ncol=q)
+    for(i in seq_len(q)){
+      cond <- foldid[[i]]==k
+      if(is.na(alpha.one)){
+        beta.int[,i] <- stats::cor(x=x[[i]][!cond,],y=y[[i]][!cond],method="spearman")
+        beta.int[,i][is.na(beta.int[,i])] <- 0
+        #warning("start temporary")
+        #beta.int[,i] <- signpval(x=x[[i]][!cond,],y=y[[i]][!cond])
+        #warning("end temporary")
+      } else if(is.infinite(alpha.one)){
+        temp <- onesidecor(x=x[[i]][!cond,],y=y[[i]][!cond])
+        pval.int.inc[,i] <- temp$inc
+        pval.int.dec[,i] <- temp$dec
+      } else {
+        glm.one.int <- glmnet::glmnet(x=x[[i]][!cond,],y=y[[i]][!cond],family=family,alpha=alpha.one)
+        temp <- coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)
+        alpha.int[i] <- temp[1]
+        beta.int[,i] <- temp[-1]
+      }
+    }
+    
+    if(is.infinite(alpha.one)){
+      rest.int <- combpval(pval.inc=pval.int.inc,pval.dec=pval.int.dec)
+    } else if(drop){
+      y_temp <- x_temp <- list()
+      for(i in seq_len(q)){
+        y_temp[[i]] <- y[[i]][foldid[[i]]==k]
+        x_temp[[i]] <- x[[i]][foldid[[i]]==k,]
+      }
+      rest.int <- combcoef2(alpha=alpha.int,beta=beta.int,y=y_temp,x=x_temp,family=family)
+      #rest.int <- combcoef_shrink(coef=beta.int,weight=n) 
+      #rest.int <- comb_calib(y=y,x=x,coef=beta.int,n=n,family=family)
+    } else {
+      rest.int <- combcoef(coef=beta.int,weight=n)
+    }
+    
+    for(i in seq_len(q)){
+      cond <- foldid[[i]]==k
+      if(tune){
+        if(drop){
+          weight <- rest.int$weight[[i]]
+        } else {
+          weight <- rest.int$weight
+        }
+      } else {
+        if(drop){
+          penalty.factor <- rest.int$penalty.factor[[i]]
+        } else {
+          penalty.factor <- rest.int$penalty.factor
+        }
+      }
+      if(tune){
+        for(l in seq_along(exponent)){
+          if(all(weight^exponent[l]==0)){
+            # This should be handled differently.
+            #y_hat[[i]][[l]][cond,] <- predict(object=glm.two.int,newx=cbind(x[[i]],x[[i]])[cond,],s=Inf,type="response")
+            glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family,lambda=99e99,alpha=alpha.two)
+          } else {
+            glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family,lower.limits=rest.int$lower.limits,upper.limits=rest.int$upper.limits,penalty.factor=1/(weight^exponent[l]),alpha=alpha.two)
+          }
+          y_hat[[i]][[l]][cond,] <- predict(object=glm.two.int,newx=cbind(x[[i]],x[[i]])[cond,],s=glm.two.ext[[i]][[l]]$lambda,type="response")
+        }
+      } else {
+        glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family,lower.limits=rest.int$lower.limits,upper.limits=rest.int$upper.limits,penalty.factor=penalty.factor,alpha=alpha.two)
+        y_hat[[i]][cond,] <- predict(object=glm.two.int,newx=cbind(x[[i]],x[[i]])[cond,],s=glm.two.ext[[i]]$lambda,type="response")
+      }
+      
+    }
+  }
+  
+  if(tune){
+    metric <- list()
+    id.min <- lambda.min <- rep(x=NA,times=q)
+    for(i in seq_len(q)){
+      metric[[i]] <- list()
+      for(l in seq_along(exponent)){
+        metric[[i]][[l]] <- apply(X=y_hat[[i]][[l]],MARGIN=2,FUN=function(x)
+          calc.metric(y=y[[i]],y_hat=x,family=family))
+      }
+      min <- sapply(metric[[i]],min)
+      tryCatch(expr=graphics::plot(x=exponent,y=min,type="o"),error=function(x) NULL)
+      id.exp <- which.min(min)
+      id.min[i] <- which.min(metric[[i]][[id.exp]])
+      lambda.min[i] <- glm.two.ext[[i]][[id.exp]]$lambda[id.min[i]]
+      glm.two.ext[[i]] <- glm.two.ext[[i]][[id.exp]]
+    }
+    
+  } else {
+    metric <- list()
+    id.min <- lambda.min <- rep(x=NA,times=q)
+    for(i in seq_len(q)){
+      metric[[i]] <- apply(X=y_hat[[i]],MARGIN=2,FUN=function(x)
+        calc.metric(y=y[[i]],y_hat=x,family=family))
+      id.min[i] <- which.min(metric[[i]])
+      lambda.min[i] <- glm.two.ext[[i]]$lambda[id.min[i]]
+    }
+  }
+  
+  list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,lambda.min=lambda.min,info=data.frame(p=p,q=q))
+  class(list) <- "glm.share"
+  return(list)
+}
+
+predict.glm.share <- function(object,newx){
+  y_hat <- list()
+  if(is.list(newx)){
+    q <- length(newx)
+    for(i in seq_len(q)){
+      y_hat[[i]] <- predict(object=object$glm.two[[i]],newx=cbind(newx[[i]],newx[[i]]),s=object$lambda.min[i],type="response")
+    }
+  } else {
+    for(i in seq_len(object$info$q)){
+      y_hat[[i]] <- predict(object=object$glm.two[[i]],newx=cbind(newx,newx),s=object$lambda.min[i],type="response")
+    }
+  }
+  return(y_hat)
+}
+
+coef.glm.share <- function(object){
+  p <- object$info$p
+  q <- length(object$lambda.min)
+  alpha <- rep(x=NA,times=object$info$q)
+  beta <- matrix(data=NA,nrow=object$info$p,ncol=object$info$q)
+  for(i in seq_len(q)){
+    temp <- coef(object=object$glm.two[[i]],s=object$lambda.min[i])
+    alpha[i] <- temp[1]
+    beta[,i] <- temp[-1][seq_len(p)]+temp[-1][seq(from=p+1,to=2*p)]
+  }
+  coef <- list(alpha=alpha,beta=beta)
+  return(coef)
+}
+
+#object <- glm.share(x=X_train,y=y_train,family=family)
+#y_hat <- predict(object=object,newx=X_test)
+#coef <- coef(object=object)
+
+glm.common <- function(x,y,family,alpha=1){
+  family <- unique(family)
+  if(length(family)>1){stop("requires unique family")}
+  object <- list()
+  object$info <- get.info(x=x,y=y,family=family)
+  fuse <- fuse.data(x=x,y=y,foldid=NULL)
+  object$cv.glmnet <- glmnet::cv.glmnet(x=fuse$x,y=fuse$y,family=family,alpha=alpha)
+  class(object) <- "glm.common"
+  return(object)
+}
+
+predict.glm.common <- function(object,newx){
+  fuse <- fuse.data(x=newx,y=NULL,foldid=NULL)
+  temp <- stats::predict(object=object$cv.glmnet,newx=fuse$x,s=object$cv.glmnet$lambda.min,type="response")
+  y_hat <- tapply(X=temp,INDEX=fuse$index,FUN=function(x) x)
+  return(y_hat)
+}
+
+coef.glm.common <- function(object){
+  coef <- coef(object=object$cv.glmnet,s="lambda.min")
+  alpha <- rep(x=coef[1],times=object$info$q)
+  beta <- matrix(data=coef[-1],nrow=object$info$p,ncol=object$info$q)
+  list <- list(alpha=alpha,beta=beta)
+  return(list)
+}
+
+#object <- glm.common(x=X_train,y=y_train,family=family)
+#y_hat <- predict(object,newx=X_test)
+#coef <- coef(object)
+
+glm.separate <- function(x,y,family,alpha=1){
+  if(is.matrix(x) & is.matrix(y)){
+    q <- ncol(y)
+    x <- replicate(n=q,expr=x,simplify=FALSE)
+    y <- apply(y,2,function(x) x,simplify=FALSE)
+  }
+  if(length(family)==1){
+    family <- rep(x=family,times=length(y))
+  }
+  object <- list()
+  object$info <- get.info(x=x,y=y,family=family)
+  object$cv.glmnet <- list()
+  for(i in seq_len(object$info$q)){
+    object$cv.glmnet[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family[i],alpha=alpha)
+  }
+  class(object) <- "glm.separate"
+  return(object)
+}
+
+predict.glm.separate <- function(object,newx){
+  if(is.matrix(newx)){
+    newx <- replicate(n=object$info$q,expr=newx,simplify=FALSE) 
+  }
+  q <- length(newx)
+  y_hat <- list()
+  for(i in seq_len(q)){
+    y_hat[[i]] <- predict(object$cv.glmnet[[i]],newx=newx[[i]],s="lambda.min",type="response")
+  }
+  return(y_hat)
+}
+
+coef.glm.separate <- function(object){
+  p <- object$info$p
+  q <- object$info$q
+  alpha <- rep(x=NA,times=q)
+  beta <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    coef <- coef(object$cv.glmnet[[i]],s="lambda.min")
+    alpha[i] <- coef[1]
+    beta[,i] <- coef[-1]
+  }
+  list <- list(alpha=alpha,beta=beta)
+  return(list)
+}
+
+#object <- glm.separate(x=X_train,y=y_train,family=family)
+#y_hat <- predict(object,newx=X_test)
+#coef <- coef(object)
+
+if(FALSE){
+  # family="mgaussian"
+  n <- 100
+  p <- 200
+  q <- 3
+  x <- matrix(data=stats::rnorm(n=n*p),nrow=n,ncol=p)
+  theta <- stats::rbinom(n=p,size=1,prob=0.05)*stats::rnorm(n=p)
+  beta <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    beta[,i] <- theta + stats::rbinom(n=p,size=1,prob=0.05)*stats::rnorm(n=p)
+  }
+  y <- x %*% beta + stats::rnorm(n*q)
+  object <- glmnet::cv.glmnet(x=x,y=y,family="mgaussian")
+  sapply(coef(object,s="lambda.min"),function(x) as.numeric(x))
+  
+  object <- glm.mgaussian(x=x,y=y,family="gaussian")
+  predict(object,newx=x)
+}
+
+glm.mgaussian <- function(x,y,family,alpha){
+  object <- list()
+  family <- unique(family)
+  if(length(family)>1){stop("requires unique family")}
+  if(family!="gaussian"){stop("requires gaussian")}
+  object$cv.glmnet <- glmnet::cv.glmnet(x=x,y=y,family="mgaussian",alpha=alpha)
+  class(object) <- "glm.mgaussian"
+  return(object)
+}
+
+predict.glm.mgaussian <- function(object,newx){
+  y_hat <- predict(object$cv.glmnet,newx=newx,s="lambda.min")
+  apply(y_hat,2,function(x) x,simplify=FALSE)
+}
+
+coef.glm.mgaussian <- function(object){
+  coef <- coef(object$cv.glmnet,s="lambda.min")
+  alpha <- sapply(coef,function(x) x[1])
+  beta <- sapply(coef,function(x) x[-1])
+  list <- list(alpha=alpha,beta=beta)
+  return(list)
+}
+
+glm.transfer <- function(x,y,family,alpha=1){
+  family <- unique(family)
+  if(length(family)>1){stop("glmtrans requires unique family")}
+  q <- length(x)
+  source <- list()
+  for(i in seq_len(q)){
+    source[[i]] <- list(y=y[[i]],x=x[[i]])
+  }
+  object <- list()
+  for(i in seq_len(q)){
+    invisible(utils::capture.output(object[[i]] <- glmtrans::glmtrans(target=list(y=y[[i]],x=x[[i]]),source=source[-i],family=family,alpha=alpha)))
+  }
+  class(object) <- "glm.transfer"
+  return(object)
+}
+
+predict.glm.transfer <- function(object,newx){
+  q <- length(newx)
+  y_hat <- list()
+  for(i in seq_len(q)){
+    y_hat[[i]] <- predict(object=object[[i]],newx=newx[[i]],type="response",s="lambda.min")
+  }
+  return(y_hat)
+}
+
+coef.glm.transfer <- function(object){
+  coef <- sapply(object,function(x) x$beta)
+  alpha <- coef[1,]
+  beta <- coef[-1,]
+  list <- list(alpha=alpha,beta=beta)
+  return(list)
+}
+
+#object <- glm.transfer(x=X_train,y=y_train,family=family)
+#y_hat <- predict(object,newx=X_train)
+#coef(object)
+
+#cor(y_train[[3]],y_hat[[3]])
+
+traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("separate","transfer","comb","common"),type){
+  if(is.list(y_train)){
+    q <- length(y_train)
+  } else {
+    q <- ncol(y_train)
+  }
+  if(length(family)==1){
+    family <- rep(x=family,times=q)
+  }
+  if(is.matrix(y_test)){
+    y_test <- apply(y_test,2,function(x) x,simplify=FALSE)
+  }
+  time <- rep(x=0,times=length(method))
+  names(time) <- method
+  deviance <- auc <- matrix(data=NA,nrow=length(method),ncol=q,dimnames=list(method,NULL))
+  coef <- y_hat <- list()
+  for(i in seq_along(method)){
+    cat("method",method[i],"\n")
+    func <- eval(parse(text=paste0("glm.",method[i])))
+    start <- Sys.time()
+    if(method[i]=="comb"){
+      object <- func(x=X_train,y=y_train,family=family,alpha=alpha,type=type)
+    } else {
+      object <- func(x=X_train,y=y_train,family=family,alpha=alpha)
+    }
+    end <- Sys.time()
+    time[i] <- difftime(time1=end,time2=start,units="secs")
+    if(!is.null(X_test)){
+      y_hat[[i]] <- predict(object,newx=X_test)
+    }
+    if(is.null(y_test)){
+      deviance[i,] <- auc[i,] <- NA
+    } else {
+      for(j in seq_len(q)){
+        deviance[i,j] <- calc.metric(y=y_test[[j]],y_hat=y_hat[[i]][[j]],family=family[j])
+        if(family[j]=="binomial"){
+          auc[i,j] <- pROC::auc(response=y_test[[j]],predictor=as.vector(y_hat[[i]][[j]]),direction="<",levels=c(0,1))
+        }
+      }
+    }
+    coef[[i]] <- coef(object)$beta
+  }
+  names(coef) <- method
+  if(!is.null(X_test)){
+    names(y_hat) <- method
+  }
+  list <- list(time=time,deviance=deviance,auc=auc,coef=coef,y_hat=y_hat)
+  return(list)
+}
+
+crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","transfer","share","retry","common"),type){
+  #if(is.matrix(y) & is.matrix(X)){
+  #  mode <- "multiple"
+  #foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
+  #n <- nrow(y)
+  #q <- ncol(y)
+  #y <- apply(y,2,function(x) x,simplify=FALSE)
+  #X <- replicate(n=q,expr=X,simplify=FALSE)
+  #foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
+  #} else {
+  #  mode <- "transfer"
+  foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+  n <- length(y[[1]])
+  q <- length(y)
+  #} 
+  
+  y_hat <- list()
+  for(j in seq_len(q)){
+    y_hat[[j]] <- matrix(data=NA,nrow=length(y[[j]]),ncol=length(method),dimnames=list(NULL,method))
+  }
+  for(i in seq_len(nfolds)){
+    cat("fold",i,"\n")
+    y_train <- X_train <- X_test <- list()
+    for(j in seq_len(q)){
+      y_train[[j]] <- y[[j]][foldid[[j]]!=i]
+      X_train[[j]] <- X[[j]][foldid[[j]]!=i,,drop=FALSE]
+      X_test[[j]] <- X[[j]][foldid[[j]]==i,,drop=FALSE]
+    }
+    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,family=family,method=method,type=type,alpha=alpha)
+    for(j in seq_len(q)){
+      for(k in method){
+        y_hat[[j]][foldid[[j]]==i,k] <- test$y_hat[[k]][[j]]
+      }
+    }
+  }
+  deviance <- auc <- matrix(data=NA,nrow=length(y),ncol=length(method),dimnames=list(names(y),method))
+  for(j in seq_along(y)){
+    for(k in method){
+      deviance[j,k] <- calc.metric(y=y[[j]],y_hat=y_hat[[j]][,k],family=family)
+      if(family=="binomial"){
+        auc[j,k] <- pROC::auc(response=y[[j]],predictor=as.vector(y_hat[[j]][,k]),direction="<",levels=c(0,1))
+      }
+    }
+  }
+  # refit model on all folds
+  cat("refit on all folds","\n")
+  refit <- traintest(y_train=y,X_train=X,family=family,method=method,type=type,alpha=alpha)
+  list <- list(deviance=deviance,auc=auc,refit=refit)
+  return(list)
+}
+
+#test <- traintest(y_train,X_train,y_test,X_test,family)
+#test <- crossval(y=y_train,X=X_train,family=family)
+
+#truth <- sample(x=c(-1,0,1),size=20,replace=TRUE)
+#estim <- sample(x=c(-1,0,1),size=20,replace=TRUE)
+#table(truth,estim)
+
+count_matrix <- function(truth,estim){
+  if(!is.matrix(truth)){stop()}
+  if(any(dim(truth)!=dim(estim))){stop()}
+  rate <- numeric()
+  for(i in 1:ncol(truth)){
+    rate <- cbind(rate,count_vector(truth=truth[,i],estim=estim[,i]))
+  }
+  return(rate)
+}
+
+count_vector <- function(truth,estim){
+  if(!is.vector(truth)){stop()}
+  if(length(truth)!=length(estim)){stop()}
+  if(!all(truth %in% c(-1,0,1))){stop()}
+  if(!all(estim %in% c(-1,0,1))){stop()}
+  TN <- sum(truth==0 & estim==0)
+  TP <- sum(truth!=0 & estim==truth)
+  #FN <- sum(truth!=0 & estim==0) # original
+  FN <- sum(truth!=0 & estim!=truth)
+  FP <- sum(estim!=0 & estim!=truth)
+  DD <- sum(truth!=0 & truth==-estim)
+  if(TN+TP+FN+FP-DD!=length(truth)){stop()}
+  sensitivity <- (sum(truth==1 & estim==1)+sum(truth==-1 & estim==-1))/sum(truth==1|truth==-1)
+  specificity <- sum(truth==0 & estim==0)/sum(truth==0)
+  #return(c(TN=TN,TP=TP,FN=FN,FP=FP)/length(truth))
+  precision <- (sum(truth==1 & estim==1)+sum(truth==-1 & estim==-1))/(sum(estim==1 | estim==-1))
+  return(c(sensitivity=sensitivity,specificity=specificity,precision=precision))
+}
+
+change <- function(x,y0,y1,main="",increase=TRUE){
+  unique <- unique(x)
+  #graphics::par(mfrow=c(1,1),mar=c(3,3,1,1))
+  graphics::plot.new()
+  xlim <- c(1-0.2,length(unique)+0.2)
+  ylim <- range(c(y0,y1),na.rm=TRUE)
+  graphics::plot.window(xlim=xlim,ylim=ylim)
+  cex.axis <- 0.7
+  graphics::axis(side=1,at=seq_along(unique),labels=unique,tick=FALSE,line=0.5,cex.axis=cex.axis)
+  #graphics::mtext(text="common",at=0.5,side=2,padj=1)
+  graphics::axis(side=2,cex.axis=cex.axis)
+  for(i in seq_along(unique)){
+    cond <- x==unique[i]
+    graphics::segments(x0=i-0.1,y0=y0[cond],x1=i+0.1,y1=y1[cond],col="grey")
+    graphics::points(x=rep(i-0.1,times=sum(cond)),y=y0[cond],col="red",pch=16,cex=0.8)
+    graphics::points(x=rep(i+0.1,times=sum(cond)),y=y1[cond],col="blue",pch=16,cex=0.8)
+    #pvalue <- stats::wilcox.test(x=y0,y=y1,paired=TRUE)$p.value
+  }
+  graphics::title(main=main,line=0)
+  #graphics::title(ylab=main,line=3,font=2)
+  graphics::par(xpd=TRUE)
+  usr <- graphics::par("usr")
+  margin <- 0.1*diff(usr[3:4])
+  if(increase){
+    inferior <- usr[3]
+    superior <- usr[4]
+    margin.inferior <- +margin
+    margin.superior <- -margin
+  } else {
+    inferior <- usr[4]
+    superior <- usr[3]
+    margin.inferior <- -margin
+    margin.superior <- +margin
+  }
+  pos <- xlim[1]-0.15*diff(xlim)
+  graphics::arrows(x0=pos,y0=inferior+margin.inferior,
+                   y1=superior+margin.superior,lwd=2,length=0.08,col="grey")
+  graphics::text(x=pos,y=inferior,labels="-",col="red",font=2,cex=1.2)
+  graphics::text(x=pos,y=superior,labels="+",col="blue",font=2,cex=1.2)
+  graphics::par(xpd=FALSE)
+}
+
+### --- development ---
+# 
+# glm.tidy <- function(x,y,family,alpha.one=0.95,alpha.two=1){
+#   
+#   if(FALSE){
+#     family <- "binomial"
+#     alpha.one <- 0.95
+#     alpha.two <- 1
+#   }
+# 
+#   n <- sapply(X=y,FUN=length)
+#   p <- ncol(x[[1]])
+#   q <- length(x)
+# 
+#   nfolds <- 10
+#   foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+# 
+#   # overall fit
+#   glm.one.ext <- glm.two.ext <- list()
+#   alpha.ext <- rep(x=NA,times=q)
+#   beta.ext <- matrix(data=NA,nrow=p,ncol=q)
+#   for(i in seq_len(q)){
+#     glm.one.ext[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family,alpha=alpha.one,foldid=foldid[[i]])
+#     coef.ext <- coef(object=glm.one.ext[[i]],s="lambda.min")
+#     alpha.ext[i] <- coef.ext[1]
+#     beta.ext[,i] <- coef.ext[-1]
+#   }
+#   
+#   rest.ext <- combcoef(coef=beta.ext,weight=n)
+#   weight <- rest.ext$weight
+#   
+#   exponent <- seq(from=0,to=2,by=0.25)
+#   
+#   for(i in seq_len(q)){
+#     glm.two.ext[[i]] <- list()
+#     for(l in seq_along(exponent)){
+#       penalty.factor <- weight^(exponent[l])
+#       if(any(is.finite(penalty.factor))){
+#         glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family,lower.limits=rest.ext$lower.limits,upper.limits=rest.ext$upper.limits,penalty.factor=penalty.factor,alpha=alpha.two)
+#       }
+#       if(all(is.infinite(penalty.factor))||length(glm.two.ext[[i]][[l]]$lambda)==1){
+#         glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family,lambda=99e99,alpha=alpha.two)
+#       }
+#     }
+#   }
+# 
+#   # cross-validation
+#   y_hat <- list()
+#   for(i in seq_len(q)){
+#     y_hat[[i]] <- list()
+#     for(l in seq_along(exponent)){
+#       nlambda <- length(glm.two.ext[[i]][[l]]$lambda)
+#       y_hat[[i]][[l]] <- matrix(data=NA,nrow=n[i],ncol=nlambda)
+#     }
+#   }
+# 
+#   for(k in seq_len(nfolds)){
+#     for(i in seq_len(q)){
+#       cond <- foldid[[i]]==k
+#       
+#       alpha.int <- alpha.ext
+#       beta.int <- beta.ext
+# 
+#       glm.one.int <- glmnet::glmnet(x=x[[i]][!cond,],y=y[[i]][!cond],family=family,alpha=alpha.one)
+#       coef.int <- coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)
+#       alpha.int[i] <- coef.int[1]
+#       beta.int[,i] <- coef.int[-1]
+#       
+#       rest.int <- combcoef(coef=beta.int,weight=n)
+#       weight <- rest.int$weight
+#     
+#       for(l in seq_along(exponent)){
+#         penalty.factor <- weight^(exponent[l])
+#         if(any(is.finite(penalty.factor))){
+#           glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family,lower.limits=rest.int$lower.limits,upper.limits=rest.int$upper.limits,penalty.factor=penalty.factor,alpha=alpha.two)
+#         }
+#         if(all(is.infinite(penalty.factor))||length(glm.two.int$lambda)==1){
+#           glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family,lambda=99e99,alpha=alpha.two)
+#         }
+#         y_hat[[i]][[l]][cond,] <- predict(object=glm.two.int,newx=cbind(x[[i]],x[[i]])[cond,],s=glm.two.ext[[i]][[l]]$lambda,type="response")
+#       }
+#     }
+#   }
+#   
+#   metric <- list()
+#   id.min <- lambda.min <- rep(x=NA,times=q)
+#   for(i in seq_len(q)){
+#     metric[[i]] <- list()
+#     for(l in seq_along(exponent)){
+#       metric[[i]][[l]] <- apply(X=y_hat[[i]][[l]],MARGIN=2,FUN=function(x)
+#       calc.metric(y=y[[i]],y_hat=x,family=family))
+#     }
+#     min <- sapply(metric[[i]],min)
+#     tryCatch(expr=graphics::plot(x=exponent,y=min,type="o"),error=function(x) NULL)
+#     id.exp <- which.min(min)
+#     id.min[i] <- which.min(metric[[i]][[id.exp]])
+#     lambda.min[i] <- glm.two.ext[[i]][[id.exp]]$lambda[id.min[i]]
+#     glm.two.ext[[i]] <- glm.two.ext[[i]][[id.exp]]
+#   }
+#     
+#   list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,lambda.min=lambda.min,info=data.frame(p=p,q=q))
+#   class(list) <- "glm.share"
+#   return(list)
+# }
+
+
+# This was a working version (2024-07-15).
+glm.retry <- function(x,y,family,alpha.one=0.95,alpha.two=1){
+  
+  n <- sapply(X=y,FUN=base::length)
+  p <- ncol(x[[1]])
+  q <- length(x)
+  
+  nfolds <- 10
+  foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+  
+  # overall fit
+  glm.one.ext <- glm.two.ext <- list()
+  alpha.ext <- rep(x=NA,times=q)
+  beta.ext <- pval.ext.inc <- pval.ext.dec <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    glm.one.ext[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family,alpha=alpha.one) # use fixed foldid?
+    temp <- coef(object=glm.one.ext[[i]],s="lambda.min")
+    alpha.ext[i] <- temp[1]
+    beta.ext[,i] <- temp[-1]
+  }
+  
+  rest.ext <- combcoef(coef=beta.ext,weight=n)
+  
+  exponent <- seq(from=0,to=2,by=0.25)
+  
+  for(i in seq_len(q)){
+    weight <- rest.ext$weight
+    glm.two.ext[[i]] <- list()
+    for(l in seq_along(exponent)){
+      if(all(weight^exponent[l]==0)){
+        glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family,lambda=99e99,alpha=alpha.two)
+      } else {
+        glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family,lower.limits=rest.ext$lower.limits,upper.limits=rest.ext$upper.limits,penalty.factor=1/(weight^exponent[l]),alpha=alpha.two)
+      }
+    }
+  }
+  
+  # cross-validation
+  y_hat <- list()
+  for(i in seq_len(q)){
+    y_hat[[i]] <- list()
+    for(l in seq_along(exponent)){
+      nlambda <- length(glm.two.ext[[i]][[l]]$lambda)
+      y_hat[[i]][[l]] <- matrix(data=NA,nrow=n[i],ncol=nlambda)
+    }
+  }
+  
+  # Changed order of loops on 2024-07-11:
+  
+  #for(k in seq_len(nfolds)){ # original
+  #  alpha.int <- alpha.ext # original
+  #  beta.int <- beta.ext # original
+  #  for(i in seq_len(q)){ # original
+  
+  for(i in seq_len(q)){ # trial   
+    alpha.int <- alpha.ext # trial
+    beta.int <- beta.ext # trial
+    for(k in seq_len(nfolds)){ # trial
+      
+      cond <- foldid[[i]]==k
+      glm.one.int <- glmnet::glmnet(x=x[[i]][!cond,],y=y[[i]][!cond],family=family,alpha=alpha.one)
+      temp <- coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)
+      alpha.int[i] <- temp[1]
+      beta.int[,i] <- temp[-1]
+      
+      rest.int <- combcoef(coef=beta.int,weight=n)
+      
+      cond <- foldid[[i]]==k
+      weight <- rest.int$weight
+      for(l in seq_along(exponent)){
+        if(all(weight^exponent[l]==0)){
+          glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family,lambda=99e99,alpha=alpha.two)
+        } else {
+          glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family,lower.limits=rest.int$lower.limits,upper.limits=rest.int$upper.limits,penalty.factor=1/(weight^exponent[l]),alpha=alpha.two)
+        }
+        y_hat[[i]][[l]][cond,] <- predict(object=glm.two.int,newx=cbind(x[[i]],x[[i]])[cond,],s=glm.two.ext[[i]][[l]]$lambda,type="response")
+      }
+    }
+  }
+  
+  metric <- list()
+  id.min <- lambda.min <- rep(x=NA,times=q)
+  exp.min <- rep(x=NA,times=q)
+  for(i in seq_len(q)){
+    metric[[i]] <- list()
+    for(l in seq_along(exponent)){
+      metric[[i]][[l]] <- apply(X=y_hat[[i]][[l]],MARGIN=2,FUN=function(x)
+        calc.metric(y=y[[i]],y_hat=x,family=family))
+    }
+    min <- sapply(metric[[i]],min)
+    tryCatch(expr=graphics::plot(x=exponent,y=min,type="o"),error=function(x) NULL)
+    id.exp <- which.min(min)
+    exp.min[i] <- exponent[id.exp]
+    id.min[i] <- which.min(metric[[i]][[id.exp]])
+    lambda.min[i] <- glm.two.ext[[i]][[id.exp]]$lambda[id.min[i]]
+    glm.two.ext[[i]] <- glm.two.ext[[i]][[id.exp]]
+  }
+  
+  list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,exp.min=exp.min,lambda.min=lambda.min,info=data.frame(p=p,q=q))
+  class(list) <- "glm.share"
+  return(list)
+}
+
+
+# This was a working version (2024-07-23).
+# (tune weighting of target data and source data)
+glm.both <- function(x,y,family,alpha.one=0.95,alpha.two=1){
+  warning("remove seed")
+  set.seed(1)
+  
+  n <- sapply(X=y,FUN=base::length)
+  p <- ncol(x[[1]])
+  q <- length(x)
+  
+  nfolds <- 10
+  foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+  
+  # overall fit
+  glm.one.ext <- glm.two.ext <- list()
+  alpha.ext <- rep(x=NA,times=q)
+  beta.ext <- pval.ext.inc <- pval.ext.dec <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    glm.one.ext[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family,alpha=alpha.one) # use fixed foldid?
+    temp <- coef(object=glm.one.ext[[i]],s="lambda.min")
+    alpha.ext[i] <- temp[1]
+    beta.ext[,i] <- temp[-1]
+  }
+  
+  cands <- seq(from=0,to=1,by=0.2) # 
+  weight <- expand.grid(source=cands,target=cands) # only for 2nd and 3rd schemes
+  
+  #weight <- data.frame(source=seq(from=0,to=1,by=0.1)) # only for 1st scheme
+  
+  for(i in seq_len(q)){
+    rest.ext <- comb_split(coef=beta.ext,weight=n,id=i)
+    glm.two.ext[[i]] <- list()
+    for(l in seq_len(nrow(weight))){
+      #pf <- 1/(weight$source[l]*rest.ext$weight.source + weight$target[l]*rest.ext$weight.target)
+      #pf <- 1/(weight$source[l]*rest.ext$weight.source + (1-weight$source[l])*rest.ext$weight.target)
+      #pf <- 1/(weight$source[l]*rest.ext$weight.source + weight$target[l]*rest.ext$weight.target) + (weight$source[l]==0 & weight$target[l]==0)
+      pf <- 1/(rest.ext$weight.source^weight$source[l] + rest.ext$weight.target^weight$target[l]) #- (weight$source[l]==0) - (weight$target[l]==0) + (weight$source[l]==0 & weight$target[l]==0))
+      if(all(pf==Inf)){
+        glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family,lambda=99e99,alpha=alpha.two)
+      } else {
+        glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family,lower.limits=rest.ext$lower.limits,upper.limits=rest.ext$upper.limits,penalty.factor=pf,alpha=alpha.two)
+      }
+    }
+  }
+  
+  # cross-validation
+  y_hat <- list()
+  for(i in seq_len(q)){
+    y_hat[[i]] <- list()
+    for(l in seq_len(nrow(weight))){
+      nlambda <- length(glm.two.ext[[i]][[l]]$lambda)
+      y_hat[[i]][[l]] <- matrix(data=NA,nrow=n[i],ncol=nlambda)
+    }
+  }
+  
+  # Changed order of loops on 2024-07-22.
+  
+  #for(k in seq_len(nfolds)){ # original
+  #  alpha.int <- alpha.ext # original
+  #  beta.int <- beta.ext # original
+  #  for(i in seq_len(q)){ # original
+  
+  for(i in seq_len(q)){ # trial
+    alpha.int <- alpha.ext # trial
+    beta.int <- beta.ext # trial
+    for(k in seq_len(nfolds)){ # trial
+      
+      cond <- foldid[[i]]==k
+      glm.one.int <- glmnet::glmnet(x=x[[i]][!cond,],y=y[[i]][!cond],family=family,alpha=alpha.one)
+      temp <- coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)
+      alpha.int[i] <- temp[1]
+      beta.int[,i] <- temp[-1]
+      
+      rest.int <- comb_split(coef=beta.int,weight=n,id=i)
+      
+      for(l in seq_len(nrow(weight))){
+        #pf <- 1/(weight$source[l]*rest.int$weight.source + weight$target[l]*rest.int$weight.target)
+        #pf <- 1/(weight$source[l]*rest.int$weight.source + (1-weight$source[l])*rest.int$weight.target)
+        #pf <- 1/(weight$source[l]*rest.int$weight.source + weight$target[l]*rest.int$weight.target) + (weight$source[l]==0 & weight$target[l]==0)
+        pf <- 1/(rest.int$weight.source^weight$source[l] + rest.int$weight.target^weight$target[l]) #- (weight$source[l]==0) - (weight$target[l]==0) + (weight$source[l]==0 & weight$target[l]==0))
+        if(all(pf==Inf)){
+          glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family,lambda=99e99,alpha=alpha.two)
+        } else {
+          glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family,lower.limits=rest.int$lower.limits,upper.limits=rest.int$upper.limits,penalty.factor=pf,alpha=alpha.two)
+        }
+        y_hat[[i]][[l]][cond,] <- predict(object=glm.two.int,newx=cbind(x[[i]],x[[i]])[cond,],s=glm.two.ext[[i]][[l]]$lambda,type="response")
+      }
+    }
+  }
+  
+  metric <- list()
+  id.min <- lambda.min <- rep(x=NA,times=q)
+  for(i in seq_len(q)){
+    metric[[i]] <- list()
+    for(l in seq_len(nrow(weight))){
+      metric[[i]][[l]] <- apply(X=y_hat[[i]][[l]],MARGIN=2,FUN=function(x)
+        calc.metric(y=y[[i]],y_hat=x,family=family))
+    }
+    min <- sapply(metric[[i]],min)
+    #tryCatch(expr=graphics::plot(x=seq_len(nrow(weight)),y=log(min),type="o"),error=function(x) NULL)
+    #tryCatch(expr=scatterplot3d::scatterplot3d(x=weight$source,y=weight$target,z=min,type="h",color="red",pch=16),error=function(x) NULL)
+    tryCatch(expr=graphics::plot(x=weight$source,y=log(min),type="o"),error=function(x) NULL)
+    
+    id.exp <- which.min(min)
+    id.min[i] <- which.min(metric[[i]][[id.exp]])
+    lambda.min[i] <- glm.two.ext[[i]][[id.exp]]$lambda[id.min[i]]
+    glm.two.ext[[i]] <- glm.two.ext[[i]][[id.exp]]
+  }
+  
+  list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,lambda.min=lambda.min,info=data.frame(p=p,q=q))
+  class(list) <- "glm.share"
+  return(list)
+}
+
+# simulate toy data for multi-task and transfer learning
+if(FALSE){
+  
+  # multi-task learning  
+  n <- 100
+  p <- 200
+  q <- 3
+  x <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
+  beta.com <- stats::rbinom(n=p,size=1,prob=0.1)*stats::rnorm(n=p)
+  beta.sep <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    beta.sep[,i] <- beta.com + stats::rbinom(n=p,size=1,prob=0.05)*stats::rnorm(n=p)
+  }
+  y <- x %*% beta.sep + stats::rnorm(n=n*q)
+  family <- "gaussian"
+  
+  # transfer learning
+  n <- c(50,100,200)
+  p <- 200
+  q <- length(n)
+  x <- list()
+  beta.com <- stats::rbinom(n=p,size=1,prob=0.1)*stats::rnorm(n=p)
+  beta.sep <- list()
+  y <- list()
+  for(i in seq_len(q)){
+    x[[i]] <- matrix(data=stats::rnorm(n=n[i]*p),nrow=n[i],ncol=p)
+    beta.sep[[i]] <- beta.com + stats::rbinom(n=p,size=1,prob=0.05)*stats::rnorm(n=p)
+    y[[i]] <- x[[i]] %*% beta.sep[[i]] + stats::rnorm(n=n[i])
+  }
+  family <- "gaussian"
+  
+  # comparison
+  object <- glm.comb(x=x,y=y,family="gaussian",type="exp")
+  
+}
+
+# This is the current working version (2024-07-23).
+# (multi-task learning and transfer learning)
+# (using all folds for support problems in the case of transfer learning, using only training folds for all problems in the case of multi-target learning)
+
+construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
+  if(type %in% c("geo","geo.con")){
+    pf <- 1/((w_int^v_int)*(w_ext^v_ext))
+  } else if(type %in% c("exp","exp.con")){
+    pf <- 1/((w_int^v_int)+(w_ext^v_ext))
+  } else if(type %in% c("rem","rem.con")){ 
+    pf <- 1/((w_int^v_int)+(w_ext^v_ext)-1*(v_int==0)-1*(v_ext==0))
+  } else if(type %in% c("ari","ari.con")){
+    pf <- 1/(v_int*w_int + v_ext*w_ext)
+  }
+  if(any(pf<0)){stop("negative pf")}
+  return(pf)
+}
+
+plotWeight <- function(x,y){
+  if(cor(x$source,x$target)==-1){
+    graphics::plot(x=x$source,y=y,type="o",xlab="weight source = 1 - weight target")
+  } else {
+    col <- grDevices::grey(level=1-(y-min(y))/(max(y)-min(y)),alpha=1)
+    graphics::plot.new()
+    graphics::plot.window(xlim=range(x$source),ylim=range(x$target))
+    graphics::box()
+    graphics::axis(side=1)
+    graphics::axis(side=2)
+    graphics::title(xlab="weight source",ylab="weight target")
+    graphics::abline(a=1,b=-1)
+    for(i in seq_len(nrow(x))){
+      graphics::points(x=x$source[i],y=x$target[i],col="black",bg=col[i],pch=21,cex=3)
+    }
+  }
+}
+
+glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,nfolds=10,type){ # was alpha.one=0.95 and alpha.two=1
+  
+  alpha.one <- alpha.init
+  alpha.two <- alpha
+  
+  #warning("remove seed")
+  #set.seed(1)
+  cat("type=",type,"\n")
+  
+  #trial <- TRUE # was FALSE
+  #mode <- ""
+  
+  if(is.matrix(y) & is.matrix(x)){
+    message("mode: multi-target learning")
+    p <- ncol(x)
+    q <- ncol(y)
+    n <- rep(x=nrow(x),times=q)
+    foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
+    y <- apply(y,2,function(x) x,simplify=FALSE)
+    x <- replicate(n=q,expr=x,simplify=FALSE)
+    # Write function for creating fold identifiers (balancing unique rows of binary columns of target matrix).
+    #foldid <- sample(rep(x=seq_len(nfolds),length.out=n[1]))
+    foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
+    mode <- "multiple"
+  } else if(is.list(y) & is.list(x)){
+    message("mode: transfer learning")
+    n <- sapply(X=y,FUN=base::length)
+    p <- ncol(x[[1]])
+    q <- length(x)
+    foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+    mode <- "transfer"
+  } else {
+    stop("Provide both x and y either as matrices (multi-target learning) or lists (transfer learning).")
+  }
+  
+  if(length(family)==1){
+    family <- rep(family,times=q)
+  }
+  
+  # standardisation (for initial regressions)
+  y_sta <- x_sta <- list()
+  for(i in seq_len(q)){
+    if(family[i]=="gaussian"){
+      y_sta[[i]] <- scale(y[[i]],center=TRUE,scale=TRUE)
+    } else {
+      y_sta[[i]] <- y[[i]]
+    }
+    x_sta[[i]] <- scale(x[[i]],center=TRUE,scale=TRUE)
+    x_sta[[i]][is.na(x_sta[[i]])] <- 0
+  }
+  
+  #warning("remove temporary line!")
+  #mode <- "multiple"
+  
+  # overall fit
+  glm.one.ext <- glm.two.ext <- list()
+  beta.ext <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    if(is.na(alpha.one)){
+      beta.ext[,i] <- stats::cor(x=x[[i]],y=y[[i]],method="spearman")
+      beta.ext[,i][is.na(beta.ext[,i])] <- 0
+    } else {
+      glm.one.ext[[i]] <- glmnet::cv.glmnet(x=x_sta[[i]],y=y_sta[[i]],family=family[i],alpha=alpha.one,foldid=foldid[[i]],standardize=FALSE)
+      beta.ext[,i] <- coef(object=glm.one.ext[[i]],s="lambda.min")[-1]
+    }
+  }
+  
+  #weight <- c(seq(from=0,to=0.1,by=0.025),0.15,seq(from=0.2,to=0.8,by=0.1),0.85,seq(from=0.9,to=1.0,by=0.025))
+  #warning("remove next line")
+  #weight[weight==0] <- 0.01
+  #weight[weight==1] <- 0.99
+  #weight <- seq(from=0,to=0.5,by=0.1)
+  
+  if(type %in% c("geo","exp","rem","ari")){
+    cands <- seq(from=0,to=1,by=0.2)
+    weight <- expand.grid(source=cands,target=cands)
+  } else if(type %in% c("geo.con","exp.con","rem.con","ari.con")){
+    cands <- seq(from=0,to=1,by=0.05)
+    weight <- data.frame(source=cands,target=1-cands)
+  } else {
+    stop(paste0("Invalid type=",type))
+  }
+  
+  for(i in seq_len(q)){
+    #rest.ext <- comb_split(coef=beta.ext,weight=n,id=i)
+    rest.ext <- comb_split_trial(coef=beta.ext,id=i)
+    glm.two.ext[[i]] <- list()
+    for(l in seq_len(nrow(weight))){
+      
+      # if(trial){
+      #   pf <- 1/(rest.ext$weight.source^weight$source[l]*rest.ext$weight.target^weight$target[l]) # trial!
+      #   #pf <- 1/(rest.ext$weight.source^weight$source[l]+rest.ext$weight.target^weight$target[l]) #- 1*(weight$source[l]==0) - 1*(weight$target[l]==0)) # original #-(weight[l]==0|weight[l]==1)
+      #   #pf <- 1/(rest.ext$weight.source^weight[l]+rest.ext$weight.target^(1-weight[l])) # -(weight[l]==0|weight[l]==1)
+      # } else {
+      #   pf <- 1/(weight$source[l]*rest.ext$weight.source + weight$target[l]*rest.ext$weight.target)
+      # }
+      # if(any(pf<0)){stop("negative pf")}
+      
+      pf <- construct_pf(w_int=rest.ext$weight.target,w_ext=rest.ext$weight.source,v_int=weight$target[l],v_ext=weight$source[l],type=type)
+      
+      
+      if(all(pf==Inf)){
+        glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family[i],lambda=99e99,alpha=alpha.two)
+      } else {
+        glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family[i],lower.limits=rest.ext$lower.limits,upper.limits=rest.ext$upper.limits,penalty.factor=pf,alpha=alpha.two)
+      }
+    }
+  }
+  
+  # cross-validation
+  y_hat <- list()
+  for(i in seq_len(q)){
+    y_hat[[i]] <- list()
+    for(l in seq_len(nrow(weight))){
+      nlambda <- length(glm.two.ext[[i]][[l]]$lambda)
+      y_hat[[i]][[l]] <- matrix(data=NA,nrow=n[i],ncol=nlambda)
+    }
+  }
+  
+  for(k in seq_len(nfolds)){
+    
+    if(mode=="multiple"){
+      beta.int <- matrix(data=NA,nrow=p,ncol=q) 
+      for(i in seq_len(q)){
+        cond <- foldid[[i]]==k # switch to vector?
+        if(is.na(alpha.one)){
+          beta.int[,i] <- stats::cor(x=x[[i]][!cond,],y=y[[i]][!cond],method="spearman")
+          beta.int[,i][is.na(beta.int[,i])] <- 0
+        } else {
+          glm.one.int <- glmnet::glmnet(x=x_sta[[i]][!cond,],y=y_sta[[i]][!cond],family=family[i],alpha=alpha.one,standardize=FALSE)
+          beta.int[,i] <- coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)[-1]
+        }
+      }
+    }
+    
+    for(i in seq_len(q)){
+      
+      if(mode=="transfer"){
+        beta.int <- beta.ext
+        cond <- foldid[[i]]==k
+        if(is.na(alpha.one)){
+          beta.int[,i] <- stats::cor(x=x[[i]][!cond,],y=y[[i]][!cond],method="spearman")
+          beta.int[,i][is.na(beta.int[,i])] <- 0
+        } else {
+          glm.one.int <- glmnet::glmnet(x=x_sta[[i]][!cond,],y=y_sta[[i]][!cond],family=family[i],alpha=alpha.one,standardize=FALSE)
+          beta.int[,i] <- coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)[-1]
+        }
+        
+      }
+      
+      #rest.int <- comb_split(coef=beta.int,weight=n,id=i)
+      rest.int <- comb_split_trial(coef=beta.int,id=i)
+      
+      for(l in seq_len(nrow(weight))){
+        
+        # if(trial){
+        #   pf <- 1/(rest.int$weight.source^weight$source[l]*rest.int$weight.target^weight$target[l]) # trial!
+        #   #pf <- 1/(rest.int$weight.source^weight$source[l]+rest.int$weight.target^weight$target[l]) #- 1*(weight$source[l]==0) - 1*(weight$target[l]==0)) # original
+        #   #pf <- 1/(rest.int$weight.source^weight[l]+rest.int$weight.target^(1-weight[l])) # -(weight[l]==0|weight[l]==1)
+        # } else {
+        #   pf <- 1/(weight$source[l]*rest.int$weight.source + weight$target[l]*rest.int$weight.target)
+        # }
+        # if(any(pf<0)){stop("negative pf")}
+        
+        pf <- construct_pf(w_int=rest.int$weight.target,w_ext=rest.int$weight.source,v_int=weight$target[l],v_ext=weight$source[l],type=type)
+        
+        if(all(pf==Inf)){
+          glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family[i],lambda=99e99,alpha=alpha.two)
+        } else {
+          glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family[i],lower.limits=rest.int$lower.limits,upper.limits=rest.int$upper.limits,penalty.factor=pf,alpha=alpha.two)
+        }
+        y_hat[[i]][[l]][cond,] <- predict(object=glm.two.int,newx=cbind(x[[i]],x[[i]])[cond,],s=glm.two.ext[[i]][[l]]$lambda,type="response")
+      }
+    }
+  }
+  
+  metric <- list()
+  id.min <- lambda.min <- rep(x=NA,times=q)
+  for(i in seq_len(q)){
+    metric[[i]] <- list()
+    for(l in seq_len(nrow(weight))){
+      metric[[i]][[l]] <- apply(X=y_hat[[i]][[l]],MARGIN=2,FUN=function(x)
+        calc.metric(y=y[[i]],y_hat=x,family=family[i]))
+    }
+    min <- sapply(metric[[i]],min)
+    tryCatch(expr=plotWeight(x=weight,y=log(min)),error=function(x) NULL)
+    id.exp <- which.min(min)
+    id.min[i] <- which.min(metric[[i]][[id.exp]])
+    lambda.min[i] <- glm.two.ext[[i]][[id.exp]]$lambda[id.min[i]]
+    glm.two.ext[[i]] <- glm.two.ext[[i]][[id.exp]]
+  }
+  
+  list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,lambda.min=lambda.min,info=data.frame(p=p,q=q,mode=mode,family=paste0(family,collapse=", ")))
+  class(list) <- "glm.share"
+  return(list)
+}
+
+
+if(FALSE){
+  p <- 50
+  x <- stats::rbinom(n=p,size=1,prob=0.4)*stats::runif(n=p)  
+  y <- stats::rbinom(n=p,size=1,prob=0.4)*stats::runif(n=p)
+  #wx <- 0.0
+  #wy <- 0.0
+  #z <- wx*x + wy * y
+  #z <- x^wx + y^wy - (wx==0) - (wy==0) + (wx==0 & wy==0)
+  #z <- z/sum(z)
+  #graphics::par(mfrow=c(1,2))
+  w <- 0.0
+  #z <- w*x + (1-w)*y
+  z <- x^w + y^(1-w) - (w==0|w==1)
+  ymax <- max(z)
+  graphics::plot(x=x,y=z,ylim=c(0,ymax))
+  graphics::plot(x=y,y=z,ylim=c(0,ymax))
+  
+}
+
+
+if(TRUE){
+  # Search for global variables!
+  fun <- objects(all.names=TRUE,pattern="\\.")
+  fun <- objects()
+  for(i in seq_along(fun)){
+    if(fun[i] %in% c("fun","path","i")){next}
+    if(fun[i]==".Random.seed"){next}
+    var <- codetools::findGlobals(fun=fun[i],merge=FALSE)$variables
+    if(length(var)>0){
+      warning(paste0("Global variable(s) in function ",fun[i],": ",paste0(var,collapse=", ")))
+    }
+  }
+}
