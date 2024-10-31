@@ -133,22 +133,34 @@ testthat::test_that("fusing target works",{
 
 truth <- sample(x=c(-1,0,1),size=n,replace=TRUE)
 
+testthat::test_that("metrics are above zero and below one if estim=random",{
+  estim <- sample(truth)
+  metric <- count_vector(truth=truth,estim=estim)
+  testthat::expect_true(all(metric>0 & metric<1))
+})
+
 testthat::test_that("sens=spec=prec=1 if estim=truth",{
   estim <- truth
   metric <- count_vector(truth=truth,estim=estim)
   testthat::expect_true(all(metric==1))
+  metric <- count_vector(truth=abs(truth),estim=abs(estim))
+  testthat::expect_true(all(metric==1))
 })
 
-testthat::test_that("prec=0 if estim=1",{
+testthat::test_that("spec=0 if estim=1",{
   estim <- rep(x=1,times=n)
   metric <- count_vector(truth=truth,estim=estim)
-  testthat::expect_true(metric["specificity"]==0)
+  testthat::expect_true(!metric["sensitivity"] %in% c(0,1) & metric["specificity"]==0 & !metric["precision"] %in% c(0,1))
+  metric <- count_vector(truth=abs(truth),estim=abs(estim))
+  testthat::expect_true(metric["sensitivity"]==1 & metric["specificity"]==0 & !metric["precision"] %in% c(0,1))
 })
 
-testthat::test_that("prec=1 if estim=0",{
+testthat::test_that("sens=0 and prec=1 if estim=0",{
   estim <- rep(x=0,times=n)
   metric <- count_vector(truth=truth,estim=estim)
-  testthat::expect_true(metric["specificity"]==1)
+  testthat::expect_true(metric["sensitivity"]==0 & metric["specificity"]==1 & is.na(metric["precision"]))
+  metric <- count_vector(truth=abs(truth),estim=abs(estim))
+  testthat::expect_true(metric["sensitivity"]==0 & metric["specificity"]==1 & is.na(metric["precision"]))
 })
 
 testthat::test_that("sens=prec=0 and spec=1 if estim=-truth",{
@@ -157,21 +169,36 @@ testthat::test_that("sens=prec=0 and spec=1 if estim=-truth",{
   testthat::expect_true(all(metric[c("sensitivity","precision")]==0) & metric["specificity"]==1)
 })
 
+testthat::test_that("count_matrix agrees with count_vector",{
+  p <- 5
+  truth <- sample(x=c(-1,0,1),size=n,replace=TRUE)
+  estim <- matrix(data=sample(x=c(-1,0,1),size=n*p,replace=TRUE),nrow=n,ncol=p)
+  metric0 <- apply(X=estim,MARGIN=2,FUN=function(x) count_vector(truth=truth,estim=x))  
+  metric1 <- count_matrix(truth=matrix(data=truth,nrow=n,ncol=p),estim=estim)
+  testthat::expect_true(all(metric0==metric1))
+})
 
 #--- construct penalty factors ---
 
 w_int <- stats::runif(n=n)
 w_ext <- stats::runif(n=n)
 
-testthat::test_that("w_tot=w_int-1 if v_int=1 and v_ext=0",{
-  w_tot <- construct_pf(w_int=w_int,w_ext=w_ext,v_int=1,v_ext=0,type="exp")
-  testthat::expect_true(all(abs(1/w_tot-1-w_int)<eps))
+testthat::test_that("w_tot=w_int+1 if v_int=1 and v_ext=0",{
+  w_tot <- 1/construct_pf(w_int=w_int,w_ext=w_ext,v_int=1,v_ext=0,type="exp")
+  testthat::expect_true(all(abs(w_tot-(w_int+1))<eps))
 })
 
-testthat::test_that("w_tot=w_ext if v_int=1 and v_ext=0",{
-  w_tot <- construct_pf(w_int=w_int,w_ext=w_ext,v_int=0,v_ext=1,type="exp")
-  testthat::expect_true(all(abs(1/w_tot-1-w_ext)<eps))
+testthat::test_that("w_tot=w_ext+1 if v_int=1 and v_ext=0",{
+  w_tot <- 1/construct_pf(w_int=w_int,w_ext=w_ext,v_int=0,v_ext=1,type="exp")
+  testthat::expect_true(all(abs(w_tot-(w_ext+1))<eps))
 })
+
+testthat::test_that("w_tot=w_int+w_ext if v_int=1 and v_ext=1",{
+  w_tot <- 1/construct_pf(w_int=w_int,w_ext=w_ext,v_int=1,v_ext=1,type="exp")
+  testthat::expect_true(all(abs(w_tot-(w_int+w_ext)<eps)))
+})
+
+#--- ---
 
 
   
