@@ -1272,6 +1272,7 @@ change <- function(x,y0,y1,main="",increase=TRUE){
     margin.superior <- +margin
   }
   pos <- xlim[1]-0.13*diff(xlim)
+  pos <- usr[2] # trial
   graphics::arrows(x0=pos,y0=inferior+margin.inferior,
                    y1=superior+margin.superior,lwd=2,length=0.08,col="grey")
   graphics::text(x=pos,y=inferior,labels="-",col="red",font=2,cex=1.2)
