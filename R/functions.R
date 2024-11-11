@@ -1231,12 +1231,25 @@ change <- function(x,y0,y1,main="",increase=TRUE){
   xlim <- c(1-0.2,length(unique)+0.2)
   ylim <- range(c(y0,y1),na.rm=TRUE)
   graphics::plot.window(xlim=xlim,ylim=ylim)
-  cex.axis <- 0.7
-  graphics::axis(side=1,at=seq_along(unique),labels=unique,tick=FALSE,line=0.5,cex.axis=cex.axis)
+  cex.axis <- 0.5
+  #if(is.list(unique)){
+  #  for(i in seq_along(unique)){
+  #    #graphics::axis(side=1,at=i,labels=unique[[i]],tick=FALSE,line=0.5,cex.axis=cex.axis)
+  #    graphics::mtext(text=unique[[i]][[1]],side=1,line=0.2,at=i,cex=cex.axis)
+  #    graphics::mtext(text=unique[[i]][[2]],side=1,line=1.2,at=i,cex=cex.axis)
+  #  }
+  #} else {
+    #graphics::axis(side=1,at=seq_along(unique),labels=unique,tick=FALSE,line=0,cex.axis=cex.axis)
+    graphics::mtext(text=unique,side=1,at=seq_along(unique),line=1,cex=cex.axis)  
+  #}
   #graphics::mtext(text="common",at=0.5,side=2,padj=1)
   graphics::axis(side=2,cex.axis=cex.axis)
   for(i in seq_along(unique)){
-    cond <- x==unique[i]
+    #if(is.list(unique)){
+    #  cond <- sapply(X=x,FUN=function(x) x[[1]]==unique[[i]][[1]] & x[[2]]==unique[[i]][[2]])
+    #} else {
+      cond <- x==unique[i]
+    #}
     graphics::segments(x0=i-0.1,y0=y0[cond],x1=i+0.1,y1=y1[cond],col="grey")
     graphics::points(x=rep(i-0.1,times=sum(cond)),y=y0[cond],col="red",pch=16,cex=0.8)
     graphics::points(x=rep(i+0.1,times=sum(cond)),y=y1[cond],col="blue",pch=16,cex=0.8)
@@ -1258,7 +1271,7 @@ change <- function(x,y0,y1,main="",increase=TRUE){
     margin.inferior <- -margin
     margin.superior <- +margin
   }
-  pos <- xlim[1]-0.15*diff(xlim)
+  pos <- xlim[1]-0.13*diff(xlim)
   graphics::arrows(x0=pos,y0=inferior+margin.inferior,
                    y1=superior+margin.superior,lwd=2,length=0.08,col="grey")
   graphics::text(x=pos,y=inferior,labels="-",col="red",font=2,cex=1.2)
