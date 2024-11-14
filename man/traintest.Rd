@@ -15,6 +15,23 @@ traintest(
   type
 )
 }
+\arguments{
+\item{y_train}{target of training samples: vector of length n}
+
+\item{X_train}{features of training samples: n x p matrix}
+
+\item{y_test}{target of testing samples: vector of length m}
+
+\item{X_test}{features of testing samples m x p matrix}
+
+\item{family}{character "gaussian" or "binomial"}
+
+\item{alpha}{elastic net mixing paramter}
+
+\item{method}{character vector}
+
+\item{type}{character}
+}
 \description{
 Trains and test prediction models
 }

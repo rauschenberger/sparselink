@@ -20,3 +20,4 @@ graphics::abline(v=0.5,lty=2)
 graphics::abline(h=0,lty=2)
 
 }
+\keyword{internal}

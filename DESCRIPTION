@@ -3,7 +3,7 @@ Version: 0.0.1
 Title: Sparse regression for related problems
 Description: Estimates sparse regression models (i.e., with few non-zero coefficients) in high-dimensional multi-task learning and transfer learning settings.
 Depends: R (>= 3.0.0)
-Imports: glmnet
+Imports: glmnet, pROC, stats
 Suggests: knitr, testthat, remotes, glmtrans
 Authors@R: person(given="Armin",family="Rauschenberger",email="armin.rauschenberger@uni.lu",role=c("aut","cre"),comment=c(ORCID="0000-0001-6498-4801"))
 License: GPL-3

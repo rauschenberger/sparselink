@@ -2,11 +2,14 @@
 if(FALSE){
   setwd("C:/Users/arauschenberger/Desktop/sparselink/package")
   roxygen2::roxygenise()
+  rcmdcheck::rcmdcheck()
 }
 
 #' @title logit function
 #' 
 #' @param x numeric vector with values in unit interval
+#' 
+#' @keywords internal
 #' 
 #' @examples
 #' x <- seq(from=0,to=1,length.out=100)
@@ -23,6 +26,8 @@ logit <- function(x){
 #' @title Sigmoid function
 #' 
 #' @param x numeric vector
+#' 
+#' @keywords internal
 #'
 #' @examples
 #' x <- seq(from=-3,to=3,length.out=100)
@@ -38,7 +43,9 @@ sigmoid <- function(x){
 #' @title Link function
 #' 
 #' @description
-#' Applies the link function. 
+#' Applies the link function.
+#'
+#' @export
 #' 
 #' @param mu numeric vector (with values in unit interval if family="binomial")
 #' @param family character "gaussian" or "binomial"
@@ -97,6 +104,8 @@ mean.function <- function(eta,family){
 #' @description
 #' Simulates data for transfer learning.
 #' 
+#' @export
+#' 
 #' @param prob.common probability of common effect
 #' @param prob.separate probability of separate effect
 #' @param q number of datasets: integer
@@ -147,8 +156,13 @@ sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,10
 }
 
 #' @title Data simulation for multi-task learning
+#' 
 #' @description
 #' Simulates data for multi-task learning.
+#' 
+#' @export
+#' 
+#' @inheritParams sim.data.transfer
 #' 
 #' @returns
 #' Returns list with slots
@@ -191,6 +205,8 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #' @description
 #' Calculates Gaussian deviance (mean-squared error) and binomial deviance.
 #' 
+#' @export
+#' 
 #' @param y response
 #' @param y_hat predictor
 #' @param family character "gaussian" or "binomial"
@@ -226,6 +242,8 @@ calc.metric <- function(y,y_hat,family){
 }
 
 #' @title  Folds for multi-task learning
+#' 
+#' @export
 #' 
 #' @param y matrix with n rows (samples) and q columns (outcomes)
 #' @param family character "gaussian" or "binomial"
@@ -273,6 +291,8 @@ make.folds.multi <- function(y,family,nfolds=10){
 
 #' @title Folds for transfer learning
 #' 
+#' @export
+#' 
 #' @param y list of q numeric vectors
 #' @inheritParams make.folds.multi
 #' 
@@ -303,8 +323,6 @@ make.folds.trans <- function(y,family,nfolds=10){
   return(foldid)
 }
 
-
-
 get.info <- function(x,y,family){
   if(length(x)!=length(y)){stop("different q")}
   if(any(sapply(X=x,FUN=base::nrow)!=sapply(X=y,FUN=base::length))){stop("different n")}
@@ -317,6 +335,12 @@ get.info <- function(x,y,family){
 }
 
 #' @title Data fusion
+#' 
+#' @export
+#'
+#' @param x list of q matrices, with n_1,...,n_q rows and with p columns
+#' @param y list of q vectors, of length n_1,...,n_q, or NULL (default)
+#' @param foldid list of q vectors, of length n_1,...n_q, or NULL (default)
 #' 
 #' @examples
 #' data <- sim.data.transfer()
@@ -891,11 +915,11 @@ predict.glm.share <- function(object,newx){
   if(is.list(newx)){
     q <- length(newx)
     for(i in seq_len(q)){
-      y_hat[[i]] <- predict(object=object$glm.two[[i]],newx=cbind(newx[[i]],newx[[i]]),s=object$lambda.min[i],type="response")
+      y_hat[[i]] <- stats::predict(object=object$glm.two[[i]],newx=cbind(newx[[i]],newx[[i]]),s=object$lambda.min[i],type="response")
     }
   } else {
     for(i in seq_len(object$info$q)){
-      y_hat[[i]] <- predict(object=object$glm.two[[i]],newx=cbind(newx,newx),s=object$lambda.min[i],type="response")
+      y_hat[[i]] <- stats::predict(object=object$glm.two[[i]],newx=cbind(newx,newx),s=object$lambda.min[i],type="response")
     }
   }
   return(y_hat)
@@ -908,7 +932,7 @@ coef.glm.share <- function(object){
   alpha <- rep(x=NA,times=object$info$q)
   beta <- matrix(data=NA,nrow=object$info$p,ncol=object$info$q)
   for(i in seq_len(q)){
-    temp <- coef(object=object$glm.two[[i]],s=object$lambda.min[i])
+    temp <- stats::coef(object=object$glm.two[[i]],s=object$lambda.min[i])
     alpha[i] <- temp[1]
     beta[,i] <- temp[-1][seq_len(p)]+temp[-1][seq(from=p+1,to=2*p)]
   }
@@ -942,7 +966,7 @@ predict.glm.common <- function(object,newx){
 
 #' @export
 coef.glm.common <- function(object){
-  coef <- coef(object=object$cv.glmnet,s="lambda.min")
+  coef <- stats::coef(object=object$cv.glmnet,s="lambda.min")
   alpha <- rep(x=coef[1],times=object$info$q)
   beta <- matrix(data=coef[-1],nrow=object$info$p,ncol=object$info$q)
   list <- list(alpha=alpha,beta=beta)
@@ -980,7 +1004,7 @@ predict.glm.separate <- function(object,newx){
   q <- length(newx)
   y_hat <- list()
   for(i in seq_len(q)){
-    y_hat[[i]] <- predict(object$cv.glmnet[[i]],newx=newx[[i]],s="lambda.min",type="response")
+    y_hat[[i]] <- stats::predict(object$cv.glmnet[[i]],newx=newx[[i]],s="lambda.min",type="response")
   }
   return(y_hat)
 }
@@ -992,7 +1016,7 @@ coef.glm.separate <- function(object){
   alpha <- rep(x=NA,times=q)
   beta <- matrix(data=NA,nrow=p,ncol=q)
   for(i in seq_len(q)){
-    coef <- coef(object$cv.glmnet[[i]],s="lambda.min")
+    coef <- stats::coef(object$cv.glmnet[[i]],s="lambda.min")
     alpha[i] <- coef[1]
     beta[,i] <- coef[-1]
   }
@@ -1035,13 +1059,13 @@ glm.mgaussian <- function(x,y,family,alpha){
 
 #' @export
 predict.glm.mgaussian <- function(object,newx){
-  y_hat <- predict(object$cv.glmnet,newx=newx,s="lambda.min")
+  y_hat <- stats::predict(object$cv.glmnet,newx=newx,s="lambda.min")
   apply(y_hat,2,function(x) x,simplify=FALSE)
 }
 
 #' @export
 coef.glm.mgaussian <- function(object){
-  coef <- coef(object$cv.glmnet,s="lambda.min")
+  coef <- stats::coef(object$cv.glmnet,s="lambda.min")
   alpha <- sapply(coef,function(x) x[1])
   beta <- sapply(coef,function(x) x[-1])
   list <- list(alpha=alpha,beta=beta)
@@ -1069,7 +1093,7 @@ predict.glm.transfer <- function(object,newx){
   q <- length(newx)
   y_hat <- list()
   for(i in seq_len(q)){
-    y_hat[[i]] <- predict(object=object[[i]],newx=newx[[i]],type="response",s="lambda.min")
+    y_hat[[i]] <- stats::predict(object=object[[i]],newx=newx[[i]],type="response",s="lambda.min")
   }
   return(y_hat)
 }
@@ -1090,9 +1114,19 @@ coef.glm.transfer <- function(object){
 #cor(y_train[[3]],y_hat[[3]])
 
 #' @title Train and test model
+#'
 #' @description
 #' Trains and test prediction models
 #' 
+#' @param y_train target of training samples: vector of length n
+#' @param X_train features of training samples: n x p matrix
+#' @param y_test target of testing samples: vector of length m
+#' @param X_test features of testing samples m x p matrix
+#' @param family character "gaussian" or "binomial"
+#' @param alpha elastic net mixing paramter
+#' @param method character vector
+#' @param type character
+#'
 traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("separate","transfer","comb","common"),type){
   if(is.list(y_train)){
     q <- length(y_train)
@@ -1121,7 +1155,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
     end <- Sys.time()
     time[i] <- difftime(time1=end,time2=start,units="secs")
     if(!is.null(X_test)){
-      y_hat[[i]] <- predict(object,newx=X_test)
+      y_hat[[i]] <- stats::predict(object,newx=X_test)
     }
     if(is.null(y_test)){
       deviance[i,] <- auc[i,] <- NA
@@ -1133,7 +1167,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
         }
       }
     }
-    coef[[i]] <- coef(object)$beta
+    coef[[i]] <- stats::coef(object)$beta
   }
   names(coef) <- method
   if(!is.null(X_test)){
@@ -1693,7 +1727,8 @@ change <- function(x,y0,y1,main="",increase=TRUE){
 #' non-negative scalar
 #' @param v_ext exponent or factor for external weights:
 #' non-negative scalar
-#' @param type
+#' @param type character "geo", "exp", "rem" or "ari"
+#' (with or without addition of ".con")
 #' 
 construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
   if(type %in% c("geo","geo.con")){
@@ -1727,7 +1762,7 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
 #' plotWeight(x=x,y=y)
 #' 
 plotWeight <- function(x,y){
-  if(cor(x$source,x$target)==-1){
+  if(stats::cor(x$source,x$target)==-1){
     graphics::plot(x=x$source,y=y,type="o",xlab="weight source = 1 - weight target")
   } else {
     col <- grDevices::grey(level=1-(y-min(y))/(max(y)-min(y)),alpha=1)
@@ -1825,7 +1860,7 @@ glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,nfolds=10,type){ # was a
       beta.ext[,i][is.na(beta.ext[,i])] <- 0
     } else {
       glm.one.ext[[i]] <- glmnet::cv.glmnet(x=x_sta[[i]],y=y_sta[[i]],family=family[i],alpha=alpha.one,foldid=foldid[[i]],standardize=FALSE)
-      beta.ext[,i] <- coef(object=glm.one.ext[[i]],s="lambda.min")[-1]
+      beta.ext[,i] <- stats::coef(object=glm.one.ext[[i]],s="lambda.min")[-1]
     }
   }
   
@@ -1892,7 +1927,7 @@ glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,nfolds=10,type){ # was a
           beta.int[,i][is.na(beta.int[,i])] <- 0
         } else {
           glm.one.int <- glmnet::glmnet(x=x_sta[[i]][!cond,],y=y_sta[[i]][!cond],family=family[i],alpha=alpha.one,standardize=FALSE)
-          beta.int[,i] <- coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)[-1]
+          beta.int[,i] <- stats::coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)[-1]
         }
       }
     }
@@ -1907,7 +1942,7 @@ glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,nfolds=10,type){ # was a
           beta.int[,i][is.na(beta.int[,i])] <- 0
         } else {
           glm.one.int <- glmnet::glmnet(x=x_sta[[i]][!cond,],y=y_sta[[i]][!cond],family=family[i],alpha=alpha.one,standardize=FALSE)
-          beta.int[,i] <- coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)[-1]
+          beta.int[,i] <- stats::coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)[-1]
         }
         
       }
@@ -1933,7 +1968,7 @@ glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,nfolds=10,type){ # was a
         } else {
           glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family[i],lower.limits=rest.int$lower.limits,upper.limits=rest.int$upper.limits,penalty.factor=pf,alpha=alpha.two)
         }
-        y_hat[[i]][[l]][cond,] <- predict(object=glm.two.int,newx=cbind(x[[i]],x[[i]])[cond,],s=glm.two.ext[[i]][[l]]$lambda,type="response")
+        y_hat[[i]][[l]][cond,] <- stats::predict(object=glm.two.int,newx=cbind(x[[i]],x[[i]])[cond,],s=glm.two.ext[[i]][[l]]$lambda,type="response")
       }
     }
   }

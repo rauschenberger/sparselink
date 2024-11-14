@@ -14,6 +14,21 @@ sim.data.multiple(
   family = "gaussian"
 )
 }
+\arguments{
+\item{prob.common}{probability of common effect}
+
+\item{prob.separate}{probability of separate effect}
+
+\item{q}{number of datasets: integer}
+
+\item{n0}{number of training samples: integer vector of length q}
+
+\item{n1}{number of testing samples for all datasets: integer}
+
+\item{p}{number of features: integer}
+
+\item{family}{character "gaussian" or "binomial"}
+}
 \value{
 Returns list with slots
 y_train (n0 x q matrix),

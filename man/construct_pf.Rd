@@ -19,7 +19,8 @@ non-negative scalar}
 \item{v_ext}{exponent or factor for external weights:
 non-negative scalar}
 
-\item{type}{}
+\item{type}{character "geo", "exp", "rem" or "ari"
+(with or without addition of ".con")}
 }
 \description{
 Uses internal and external weights (for negative and positive effects)
