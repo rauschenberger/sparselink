@@ -223,8 +223,6 @@ calc.metric <- function(y,y_hat,family){
   return(metric)
 }
 
-
-
 #' @title  Folds for multi-task learning
 #' 
 #' @param
@@ -300,6 +298,7 @@ make.folds.trans <- function(y,family,nfolds=10){
 }
 
 
+
 get.info <- function(x,y,family){
   if(length(x)!=length(y)){stop("different q")}
   if(any(sapply(X=x,FUN=base::nrow)!=sapply(X=y,FUN=base::length))){stop("different n")}
@@ -338,7 +337,7 @@ fuse.data <- function(x,y=NULL,foldid=NULL){
   list$index <- rep(x=seq_len(q),times=n)
   return(list)
 }
-# 
+
 # glm.shrink <- function(x,y,family,trial=TRUE){
 #   info <- get.info(x=x,y=y,family=family)
 #   
@@ -1223,6 +1222,12 @@ count_vector <- function(truth,estim){
   precision <- (sum(truth==1 & estim==1)+sum(truth==-1 & estim==-1))/(sum(estim==1 | estim==-1))
   return(c(sensitivity=sensitivity,specificity=specificity,precision=precision))
 }
+
+#' @param x
+#' @param y0
+#' @param y1
+#' @param main
+#' @param increase change to arrow NULL, up, down
 
 change <- function(x,y0,y1,main="",increase=TRUE){
   unique <- unique(x)
