@@ -1,11 +1,11 @@
 
-#' @name arguments
+if(FALSE){
+  setwd("C:/Users/arauschenberger/Desktop/sparselink/package")
+  roxygen2::roxygenise()
+}
+
+#' @title logit function
 #' 
-#' @param x
-#' @param family character "gaussian" or "binomial"
-NULL
-
-
 #' @param x numeric vector with values in unit interval
 #' 
 #' @examples
@@ -20,8 +20,10 @@ logit <- function(x){
   log(x/(1-x))
 }
 
-#' @param x numeric vector
+#' @title Sigmoid function
 #' 
+#' @param x numeric vector
+#'
 #' @examples
 #' x <- seq(from=-3,to=3,length.out=100)
 #' y <- sigmoid(x)
@@ -225,8 +227,9 @@ calc.metric <- function(y,y_hat,family){
 
 #' @title  Folds for multi-task learning
 #' 
-#' @param
-#' @param family
+#' @param y matrix with n rows (samples) and q columns (outcomes)
+#' @param family character "gaussian" or "binomial"
+#' @param nfolds integer between 2 and n
 #' 
 #' @examples
 #' 
@@ -269,6 +272,9 @@ make.folds.multi <- function(y,family,nfolds=10){
 }
 
 #' @title Folds for transfer learning
+#' 
+#' @param y list of q numeric vectors
+#' @inheritParams make.folds.multi
 #' 
 #' @examples
 #' family <- "binomial"
@@ -879,7 +885,7 @@ comb_split_trial <- function(coef,id){
 #   return(list)
 # }
 
-
+#' @export
 predict.glm.share <- function(object,newx){
   y_hat <- list()
   if(is.list(newx)){
@@ -895,6 +901,7 @@ predict.glm.share <- function(object,newx){
   return(y_hat)
 }
 
+#' @export
 coef.glm.share <- function(object){
   p <- object$info$p
   q <- length(object$lambda.min)
@@ -925,6 +932,7 @@ glm.common <- function(x,y,family,alpha=1){
   return(object)
 }
 
+#' @export
 predict.glm.common <- function(object,newx){
   fuse <- fuse.data(x=newx,y=NULL,foldid=NULL)
   temp <- stats::predict(object=object$cv.glmnet,newx=fuse$x,s=object$cv.glmnet$lambda.min,type="response")
@@ -932,6 +940,7 @@ predict.glm.common <- function(object,newx){
   return(y_hat)
 }
 
+#' @export
 coef.glm.common <- function(object){
   coef <- coef(object=object$cv.glmnet,s="lambda.min")
   alpha <- rep(x=coef[1],times=object$info$q)
@@ -963,6 +972,7 @@ glm.separate <- function(x,y,family,alpha=1){
   return(object)
 }
 
+#' @export
 predict.glm.separate <- function(object,newx){
   if(is.matrix(newx)){
     newx <- replicate(n=object$info$q,expr=newx,simplify=FALSE) 
@@ -975,6 +985,7 @@ predict.glm.separate <- function(object,newx){
   return(y_hat)
 }
 
+#' @export
 coef.glm.separate <- function(object){
   p <- object$info$p
   q <- object$info$q
@@ -1022,11 +1033,13 @@ glm.mgaussian <- function(x,y,family,alpha){
   return(object)
 }
 
+#' @export
 predict.glm.mgaussian <- function(object,newx){
   y_hat <- predict(object$cv.glmnet,newx=newx,s="lambda.min")
   apply(y_hat,2,function(x) x,simplify=FALSE)
 }
 
+#' @export
 coef.glm.mgaussian <- function(object){
   coef <- coef(object$cv.glmnet,s="lambda.min")
   alpha <- sapply(coef,function(x) x[1])
@@ -1051,6 +1064,7 @@ glm.transfer <- function(x,y,family,alpha=1){
   return(object)
 }
 
+#' @export
 predict.glm.transfer <- function(object,newx){
   q <- length(newx)
   y_hat <- list()
@@ -1060,6 +1074,7 @@ predict.glm.transfer <- function(object,newx){
   return(y_hat)
 }
 
+#' @export
 coef.glm.transfer <- function(object){
   coef <- sapply(object,function(x) x$beta)
   alpha <- coef[1,]
@@ -1191,6 +1206,11 @@ crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","transfer"
 #estim <- sample(x=c(-1,0,1),size=20,replace=TRUE)
 #table(truth,estim)
 
+#' @title Metrics for sign detection
+#' 
+#' @param truth n times p matrix with entries in -1, 0, 1
+#' @param estim n times p matrix with entries in -1, 0, 1
+#'
 count_matrix <- function(truth,estim){
   if(!is.matrix(truth)){stop()}
   if(any(dim(truth)!=dim(estim))){stop()}
@@ -1201,6 +1221,8 @@ count_matrix <- function(truth,estim){
   return(rate)
 }
 
+#' @title Metrics for sign detection
+#' 
 #' @param truth vector of length p with entries in -1, 0, 1
 #' @param estim vector of length p with entries -1, 0, 1
 #' 
@@ -1223,12 +1245,14 @@ count_vector <- function(truth,estim){
   return(c(sensitivity=sensitivity,specificity=specificity,precision=precision))
 }
 
-#' @param x
-#' @param y0
-#' @param y1
-#' @param main
+#' @title Plot pairwise differences
+#' 
+#' @param x setting: character vector
+#' @param y0 old value: numeric vector
+#' @param y1 new value: numeric vector
+#' @param main title
 #' @param increase change to arrow NULL, up, down
-
+#' 
 change <- function(x,y0,y1,main="",increase=TRUE){
   unique <- unique(x)
   #graphics::par(mfrow=c(1,1),mar=c(3,3,1,1))
@@ -1654,13 +1678,20 @@ change <- function(x,y0,y1,main="",increase=TRUE){
 # (using all folds for support problems in the case of transfer learning, using only training folds for all problems in the case of multi-target learning)
 
 
+#' @title Construct penalty factors
+#' 
+#' @description
+#' Uses internal and external weights (for negative and positive effects)
+#' as well as internal and external exponents/factors for these weights
+#' to construct penalty factors.
+#' 
 #' @param w_int internal weights:
 #' numeric vector of length p with non-negative entries
 #' @param w_ext external weights:
 #' numeric vector of length p with non-negative entries
-#' @param v_int exponent for internal weights:
+#' @param v_int exponent or factor for internal weights:
 #' non-negative scalar
-#' @param v_ext exponent for external weights:
+#' @param v_ext exponent or factor for external weights:
 #' non-negative scalar
 #' @param type
 #' 
@@ -1678,7 +1709,14 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
   return(pf)
 }
 
-
+#' @title Visualise metric that depends on two parameters
+#' 
+#' @description 
+#' Displays values in y in a grey scale (white=lowest, black=highest),
+#' for different combinations of the two variables in x.
+#' The lowest value is indicated by a red cross,
+#' and the lowest value on the diagonal is indicated by a red circle.
+#'
 #' @param x list with slots source and target
 #' @param y numeric vector
 #' 
@@ -1942,7 +1980,7 @@ glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,nfolds=10,type){ # was a
 # }
 
 
-if(TRUE){
+if(FALSE){
   # Search for global variables!
   fun <- objects(all.names=TRUE,pattern="\\.")
   fun <- objects()
