@@ -1,0 +1,18 @@
+citHeader("To cite sparselink in publications use:")
+
+bibentry(
+  bibtype  = "Article",
+  title    = "Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation",
+  author   = c(person("Armin","Rauschenberger"),
+              person("Petr V.","Nazarov"),
+              person("Enrico","Glaab")),
+  journal  = "Manuscript in preparation",
+  year     = 2024,
+  volume   = "X",
+  number   = "X",
+  pages    = "X",
+  doi      = "X",
+  textVersion = paste("Armin Rauschenberger, Petr V. Nazarov, and Enrico Glaab (2024).",
+		"\"Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation\".",
+		"Manuscript in preparation")
+)
