@@ -1127,7 +1127,7 @@ coef.glm.transfer <- function(object){
 #' @param method character vector
 #' @param type character
 #'
-traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("separate","transfer","comb","common"),type){
+traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("separate","transfer","comb","common"),alpha.init,type){
   if(is.list(y_train)){
     q <- length(y_train)
   } else {
@@ -1148,7 +1148,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
     func <- eval(parse(text=paste0("glm.",method[i])))
     start <- Sys.time()
     if(method[i]=="comb"){
-      object <- func(x=X_train,y=y_train,family=family,alpha=alpha,type=type)
+      object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha,type=type)
     } else {
       object <- func(x=X_train,y=y_train,family=family,alpha=alpha)
     }
@@ -1179,7 +1179,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
 
 
 # This cross-validation function only works for transfer learning (not for multi-task learning).
-crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","transfer","share","retry","common"),type){
+crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","transfer","share","retry","common"),alpha.init,type){
   #if(is.matrix(y) & is.matrix(X)){
   #  mode <- "multiple"
   #foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
@@ -1797,7 +1797,7 @@ plotWeight <- function(x,y){
 #' @param nfolds number of cross-validation folds
 #' @param type character
 #' 
-glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,nfolds=10,type){ # was alpha.one=0.95 and alpha.two=1
+glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){ # was alpha.init=0.95 and alpha=1
   
   alpha.one <- alpha.init
   alpha.two <- alpha
