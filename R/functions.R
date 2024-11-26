@@ -1248,9 +1248,10 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","mgauss
   for(i in seq_len(nfolds)){
     cat("fold",i,"\n")
     y_train <- y[foldid!=i,]
+    y_test <- y[foldid==i,]
     X_train <- X[foldid!=i,,drop=FALSE]
     X_test <- X[foldid==i,,drop=FALSE]
-    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type)
+    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,y_test=y_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type)
     for(k in method){
         y_hat[[k]][foldid==i,] <- as.matrix(as.data.frame(test$y_hat[[k]]))
     }
