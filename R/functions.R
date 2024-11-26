@@ -545,14 +545,14 @@ comb_split_trial <- function(coef,id){
   negative <- abs(pmin(0,coef[,id]))
   weight.int <- c(positive,negative)
 
-  #warning("removed weight standardisation")
-  warning("reactivated weight standardisation")
-  if(any(weight.ext!=0)){
-    weight.ext <- weight.ext/sum(weight.ext)
-  }
-  if(any(weight.int!=0)){
-    weight.int <- weight.int/sum(weight.int)
-  }
+  warning("removed weight standardisation")
+  #warning("reactivated weight standardisation")
+  #if(any(weight.ext!=0)){
+  #  weight.ext <- weight.ext/sum(weight.ext)
+  #}
+  #if(any(weight.int!=0)){
+  #  weight.int <- weight.int/sum(weight.int)
+  #}
   #warning("end temporary")
 
   list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight.source=weight.ext,weight.target=weight.int)
