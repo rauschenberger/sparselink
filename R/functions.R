@@ -1182,17 +1182,17 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
 crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","transfer","share","retry","common"),alpha.init,type){
   #if(is.matrix(y) & is.matrix(X)){
   #  mode <- "multiple"
-  #foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
-  #n <- nrow(y)
-  #q <- ncol(y)
-  #y <- apply(y,2,function(x) x,simplify=FALSE)
-  #X <- replicate(n=q,expr=X,simplify=FALSE)
-  #foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
+  #  foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
+  #  n <- nrow(y)
+  #  q <- ncol(y)
+  #  y <- apply(y,2,function(x) x,simplify=FALSE)
+  #  X <- replicate(n=q,expr=X,simplify=FALSE)
+  #  foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
   #} else {
-  #  mode <- "transfer"
-  foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
-  n <- length(y[[1]])
-  q <- length(y)
+    mode <- "transfer"
+    foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+    n <- length(y[[1]])
+    q <- length(y)
   #} 
   
   y_hat <- list()
