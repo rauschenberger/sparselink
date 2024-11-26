@@ -1207,7 +1207,7 @@ crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","transfer"
       X_train[[j]] <- X[[j]][foldid[[j]]!=i,,drop=FALSE]
       X_test[[j]] <- X[[j]][foldid[[j]]==i,,drop=FALSE]
     }
-    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,family=family,method=method,type=type,alpha=alpha)
+    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type)
     for(j in seq_len(q)){
       for(k in method){
         y_hat[[j]][foldid[[j]]==i,k] <- test$y_hat[[k]][[j]]
@@ -1225,7 +1225,7 @@ crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","transfer"
   }
   # refit model on all folds
   cat("refit on all folds","\n")
-  refit <- traintest(y_train=y,X_train=X,family=family,method=method,type=type,alpha=alpha)
+  refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha)
   list <- list(deviance=deviance,auc=auc,refit=refit)
   return(list)
 }
