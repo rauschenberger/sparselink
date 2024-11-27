@@ -1839,6 +1839,15 @@ plotWeight <- function(x,y){
 #' @param nfolds number of cross-validation folds
 #' @param type character
 #' 
+#' @example
+#' # multi-task learning
+#' n <- 100
+#' p <- 50
+#' q <- 2
+#' family <- "gaussian"
+#' x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
+#' y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
+#' 
 glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){ # was alpha.init=0.95 and alpha=1
   
   alpha.one <- alpha.init
@@ -2023,7 +2032,7 @@ glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){ #
       metric[[i]][[l]] <- apply(X=y_hat[[i]][[l]],MARGIN=2,FUN=function(x)
         calc.metric(y=y[[i]],y_hat=x,family=family[i]))
     }
-    min <- sapply(metric[[i]],min)
+    min <- sapply(X=metric[[i]],FUN=min)
     tryCatch(expr=plotWeight(x=weight,y=log(min)),error=function(x) NULL)
     id.exp <- which.min(min)
     id.min[i] <- which.min(metric[[i]][[id.exp]])
