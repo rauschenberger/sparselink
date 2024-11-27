@@ -4,7 +4,7 @@
 \alias{glm.comb}
 \title{Sparse regression for related problems}
 \usage{
-glm.comb(x, y, family, alpha.init = 0.95, alpha = 1, nfolds = 10, type)
+glm.comb(x, y, family, alpha.init = 0.95, alpha = 1, type = "exp", nfolds = 10)
 }
 \arguments{
 \item{x}{n x p matrix (multi-task learning) 
@@ -21,10 +21,21 @@ default: 0.95 (lasso-like elastic net)}
 \item{alpha}{elastic net mixing parameter of final regressions,
 default: 1 (lasso)}
 
-\item{nfolds}{number of cross-validation folds}
-
 \item{type}{character}
+
+\item{nfolds}{number of cross-validation folds}
 }
 \description{
 Sparse regression for related problems
+}
+\examples{
+# multi-task learning
+n <- 100
+p <- 50
+q <- 2
+family <- "gaussian"
+x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
+y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
+object <- glm.comb(x=x,y=y,family=family)
+
 }

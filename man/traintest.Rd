@@ -12,6 +12,7 @@ traintest(
   family,
   alpha,
   method = c("separate", "transfer", "comb", "common"),
+  alpha.init,
   type
 )
 }
@@ -29,6 +30,8 @@ traintest(
 \item{alpha}{elastic net mixing paramter}
 
 \item{method}{character vector}
+
+\item{alpha.init}{elastic net mixing parameter for initial regressions}
 
 \item{type}{character}
 }

@@ -24,3 +24,4 @@ h <- ifelse(family=="binomial",0.5,0)
 graphics::abline(h=h,lty=2)
 
 }
+\keyword{internal}

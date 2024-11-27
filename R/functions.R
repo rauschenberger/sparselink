@@ -6,10 +6,10 @@ if(FALSE){
 }
 
 #' @title logit function
+#' @export
+#' @keywords internal
 #' 
 #' @param x numeric vector with values in unit interval
-#' 
-#' @keywords internal
 #' 
 #' @examples
 #' x <- seq(from=0,to=1,length.out=100)
@@ -24,10 +24,10 @@ logit <- function(x){
 }
 
 #' @title Sigmoid function
+#' @export
+#' @keywords internal
 #' 
 #' @param x numeric vector
-#' 
-#' @keywords internal
 #'
 #' @examples
 #' x <- seq(from=-3,to=3,length.out=100)
@@ -41,12 +41,12 @@ sigmoid <- function(x){
 }
 
 #' @title Link function
+#' @export
+#' @keywords internal
 #' 
 #' @description
 #' Applies the link function.
 #'
-#' @export
-#' 
 #' @param mu numeric vector (with values in unit interval if family="binomial")
 #' @param family character "gaussian" or "binomial"
 #'
@@ -73,6 +73,9 @@ link.function <- function(mu,family){
 }
 
 #' @title Mean function
+#' @export
+#' @keywords internal
+#' 
 #' @description
 #' Applies the mean function (inverse link function).
 #' 
@@ -129,13 +132,20 @@ mean.function <- function(eta,family){
 #' sapply(X=data$X_test,FUN=dim)
 #' dim(data$beta)
 #' 
-sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,200),n1=10000,p=200,family="gaussian"){
+sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,200),n1=10000,p=200,rho=0.5,family="gaussian"){
   n <- n0 + n1
   theta <- stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.common)
   X <- beta <- y <- foldid <- list()
   beta <- matrix(data=NA,nrow=p,ncol=q)
   for(i in seq_len(q)){
-    X[[i]] <- matrix(data=stats::rnorm(n[i]*p),nrow=n[i],ncol=p)
+    if(rho==0){
+      X[[i]] <- matrix(data=stats::rnorm(n[i]*p),nrow=n[i],ncol=p)
+    } else {
+      mean <- rep(x=0,times=p)
+      sigma <- matrix(data=NA,nrow=p,ncol=p)
+      sigma <- rho^abs(row(sigma)-col(sigma))
+      X[[i]] <- mvtnorm::rmvnorm(n=n[i],mean=mean,sigma=sigma)
+    }
     beta[,i] <- theta + stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.separate)
     y[[i]] <- X[[i]] %*% beta[,i] + stats::rnorm(n=n[[i]])
     if(family=="binomial"){
@@ -176,10 +186,17 @@ sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,10
 #' data <- sim.data.multiple()
 #' sapply(X=data,FUN=dim)
 #'  
-sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=10000,p=200,family="gaussian"){
+sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=10000,p=200,rho=0.5,family="gaussian"){
   n <- n0 + n1
   theta <- stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.common)
-  X <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
+  if(rho==0){
+    X <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
+  } else {
+    mean <- rep(x=0,times=p)
+    sigma <- matrix(data=NA,nrow=p,ncol=p)
+    sigma <- rho^abs(row(sigma)-col(sigma))
+    X <- mvtnorm::rmvnorm(n=n,mean=mean,sigma=sigma)
+  }
   y <- matrix(data=NA,nrow=n,ncol=q)
   beta <- matrix(data=NA,nrow=p,ncol=q)
   for(i in seq_len(q)){
@@ -190,7 +207,6 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
     }
   }
   foldid <- rep(x=c(0,1),times=c(n0,n1))
-  
   cond <- foldid==0
   y_train <- y[cond,]
   y_test <- y[!cond,]
@@ -1131,6 +1147,7 @@ coef.glm.transfer <- function(object){
 #' @param y_test target of testing samples: vector of length m
 #' @param X_test features of testing samples m x p matrix
 #' @param family character "gaussian" or "binomial"
+#' @param alpha.init elastic net mixing parameter for initial regressions
 #' @param alpha elastic net mixing paramter
 #' @param method character vector
 #' @param type character
@@ -1155,8 +1172,10 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
     cat("method",method[i],"\n")
     func <- eval(parse(text=paste0("glm.",method[i])))
     start <- Sys.time()
+    hyperpar <- NULL
     if(method[i]=="comb"){
       object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha,type=type)
+      hyperpar <- object$weight.min
     } else {
       object <- func(x=X_train,y=y_train,family=family,alpha=alpha)
     }
@@ -1181,7 +1200,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
   if(!is.null(X_test)){
     names(y_hat) <- method
   }
-  list <- list(time=time,deviance=deviance,auc=auc,coef=coef,y_hat=y_hat)
+  list <- list(time=time,deviance=deviance,auc=auc,coef=coef,y_hat=y_hat,hyperpar=hyperpar)
   return(list)
 }
 
@@ -1834,6 +1853,7 @@ plotWeight <- function(x,y){
 }
 
 #' @title Sparse regression for related problems
+#' @export
 #' @param x n x p matrix (multi-task learning) 
 #' or list of n_k x p matrices (transfer learning)
 #' @param y n x q matrix (multi-task learning)
@@ -1846,11 +1866,11 @@ plotWeight <- function(x,y){
 #' @param nfolds number of cross-validation folds
 #' @param type character
 #' 
-#' @example
+#' @examples
 #' # multi-task learning
 #' n <- 100
 #' p <- 50
-#' q <- 2
+#' q <- 3
 #' family <- "gaussian"
 #' x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 #' y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
@@ -2062,7 +2082,7 @@ glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){ #
     cvm.min[,i] <- sapply(X=metric[[i]],FUN=min)
   }
   weight.ind <- apply(X=cvm.min,MARGIN=2,FUN=which.min)
-  weight.min <- weight[cbind(weight.ind,c(1,2))]
+  weight.min <- weight[weight.ind,]
   
   list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,weight=weight,weight.ind=weight.ind,weight.min=weight.min,lambda.min=lambda.min,info=data.frame(p=p,q=q,mode=mode,family=paste0(family,collapse=", ")))
   class(list) <- "glm.share"

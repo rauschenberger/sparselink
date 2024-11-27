@@ -26,3 +26,4 @@ graphics::abline(v=v,lty=2)
 graphics::abline(h=0,lty=2)
 
 }
+\keyword{internal}
