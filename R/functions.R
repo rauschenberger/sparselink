@@ -911,16 +911,22 @@ comb_split_trial <- function(coef,id){
 # }
 
 #' @export
-predict.glm.share <- function(object,newx){
+predict.glm.share <- function(object,newx,weight=NULL){
+  if(is.null(weight)){
+    id <- object$weight.ind
+  } else {
+    if(length(weight)!=length(object$glm.one)){stop("invalid length")}
+    id <- which(object$weight$source==weight[1] & object$weight$target==weight[2])
+  }
   y_hat <- list()
   if(is.list(newx)){
     q <- length(newx)
     for(i in seq_len(q)){
-      y_hat[[i]] <- stats::predict(object=object$glm.two[[i]],newx=cbind(newx[[i]],newx[[i]]),s=object$lambda.min[i],type="response")
+      y_hat[[i]] <- stats::predict(object=object$glm.two[[i]][[id[i]]],newx=cbind(newx[[i]],newx[[i]]),s=object$lambda.min[id[i],i],type="response")
     }
   } else {
     for(i in seq_len(object$info$q)){
-      y_hat[[i]] <- stats::predict(object=object$glm.two[[i]],newx=cbind(newx,newx),s=object$lambda.min[i],type="response")
+      y_hat[[i]] <- stats::predict(object=object$glm.two[[i]][[id[i]]],newx=cbind(newx,newx),s=object$lambda.min[id[i],i],type="response")
     }
   }
   return(y_hat)
@@ -928,12 +934,13 @@ predict.glm.share <- function(object,newx){
 
 #' @export
 coef.glm.share <- function(object){
+  id <- object$weight.ind
   p <- object$info$p
-  q <- length(object$lambda.min)
+  q <- object$info$q #length(object$lambda.min)
   alpha <- rep(x=NA,times=object$info$q)
   beta <- matrix(data=NA,nrow=object$info$p,ncol=object$info$q)
   for(i in seq_len(q)){
-    temp <- stats::coef(object=object$glm.two[[i]],s=object$lambda.min[i])
+    temp <- stats::coef(object=object$glm.two[[i]][[id[i]]],s=object$lambda.min[id[i],i])
     alpha[i] <- temp[1]
     beta[,i] <- temp[-1][seq_len(p)]+temp[-1][seq(from=p+1,to=2*p)]
   }
@@ -1847,6 +1854,7 @@ plotWeight <- function(x,y){
 #' family <- "gaussian"
 #' x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 #' y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
+#' object <- glm.comb(x=x,y=y,family=family)
 #' 
 glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){ # was alpha.init=0.95 and alpha=1
   
@@ -2024,23 +2032,39 @@ glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){ #
     }
   }
   
+  # # original (until 2024-11-27)
+  # metric <- list()
+  # id.min <- lambda.min <- rep(x=NA,times=q)
+  # for(i in seq_len(q)){
+  #   metric[[i]] <- list()
+  #   for(l in seq_len(nrow(weight))){
+  #     metric[[i]][[l]] <- apply(X=y_hat[[i]][[l]],MARGIN=2,FUN=function(x)
+  #       calc.metric(y=y[[i]],y_hat=x,family=family[i]))
+  #   }
+  #   min <- sapply(X=metric[[i]],FUN=min)
+  #   tryCatch(expr=plotWeight(x=weight,y=log(min)),error=function(x) NULL)
+  #   id.exp <- which.min(min)
+  #   id.min[i] <- which.min(metric[[i]][[id.exp]])
+  #   lambda.min[i] <- glm.two.ext[[i]][[id.exp]]$lambda[id.min[i]]
+  #   glm.two.ext[[i]] <- glm.two.ext[[i]][[id.exp]]
+  # }
+  
   metric <- list()
-  id.min <- lambda.min <- rep(x=NA,times=q)
+  cvm.min <- lambda.ind <- lambda.min <- matrix(data=NA,nrow=nrow(weight),ncol=q)
   for(i in seq_len(q)){
     metric[[i]] <- list()
     for(l in seq_len(nrow(weight))){
       metric[[i]][[l]] <- apply(X=y_hat[[i]][[l]],MARGIN=2,FUN=function(x)
-        calc.metric(y=y[[i]],y_hat=x,family=family[i]))
+      calc.metric(y=y[[i]],y_hat=x,family=family[i]))
+      lambda.ind[l,i] <- which.min(metric[[i]][[l]])
+      lambda.min[l,i] <- glm.two.ext[[i]][[l]]$lambda[lambda.ind[l,i]]
     }
-    min <- sapply(X=metric[[i]],FUN=min)
-    tryCatch(expr=plotWeight(x=weight,y=log(min)),error=function(x) NULL)
-    id.exp <- which.min(min)
-    id.min[i] <- which.min(metric[[i]][[id.exp]])
-    lambda.min[i] <- glm.two.ext[[i]][[id.exp]]$lambda[id.min[i]]
-    glm.two.ext[[i]] <- glm.two.ext[[i]][[id.exp]]
+    cvm.min[,i] <- sapply(X=metric[[i]],FUN=min)
   }
+  weight.ind <- apply(X=cvm.min,MARGIN=2,FUN=which.min)
+  weight.min <- weight[cbind(weight.ind,c(1,2))]
   
-  list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,lambda.min=lambda.min,info=data.frame(p=p,q=q,mode=mode,family=paste0(family,collapse=", ")))
+  list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,weight=weight,weight.ind=weight.ind,weight.min=weight.min,lambda.min=lambda.min,info=data.frame(p=p,q=q,mode=mode,family=paste0(family,collapse=", ")))
   class(list) <- "glm.share"
   return(list)
 }
