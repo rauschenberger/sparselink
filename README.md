@@ -1,8 +1,4 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
+
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/rauschenberger/sparselink?svg=true)](https://ci.appveyor.com/project/rauschenberger/sparselink)
 [![R-CMD-check](https://github.com/rauschenberger/sparselink/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rauschenberger/sparselink/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/rauschenberger/sparselink/graph/badge.svg)](https://app.codecov.io/gh/rauschenberger/sparselink)
