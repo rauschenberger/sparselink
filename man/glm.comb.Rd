@@ -32,7 +32,7 @@ Sparse regression for related problems
 # multi-task learning
 n <- 100
 p <- 50
-q <- 2
+q <- 3
 family <- "gaussian"
 x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)

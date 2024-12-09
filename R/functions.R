@@ -55,13 +55,13 @@ sigmoid <- function(x){
 #' from <- ifelse(family=="binomial",0,-3)
 #' to <- ifelse(family=="binomial",1,3)
 #' mu <- seq(from=from,to=to,length.out=100)
-#' eta <- link.function(mu=mu,family=family)
+#' eta <- link_function(mu=mu,family=family)
 #' graphics::plot(x=mu,y=eta,type="l",main=family)
 #' v <- ifelse(family=="binomial",0.5,0)
 #' graphics::abline(v=v,lty=2)
 #' graphics::abline(h=0,lty=2)
 #' 
-link.function <- function(mu,family){
+link_function <- function(mu,family){
   if(family=="gaussian"){
     eta <- mu
   } else if(family=="binomial"){
@@ -85,13 +85,13 @@ link.function <- function(mu,family){
 #' @examples
 #' family <- "binomial"
 #' eta <- seq(from=-3,to=3,length.out=100)
-#' mu <- mean.function(eta=eta,family=family)
+#' mu <- mean_function(eta=eta,family=family)
 #' graphics::plot(x=eta,y=mu,type="l",main=family)
 #' graphics::abline(v=0,lty=2)
 #' h <- ifelse(family=="binomial",0.5,0)
 #' graphics::abline(h=h,lty=2)
 #' 
-mean.function <- function(eta,family){
+mean_function <- function(eta,family){
   if(family=="gaussian"){
     mu <- eta
   } else if(family=="binomial"){
@@ -116,6 +116,7 @@ mean.function <- function(eta,family){
 #' @param n1 number of testing samples for all datasets: integer
 #' @param p number of features: integer
 #' @param family character "gaussian" or "binomial"
+#' @param rho correlation (for decreasing structure)
 #' 
 #' @returns
 #' Returns a list with slots y_train and X_train for training data,
@@ -523,7 +524,7 @@ comb_split_trial <- function(coef,id){
   # metric <- numeric()
   # for(i in seq_len(ncol(coef))){
   #    eta <- x_sta[[id]] %*% coef[,i]
-  #    y_hat <- mean.function(eta=eta,family=family)
+  #    y_hat <- mean_function(eta=eta,family=family)
   #    metric[i] <- calc.metric(y=y_sta[[id]],y_hat=y_hat,family=family)
   # }
   # mean <- rep(x=y_sta[[i]],times=length(y_sta[[i]]))
@@ -639,7 +640,7 @@ comb_split_trial <- function(coef,id){
 #   for(i in seq_len(q)){
 #     for(j in seq_len(q)){
 #       eta_hat <- alpha[j] + x[[i]] %*% beta[,j]
-#       y_hat <- mean.function(eta=eta_hat,family=family)
+#       y_hat <- mean_function(eta=eta_hat,family=family)
 #       metric[i,j] <- calc.metric(y=y[[i]],y_hat=y_hat,family=family)
 #     }
 #     metric[i,j+1] <- calc.metric(y=y[[i]],y_hat=rep(x=mean(y[[i]]),times=n[i]),family=family)
@@ -1813,6 +1814,8 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
 }
 
 #' @title Visualise metric that depends on two parameters
+#' @export
+#' @keywords internal
 #' 
 #' @description 
 #' Displays values in y in a grey scale (white=lowest, black=highest),

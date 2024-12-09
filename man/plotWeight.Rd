@@ -24,3 +24,4 @@ y <- stats::rexp(n=length(values)*length(values))
 plotWeight(x=x,y=y)
 
 }
+\keyword{internal}

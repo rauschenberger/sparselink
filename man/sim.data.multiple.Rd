@@ -11,6 +11,7 @@ sim.data.multiple(
   n0 = 100,
   n1 = 10000,
   p = 200,
+  rho = 0.5,
   family = "gaussian"
 )
 }
@@ -26,6 +27,8 @@ sim.data.multiple(
 \item{n1}{number of testing samples for all datasets: integer}
 
 \item{p}{number of features: integer}
+
+\item{rho}{correlation (for decreasing structure)}
 
 \item{family}{character "gaussian" or "binomial"}
 }
