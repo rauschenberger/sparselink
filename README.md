@@ -13,7 +13,7 @@ Install the current release from
 [CRAN](https://CRAN.R-project.org/package=sparselink):
 
 ``` r
-install.packages("sparselink")
+#install.packages("sparselink") # not yet available
 ```
 
 or the latest development version from [GitHub](https://github.com/lcsb-bds/sparselink) or [GitLab](https://gitlab.lcsb.uni.lu/bds/sparselink):
@@ -21,7 +21,6 @@ or the latest development version from [GitHub](https://github.com/lcsb-bds/spar
 ``` r
 #install.packages("remotes")
 remotes::install_github("rauschenberger/sparselink")
-remotes::install_gitlab("bds/sparselink",host="gitlab.lcsb.uni.lu") # mirror
 ```
 
 ## Reference
@@ -30,7 +29,7 @@ Armin Rauschenberger
 [![AR](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png)](https://orcid.org/0000-0001-6498-4801),
 Petr V. Nazarov[![PVN](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png)](https://orcid.org/0000-0003-3443-0298),
 and Enrico Glaab
-[![EG](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png)](https://orcid.org/0000-0003-3977-7469) (2023).
+[![EG](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png)](https://orcid.org/0000-0003-3977-7469) (2024).
 "Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation".
 *Manuscript in preparation*.
 
