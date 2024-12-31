@@ -192,14 +192,14 @@ figure_change <- function(){
   
 }
 
-grDevices::postscript(file=file.path(path,"manuscript","fig_sim_multiple.eps"))
+grDevices::postscript(file=file.path(path,"manuscript","fig_sim_multiple.eps"),width=6.5,height=6)
 load(file.path(path,paste0("results/simulation_multiple.RData")))
 model.ref <- "mgaussian"
 model.own <- "comb"
 figure_change()
 grDevices::dev.off()
 
-grDevices::postscript(file=file.path(path,"manuscript","fig_sim_transfer.eps"))
+grDevices::postscript(file=file.path(path,"manuscript","fig_sim_transfer.eps"),width=6.5,height=6)
 load(file.path(path,paste0("results/simulation_transfer.RData")))
 model.ref <- "transfer"
 model.own <- "comb"
@@ -537,8 +537,8 @@ This chunk generates the figure on the predictive performance.
 ```{r transfer_figure,eval=TRUE}
 #<<setup>>
 
-grDevices::postscript(file=file.path(path,"manuscript","fig_app.eps"),width=6,height=4)
-graphics::par(mfrow=c(2,1),mar=c(4,4,1,1),oma=c(0,0,0,0))
+grDevices::postscript(file=file.path(path,"manuscript","fig_app.eps"),width=6.5,height=4)
+graphics::par(mfrow=c(2,1),mar=c(4,2,1,1),oma=c(0,0,0,0))
 load(file.path(path,paste0("results/application.RData")))
 
 reference <- "transfer"
@@ -589,7 +589,7 @@ This chunk generates the figure on feature selection.
 
 - Ensures: file `fig_coef.eps` in folder `manuscript`
 
-```{r interpret_models,eval=TRUE,fig.height=4,fig.width=7}
+```{r interpret_models,eval=TRUE}
 #<<setup>>
 
 load(file.path(path,"results","application.RData"))
