@@ -152,7 +152,7 @@ The following chunk generate the figures for the simulation study.
 
 - Ensures: files `fig_sim_multiple.eps` and `fig_sim_transfer.eps` in folder `manuscript`
 
-```{r simulation_figure,eval=FALSE}
+```{r simulation_figure,eval=TRUE}
 #<<setup>>
 
 caption <- paste(c("\\textbf{Multi-task learning.}","\\textbf{Transfer learning.}"),"Comparison of different measures (rows) between an available method (red) and the proposed method (blue) in different simulation settings (columns), based on the average of three problems",c("(tasks)","(datasets)"),"for each repetition out of ten. Measures: performance metric (mean squared error on hold-out data, as a fraction of the one from standard lasso regression; a point below the dashed line means that",c("multi-task","transfer"),"learning improves predictions), sparsity (number of non-zero coefficients), precision (number of coefficients with correct signs divided by number of non-zero coefficients). The arrows point in the direction of improvement. Settings: percentage of features with a common effect for all problems ($\\pi_\\theta$), percentage of features with a specific effect for each problem ($\\pi_\\delta$).",c("\\label{fig_sim_multiple}","\\label{fig_sim_transfer}"))
