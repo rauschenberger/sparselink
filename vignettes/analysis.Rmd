@@ -13,10 +13,10 @@ vignette: >
 
 ## Working environment
 
-This chunk verifies the working environment. The working directory, specified by the object `path`, must contain the R functions in "package/R/functions.R" as well as the folders "results" and "manuscript". Alternatively, the R functions can be loaded from the R package `sparselink`. This chunk also installs missing R packages from CRAN or Bioconductor. Running this vignette with the option `eval=FALSE` means that figures and tables are generated from previously obtained results.  
+This chunk verifies the working environment. The working directory, specified by the object `path`, must contain the R functions in "package/R/functions.R" as well as the folders "results" and "manuscript". Alternatively, the R functions can be loaded from the R package `sparselink`. This chunk also installs missing R packages from CRAN or Bioconductor. Running this vignette with the option `eval=FALSE` means that figures and tables will be generated from previously obtained results. Running this vignette with the option `eval=TRUE` means that all results will be reproduced (including data download and data processing). It is also possible to execute individual chunks (e.g., for reproducing a specific figure or table), but then it is important to provide the required inputs (e.g., "Requires: file X in folder Y, execution of chunk Z").
 
 ```{r setup,eval=TRUE}
-knitr::opts_chunk$set(eval=FALSE) # Use eval=TRUE for reproducing everything.
+knitr::opts_chunk$set(eval=TRUE) # Use eval=TRUE for reproducing everything.
 path <- "C:/Users/arauschenberger/Desktop/sparselink" # LIH (Windows)
 #path <- "/Users/armin.rauschenberger/Desktop/LIH/sparselink" # LCSB (Mac)
 
