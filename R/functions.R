@@ -1358,7 +1358,7 @@ count_vector <- function(truth,estim){
 #' @param cex.axis numeric
 #' @param cex.main numeric
 #' 
-change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=0.5,increase=TRUE){
+change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
   unique <- unique(x)
   #graphics::par(mfrow=c(1,1),mar=c(3,3,1,1))
   graphics::plot.new()
