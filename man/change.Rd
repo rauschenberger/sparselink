@@ -4,7 +4,7 @@
 \alias{change}
 \title{Plot pairwise differences}
 \usage{
-change(x, y0, y1, main = "", increase = TRUE)
+change(x, y0, y1, main = "", cex.axis = 0.5, cex.main = 0.5, increase = TRUE)
 }
 \arguments{
 \item{x}{setting: character vector}
@@ -14,6 +14,10 @@ change(x, y0, y1, main = "", increase = TRUE)
 \item{y1}{new value: numeric vector}
 
 \item{main}{title}
+
+\item{cex.axis}{numeric}
+
+\item{cex.main}{numeric}
 
 \item{increase}{change to arrow NULL, up, down}
 }

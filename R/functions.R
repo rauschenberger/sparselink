@@ -1355,15 +1355,16 @@ count_vector <- function(truth,estim){
 #' @param y1 new value: numeric vector
 #' @param main title
 #' @param increase change to arrow NULL, up, down
+#' @param cex.axis numeric
+#' @param cex.main numeric
 #' 
-change <- function(x,y0,y1,main="",increase=TRUE){
+change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=0.5,increase=TRUE){
   unique <- unique(x)
   #graphics::par(mfrow=c(1,1),mar=c(3,3,1,1))
   graphics::plot.new()
   xlim <- c(1-0.2,length(unique)+0.2)
   ylim <- range(c(y0,y1),na.rm=TRUE)
   graphics::plot.window(xlim=xlim,ylim=ylim)
-  cex.axis <- 0.5
   #if(is.list(unique)){
   #  for(i in seq_along(unique)){
   #    #graphics::axis(side=1,at=i,labels=unique[[i]],tick=FALSE,line=0.5,cex.axis=cex.axis)
@@ -1387,7 +1388,7 @@ change <- function(x,y0,y1,main="",increase=TRUE){
     graphics::points(x=rep(i+0.1,times=sum(cond)),y=y1[cond],col="blue",pch=16,cex=0.8)
     #pvalue <- stats::wilcox.test(x=y0,y=y1,paired=TRUE)$p.value
   }
-  graphics::title(main=main,line=0)
+  graphics::title(main=main,line=0,cex.main=cex.main)
   #graphics::title(ylab=main,line=3,font=2)
   graphics::par(xpd=TRUE)
   usr <- graphics::par("usr")

@@ -2,9 +2,11 @@
 title: "Analysis code"
 author: "Armin Rauschenberger"
 date: "`r Sys.Date()`"
-output: html_document
-editor_options: 
-  chunk_output_type: console
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{analysis}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 **We obtained our results on 2024-12-29 using R version 4.4.0 (2024-04-24, "Puppy Cup") running on a Dell Latitude 5440 laptop with a 13th Gen Intel(R) Core(TM) i7-1365U processor (1800 Mhz) and the operating system Microsoft Windows 10 Enterprise. The total computation time was around 2 hours (excluding data download, without parallel computing).**
