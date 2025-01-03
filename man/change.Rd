@@ -4,7 +4,7 @@
 \alias{change}
 \title{Plot pairwise differences}
 \usage{
-change(x, y0, y1, main = "", cex.axis = 0.5, cex.main = 0.5, increase = TRUE)
+change(x, y0, y1, main = "", cex.axis = 0.5, cex.main = 1, increase = TRUE)
 }
 \arguments{
 \item{x}{setting: character vector}
