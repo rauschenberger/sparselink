@@ -3,6 +3,7 @@ if(FALSE){
   setwd("C:/Users/arauschenberger/Desktop/sparselink/package")
   roxygen2::roxygenise()
   rcmdcheck::rcmdcheck()
+  pkgdown::check_pkgdown()
 }
 
 #' @title logit function
