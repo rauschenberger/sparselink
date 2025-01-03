@@ -7,7 +7,7 @@ home:
     structure: [links, community, citation, authors, dev]
 
 navbar:
-  title: "transreg"
+  title: "sparselink"
   left:
     - text: "functions"
       href: reference/index.html
