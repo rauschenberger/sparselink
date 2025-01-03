@@ -1,0 +1,36 @@
+url: ~
+template:
+  bootstrap: 5
+
+home:
+  sidebar:
+    structure: [links, community, citation, authors, dev]
+
+navbar:
+  title: "transreg"
+  left:
+    - text: "functions"
+      href: reference/index.html
+    - text: "article"
+      href: articles/article.html
+    - text: "analysis"
+      href: articles/analysis.html
+    - text: "news"
+      href: news/index.html
+
+reference:
+
+- title: "R Package"
+  contents:
+  - transreg-package
+
+- title: "Main functions"
+  contents:
+  - sparselink
+  - coef.sparselink
+  - predict.sparselink
+
+- title: "Other functions"
+  contents:
+  - sim.data.multiple
+  - sim.data.transfer
