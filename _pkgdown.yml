@@ -28,3 +28,12 @@ reference:
   contents:
   - sim.data.multiple
   - sim.data.transfer
+  - calc.metric
+  - change
+  - construct_pf
+  - count_matrix
+  - count_vector
+  - fuse.data
+  - make.folds.multi
+  - make.folds.trans
+  - traintest
