@@ -727,7 +727,7 @@ comb_split_trial <- function(coef,id){
 #   return(list)
 # }
 # 
-# glm.share <- function(x,y,family,alpha.one=0.95,alpha.two=1,drop=FALSE,tune=TRUE){ # Change back to alpha.one=NA (correlation). Under tune=TRUE, alpha.one=Inf (transformed p-values) and alpha.one=0 (ridge) work equally well.
+# sparselink <- function(x,y,family,alpha.one=0.95,alpha.two=1,drop=FALSE,tune=TRUE){ # Change back to alpha.one=NA (correlation). Under tune=TRUE, alpha.one=Inf (transformed p-values) and alpha.one=0 (ridge) work equally well.
 #   
 #   if(!is.na(alpha.one)){warning("Not using correlation!")}
 #   
@@ -923,12 +923,12 @@ comb_split_trial <- function(coef,id){
 #   }
 #   
 #   list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,lambda.min=lambda.min,info=data.frame(p=p,q=q))
-#   class(list) <- "glm.share"
+#   class(list) <- "sparselink"
 #   return(list)
 # }
 
 #' @export
-predict.glm.share <- function(object,newx,weight=NULL){
+predict.sparselink <- function(object,newx,weight=NULL){
   if(is.null(weight)){
     id <- object$weight.ind
   } else {
@@ -950,7 +950,7 @@ predict.glm.share <- function(object,newx,weight=NULL){
 }
 
 #' @export
-coef.glm.share <- function(object){
+coef.sparselink <- function(object){
   id <- object$weight.ind
   p <- object$info$p
   q <- object$info$q #length(object$lambda.min)
@@ -966,7 +966,7 @@ coef.glm.share <- function(object){
 }
 
 
-# #object <- glm.share(x=X_train,y=y_train,family=family)
+# #object <- sparselink(x=X_train,y=y_train,family=family)
 # #y_hat <- predict(object=object,newx=X_test)
 # #coef <- coef(object=object)
 
@@ -1518,7 +1518,7 @@ change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
 #   }
 #     
 #   list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,lambda.min=lambda.min,info=data.frame(p=p,q=q))
-#   class(list) <- "glm.share"
+#   class(list) <- "sparselink"
 #   return(list)
 # }
 
@@ -1622,7 +1622,7 @@ change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
 #   }
 #   
 #   list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,exp.min=exp.min,lambda.min=lambda.min,info=data.frame(p=p,q=q))
-#   class(list) <- "glm.share"
+#   class(list) <- "sparselink"
 #   return(list)
 # }
 # 
@@ -1737,7 +1737,7 @@ change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
 #   }
 #   
 #   list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,lambda.min=lambda.min,info=data.frame(p=p,q=q))
-#   class(list) <- "glm.share"
+#   class(list) <- "sparselink"
 #   return(list)
 # }
 # 
@@ -1773,7 +1773,7 @@ change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
 #   family <- "gaussian"
 #   
 #   # comparison
-#   object <- glm.comb(x=x,y=y,family="gaussian",type="exp")
+#   object <- sparselink(x=x,y=y,family="gaussian",type="exp")
 #   
 # }
 
@@ -1878,9 +1878,9 @@ plotWeight <- function(x,y){
 #' family <- "gaussian"
 #' x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 #' y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
-#' object <- glm.comb(x=x,y=y,family=family)
+#' object <- sparselink(x=x,y=y,family=family)
 #' 
-glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){ # was alpha.init=0.95 and alpha=1
+sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){ # was alpha.init=0.95 and alpha=1
   
   alpha.one <- alpha.init
   alpha.two <- alpha
@@ -2089,7 +2089,7 @@ glm.comb <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){ #
   weight.min <- weight[weight.ind,]
   
   list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,weight=weight,weight.ind=weight.ind,weight.min=weight.min,lambda.min=lambda.min,info=data.frame(p=p,q=q,mode=mode,family=paste0(family,collapse=", ")))
-  class(list) <- "glm.share"
+  class(list) <- "sparselink"
   return(list)
 }
 
