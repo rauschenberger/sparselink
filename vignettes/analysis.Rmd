@@ -50,6 +50,15 @@ for(i in seq_along(pkgs)){
 }
 
 blue <- "blue"; red <- "red"
+
+if(!sim.app&fig.tab){
+  files <- c("simulation_multiple.RData","simulation_transfer.RData","recount3_data.RData","explore_data.RData","application.RData")
+  for(i in seq_along(files)){
+    if(!file.exists(file.path(path,"results",files[i]))){
+      stop("File",files[i],"is missing.")
+    }
+  }
+}
 ```
 
 ## Methods
