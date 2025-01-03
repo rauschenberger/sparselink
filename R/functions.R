@@ -4,6 +4,7 @@ if(FALSE){
   roxygen2::roxygenise()
   rcmdcheck::rcmdcheck()
   pkgdown::check_pkgdown()
+  pkgdown::build_site()
 }
 
 #' @title logit function
