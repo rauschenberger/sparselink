@@ -9,17 +9,19 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-**We obtained our results on 2024-12-31 using R version 4.4.0 (2024-04-24, "Puppy Cup") running on a Dell Latitude 5440 laptop with a 13th Gen Intel(R) Core(TM) i7-1365U processor (1800 Mhz) and the operating system Microsoft Windows 10 Enterprise. The total computation time was around 2 hours (excluding data download, without parallel computing).**
+**We obtained our results on 2025-01-03 using R version 4.4.0 (2024-04-24, "Puppy Cup") running on a Dell Latitude 5440 laptop with a 13th Gen Intel(R) Core(TM) i7-1365U processor (1800 Mhz) and the operating system Microsoft Windows 10 Enterprise. The total computation time was around 2 hours (excluding data download, without parallel computing).**
 
 ## Working environment
 
-This chunk verifies the working environment. The working directory, specified by the object `path`, must contain the R functions in "package/R/functions.R" as well as the folders "results" and "manuscript". Alternatively, the R functions can be loaded from the R package `sparselink`. This chunk also installs missing R packages from CRAN or Bioconductor. Running this vignette with the option `eval=FALSE` means that figures and tables will be generated from previously obtained results. Running this vignette with the option `sim.app=TRUE` (simulation and application) `fig.tab=TRUE` (figures and tables) and means that all results will be reproduced (including data download and data processing). It is also possible to execute individual chunks (e.g., for reproducing a specific figure or table), but then it is important to provide the required inputs (e.g., "Requires: file X in folder Y, execution of chunk Z").
+This vignette includes code chunks with a long computation time (e.g., analysing simulated and experimental data) and code chunks with a short computation time (e.g., generating figures and tables). The logical options `sim.app` and `fig.tab` determine whether the chunks for (i) running the simulation and application or (ii) generating figures and tables are evaluated, respectively. Running this vignette with `sim.app=FALSE` and `fig.tab=TRUE` means that figures and tables will be generated from previously obtained results. Running this vignette with `sim.app=TRUE` and `fig.tab=TRUE`and means that all results will be reproduced (including data download and data processing). It is also possible to execute individual chunks (e.g., for reproducing a specific figure or table), but then it is important to provide the required inputs (e.g., "Requires: file X in folder Y, execution of chunk Z").
 
-```{r eval,echo=FALSE,eval=TRUE}
-knitr::opts_chunk$set(eval=FALSE)
+```{r eval,eval=TRUE}
+knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 sim.app <- FALSE # reproduce simulation and application?
 fig.tab <- FALSE # reproduce figures and tables?
 ```
+
+This chunk verifies the working environment. The working directory, specified by the object `path`, must contain the R functions in "package/R/functions.R" as well as the folders "results" and "manuscript". Alternatively, the R functions can be loaded from the R package `sparselink`. This chunk also installs missing R packages from CRAN or Bioconductor.
 
 ```{r setup,eval=sim.app|fig.tab}
 path <- "C:/Users/arauschenberger/Desktop/sparselink" # LIH (Windows)
