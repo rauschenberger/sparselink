@@ -20,10 +20,6 @@ navbar:
 
 reference:
 
-- title: "R Package"
-  contents:
-  - transreg-package
-
 - title: "Main functions"
   contents:
   - sparselink
