@@ -1860,6 +1860,7 @@ plotWeight <- function(x,y){
 }
 
 #' @title Sparse regression for related problems
+#' 
 #' @export
 #' @param x n x p matrix (multi-task learning) 
 #' or list of n_k x p matrices (transfer learning)
