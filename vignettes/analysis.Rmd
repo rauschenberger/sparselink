@@ -123,11 +123,11 @@ for(mode in c("transfer","multiple")){
     cat("i=",i,"\n")
     if(mode=="transfer"){
       data <- sim.data.transfer(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i])
-      method <- c("separate","transfer","comb")
+      method <- c("glm.separate","glm.transfer","sparselink")
     } else if(mode=="multiple"){
       #--- multi-task learning ---
       data <- sim.data.multiple(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i])
-      method <- c("separate","mgaussian","comb") # add glmnet "mgaussian" (only for linear case) or "MTPS" (not sparse)?
+      method <- c("glm.separate","glm.mgaussian","sparselink") # add glmnet "mgaussian" (only for linear case) or "MTPS" (not sparse)?
     }
     
     result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1)
@@ -201,15 +201,15 @@ figure_change <- function(){
 
 grDevices::postscript(file=file.path(path,"manuscript","fig_sim_multiple.eps"),width=6.5,height=6)
 load(file.path(path,paste0("results/simulation_multiple.RData")))
-model.ref <- "mgaussian"
-model.own <- "comb"
+model.ref <- "glm.mgaussian"
+model.own <- "sparselink"
 figure_change()
 grDevices::dev.off()
 
 grDevices::postscript(file=file.path(path,"manuscript","fig_sim_transfer.eps"),width=6.5,height=6)
 load(file.path(path,paste0("results/simulation_transfer.RData")))
-model.ref <- "transfer"
-model.own <- "comb"
+model.ref <- "glm.transfer"
+model.own <- "sparselink"
 figure_change()
 grDevices::dev.off()
 ```
@@ -524,7 +524,7 @@ for(i in names(project)){
   for(j in seq_len(5)){ # 5 repetitions of 10-fold CV
     set.seed(j)
     codes <- project[[i]]
-    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("separate","transfer","comb","common"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
+    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.transfer","sparselink","glm.common"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
   }
 }
 save(result,project,file=file.path(path,"results","application.RData"))
@@ -548,8 +548,8 @@ grDevices::postscript(file=file.path(path,"manuscript","fig_app.eps"),width=6.5,
 graphics::par(mfrow=c(2,1),mar=c(4,2,1,1),oma=c(0,0,0,0))
 load(file.path(path,paste0("results/application.RData")))
 
-reference <- "transfer"
-experimental <- "comb"
+reference <- "glm.transfer"
+experimental <- "sparselink"
 
 # predictivity
 metric <- lapply(result,function(x) do.call(what="rbind",args=lapply(x,function(x) x$auc))) # DEV and AUC need different directions (increase=FALSE/TRUE)!

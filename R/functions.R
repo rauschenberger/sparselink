@@ -1153,7 +1153,7 @@ coef.glm.transfer <- function(object){
 #' @param method character vector
 #' @param type character
 #'
-traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("separate","transfer","comb","common"),alpha.init,type){
+traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.separate","glm.transfer","sparselink","glm.common"),alpha.init,type){
   if(is.list(y_train)){
     q <- length(y_train)
   } else {
@@ -1171,10 +1171,11 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
   coef <- y_hat <- list()
   for(i in seq_along(method)){
     cat("method",method[i],"\n")
-    func <- eval(parse(text=paste0("glm.",method[i])))
+    #func <- eval(parse(text=paste0("glm.",method[i])))
+    func <- eval(parse(text=paste0(method[i])))
     start <- Sys.time()
     hyperpar <- NULL
-    if(method[i]=="comb"){
+    if(method[i]=="sparselink"){
       object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha,type=type)
       hyperpar <- object$weight.min
     } else {
@@ -1207,7 +1208,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
 
 
 # This cross-validation function only works for transfer learning (not for multi-task learning).
-crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","transfer","share","retry","common"),alpha.init,type){
+crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.transfer","sparselink","glm.common"),alpha.init,type){
   #if(is.matrix(y) & is.matrix(X)){
   #  mode <- "multiple"
   #  foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
@@ -1261,7 +1262,7 @@ crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","transfer"
 
 
 # This cross-validation function only works for transfer learning (not for multi-task learning).
-cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("separate","mgaussian","comb"),alpha.init,type){
+cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink"),alpha.init,type){
   mode <- "multiple"
   foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
   n <- nrow(y)

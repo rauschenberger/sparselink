@@ -11,7 +11,7 @@ traintest(
   X_test = NULL,
   family,
   alpha,
-  method = c("separate", "transfer", "comb", "common"),
+  method = c("glm.separate", "glm.transfer", "sparselink", "glm.common"),
   alpha.init,
   type
 )
