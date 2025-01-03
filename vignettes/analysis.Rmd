@@ -179,7 +179,7 @@ figure_change <- function(){
   
   #--- predictive performance ---
   means <- t(sapply(X=deviance,FUN=rowMeans))
-  means <- means/means[,"separate"]
+  means <- means/means[,"glm.separate"]
   change(x=mode,y0=means[,model.ref],y1=means[,model.own],main="metric",increase=FALSE)
   graphics::abline(h=1,lty=2,col="grey")
   label()
@@ -554,7 +554,7 @@ experimental <- "sparselink"
 # predictivity
 metric <- lapply(result,function(x) do.call(what="rbind",args=lapply(x,function(x) x$auc))) # DEV and AUC need different directions (increase=FALSE/TRUE)!
 metric <- do.call(what="rbind",args=metric)
-metric <- metric/metric[,"separate"]
+metric <- metric/metric[,"glm.separate"]
 #xlab <- refs[rownames(metric)]
 #names <- gsub(pattern="",replacement="\n",x=unlist(project))
 
