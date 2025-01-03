@@ -2,7 +2,7 @@
 title: Sparse regression for related problems
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{article}
+  %\VignetteIndexEntry{Sparse regression for related problems}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
