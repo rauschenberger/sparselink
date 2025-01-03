@@ -1,6 +1,7 @@
 url: https://rauschenberger.github.io/sparselink/
 template:
   bootstrap: 5
+  bootswatch: cerulean
 
 home:
   sidebar:
@@ -19,11 +20,9 @@ navbar:
       href: news/index.html
 
 reference:
-
-- title: "Main functions"
+- title: "Main function"
   contents:
   - sparselink
-
 - title: "Other functions"
   contents:
   - sim.data.multiple
