@@ -1,0 +1,11 @@
+*.pdf
+*.log
+*.Rhistory
+*.DS_Store
+*.aux
+*.html
+*.RData
+*.eps
+*.jpg
+*.jpeg
+*.png
