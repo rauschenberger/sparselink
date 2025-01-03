@@ -23,8 +23,6 @@ reference:
 - title: "Main functions"
   contents:
   - sparselink
-  - coef.sparselink
-  - predict.sparselink
 
 - title: "Other functions"
   contents:
