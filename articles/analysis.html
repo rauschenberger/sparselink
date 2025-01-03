@@ -64,7 +64,7 @@ Rauschenberger</h4>
 
     
     
-<p><strong>We obtained our results on 2024-12-31 using R version 4.4.0
+<p><strong>We obtained our results on 2025-01-03 using R version 4.4.0
 (2024-04-24, “Puppy Cup”) running on a Dell Latitude 5440 laptop with a
 13th Gen Intel(R) Core(TM) i7-1365U processor (1800 Mhz) and the
 operating system Microsoft Windows 10 Enterprise. The total computation
@@ -73,22 +73,32 @@ computing).</strong></p>
 <div class="section level3">
 <h3 id="working-environment">Working environment<a class="anchor" aria-label="anchor" href="#working-environment"></a>
 </h3>
-<p>This chunk verifies the working environment. The working directory,
-specified by the object <code>path</code>, must contain the R functions
-in “package/R/functions.R” as well as the folders “results” and
-“manuscript”. Alternatively, the R functions can be loaded from the R
-package <code>sparselink</code>. This chunk also installs missing R
-packages from CRAN or Bioconductor. Running this vignette with the
-option <code>eval=FALSE</code> means that figures and tables will be
+<p>This vignette includes code chunks with a long computation time
+(e.g., analysing simulated and experimental data) and code chunks with a
+short computation time (e.g., generating figures and tables). The
+logical options <code>sim.app</code> and <code>fig.tab</code> determine
+whether the chunks for (i) running the simulation and application or
+(ii) generating figures and tables are evaluated, respectively. Running
+this vignette with <code>sim.app=FALSE</code> and
+<code>fig.tab=TRUE</code> means that figures and tables will be
 generated from previously obtained results. Running this vignette with
-the option <code>sim.app=TRUE</code> (simulation and application)
-<code>fig.tab=TRUE</code> (figures and tables) and means that all
-results will be reproduced (including data download and data
+<code>sim.app=TRUE</code> and <code>fig.tab=TRUE</code>and means that
+all results will be reproduced (including data download and data
 processing). It is also possible to execute individual chunks (e.g., for
 reproducing a specific figure or table), but then it is important to
 provide the required inputs (e.g., “Requires: file X in folder Y,
 execution of chunk Z”).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>echo<span class="op">=</span><span class="cn">TRUE</span>,eval<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">sim.app</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># reproduce simulation and application?</span></span>
+<span><span class="va">fig.tab</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># reproduce figures and tables?</span></span></code></pre></div>
+<p>This chunk verifies the working environment. The working directory,
+specified by the object <code>path</code>, must contain the R functions
+in “package/R/functions.R” as well as the folders “results” and
+“manuscript”. Alternatively, the R functions can be loaded from the R
+package <code>sparselink</code>. This chunk also installs missing R
+packages from CRAN or Bioconductor.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="st">"C:/Users/arauschenberger/Desktop/sparselink"</span> <span class="co"># LIH (Windows)</span></span>
 <span><span class="co">#path &lt;- "/Users/armin.rauschenberger/Desktop/LIH/sparselink" # LCSB (Mac)</span></span>
 <span></span>
@@ -128,7 +138,7 @@ second</p></li>
 <li><p>Ensures: file <code>fig_flow.eps</code> in folder
 <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span></span>
 <span><span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/postscript.html" class="external-link">postscript</a></span><span class="op">(</span>file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"manuscript"</span>,<span class="st">"fig_flow.eps"</span><span class="op">)</span>,width<span class="op">=</span><span class="fl">6</span>,height<span class="op">=</span><span class="fl">2.5</span><span class="op">)</span></span>
@@ -175,7 +185,7 @@ learning), <code>simulation_multiple.RData</code> (multi-task learning)
 and <code>info_sim.txt</code> (session information) in folder
 <code>results</code></p></li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span></span>
 <span><span class="va">alpha.init</span> <span class="op">&lt;-</span> <span class="fl">0.95</span>; <span class="va">type</span> <span class="op">&lt;-</span> <span class="st">"exp"</span>;  <span class="va">repetitions</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
@@ -232,7 +242,7 @@ second</p></li>
 <code>fig_sim_transfer.eps</code> in folder
 <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span></span>
 <span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\\textbf{Multi-task learning.}"</span>,<span class="st">"\\textbf{Transfer learning.}"</span><span class="op">)</span>,<span class="st">"Comparison of different measures (rows) between an available method (red) and the proposed method (blue) in different simulation settings (columns), based on the average of three problems"</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"(tasks)"</span>,<span class="st">"(datasets)"</span><span class="op">)</span>,<span class="st">"for each repetition out of ten. Measures: performance metric (mean squared error on hold-out data, as a fraction of the one from standard lasso regression; a point below the dashed line means that"</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"multi-task"</span>,<span class="st">"transfer"</span><span class="op">)</span>,<span class="st">"learning improves predictions), sparsity (number of non-zero coefficients), precision (number of coefficients with correct signs divided by number of non-zero coefficients). The arrows point in the direction of improvement. Settings: percentage of features with a common effect for all problems ($\\pi_\\theta$), percentage of features with a specific effect for each problem ($\\pi_\\delta$)."</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\\label{fig_sim_multiple}"</span>,<span class="st">"\\label{fig_sim_transfer}"</span><span class="op">)</span><span class="op">)</span></span>
@@ -252,7 +262,7 @@ second</p></li>
 <span>  </span>
 <span>  <span class="co">#--- predictive performance ---</span></span>
 <span>  <span class="va">means</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span>X<span class="op">=</span><span class="va">deviance</span>,FUN<span class="op">=</span><span class="va">rowMeans</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">means</span> <span class="op">&lt;-</span> <span class="va">means</span><span class="op">/</span><span class="va">means</span><span class="op">[</span>,<span class="st">"separate"</span><span class="op">]</span></span>
+<span>  <span class="va">means</span> <span class="op">&lt;-</span> <span class="va">means</span><span class="op">/</span><span class="va">means</span><span class="op">[</span>,<span class="st">"glm.separate"</span><span class="op">]</span></span>
 <span>  <span class="fu"><a href="../reference/change.html">change</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">mode</span>,y0<span class="op">=</span><span class="va">means</span><span class="op">[</span>,<span class="va">model.ref</span><span class="op">]</span>,y1<span class="op">=</span><span class="va">means</span><span class="op">[</span>,<span class="va">model.own</span><span class="op">]</span>,main<span class="op">=</span><span class="st">"metric"</span>,increase<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span>  <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h<span class="op">=</span><span class="fl">1</span>,lty<span class="op">=</span><span class="fl">2</span>,col<span class="op">=</span><span class="st">"grey"</span><span class="op">)</span></span>
 <span>  <span class="fu">label</span><span class="op">(</span><span class="op">)</span></span>
@@ -299,7 +309,7 @@ application.</p>
 <li><p>Ensures: list <code>project</code> in working
 environment</p></li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">project</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">project</span><span class="op">$</span><span class="va">IBD</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tew (2016)"</span><span class="op">=</span><span class="st">"SRP063496"</span>,</span>
 <span>                 <span class="st">"Haberman (2019)"</span><span class="op">=</span><span class="st">"SRP129004"</span>,</span>
@@ -319,7 +329,7 @@ files</p></li>
 <code>info_data.txt</code> (system information) in folder
 <code>results</code></p></li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span></span>
@@ -347,7 +357,7 @@ seconds</p></li>
 <li><p>Ensures: lists <code>y</code> (targets) and <code>x</code>
 (features) in working environment</p></li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span></span>
@@ -475,7 +485,7 @@ minutes</p></li>
 <code>info_explore.txt</code> (session information) in folder
 <code>results</code></p></li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;preprocess_data&gt;&gt;</span></span>
@@ -526,7 +536,7 @@ second</p></li>
 <li><p>Ensures: files <code>tab_cor.tex</code> and
 <code>tab_auc.tex</code> in folder <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#if(any(unlist(project)!=names(refs))){stop("not compatible")}</span></span>
 <span></span>
@@ -595,7 +605,7 @@ folder <code>results</code> (generated by chunk
 <code>info_app.txt</code> (session information) in folder
 <code>results</code></p></li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;preprocess_data&gt;&gt;</span></span>
@@ -627,7 +637,7 @@ second</p></li>
 <li><p>Ensures: file <code>fig_app.eps</code> in folder
 <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span></span>
 <span><span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/postscript.html" class="external-link">postscript</a></span><span class="op">(</span>file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"manuscript"</span>,<span class="st">"fig_app.eps"</span><span class="op">)</span>,width<span class="op">=</span><span class="fl">6.5</span>,height<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
@@ -640,7 +650,7 @@ second</p></li>
 <span><span class="co"># predictivity</span></span>
 <span><span class="va">metric</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">result</span>,<span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span>what<span class="op">=</span><span class="st">"rbind"</span>,args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">x</span>,<span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">auc</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co"># DEV and AUC need different directions (increase=FALSE/TRUE)!</span></span>
 <span><span class="va">metric</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span>what<span class="op">=</span><span class="st">"rbind"</span>,args<span class="op">=</span><span class="va">metric</span><span class="op">)</span></span>
-<span><span class="va">metric</span> <span class="op">&lt;-</span> <span class="va">metric</span><span class="op">/</span><span class="va">metric</span><span class="op">[</span>,<span class="st">"separate"</span><span class="op">]</span></span>
+<span><span class="va">metric</span> <span class="op">&lt;-</span> <span class="va">metric</span><span class="op">/</span><span class="va">metric</span><span class="op">[</span>,<span class="st">"glm.separate"</span><span class="op">]</span></span>
 <span><span class="co">#xlab &lt;- refs[rownames(metric)]</span></span>
 <span><span class="co">#names &lt;- gsub(pattern="",replacement="\n",x=unlist(project))</span></span>
 <span></span>
@@ -683,7 +693,7 @@ second</p></li>
 <li><p>Ensures: file <code>fig_coef.eps</code> in folder
 <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"results"</span>,<span class="st">"application.RData"</span><span class="op">)</span><span class="op">)</span></span>
