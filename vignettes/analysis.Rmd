@@ -13,10 +13,15 @@ vignette: >
 
 ## Working environment
 
-This chunk verifies the working environment. The working directory, specified by the object `path`, must contain the R functions in "package/R/functions.R" as well as the folders "results" and "manuscript". Alternatively, the R functions can be loaded from the R package `sparselink`. This chunk also installs missing R packages from CRAN or Bioconductor. Running this vignette with the option `eval=FALSE` means that figures and tables will be generated from previously obtained results. Running this vignette with the option `eval=TRUE` means that all results will be reproduced (including data download and data processing). It is also possible to execute individual chunks (e.g., for reproducing a specific figure or table), but then it is important to provide the required inputs (e.g., "Requires: file X in folder Y, execution of chunk Z").
+This chunk verifies the working environment. The working directory, specified by the object `path`, must contain the R functions in "package/R/functions.R" as well as the folders "results" and "manuscript". Alternatively, the R functions can be loaded from the R package `sparselink`. This chunk also installs missing R packages from CRAN or Bioconductor. Running this vignette with the option `eval=FALSE` means that figures and tables will be generated from previously obtained results. Running this vignette with the option `sim.app=TRUE` (simulation and application) `fig.tab=TRUE` (figures and tables) and means that all results will be reproduced (including data download and data processing). It is also possible to execute individual chunks (e.g., for reproducing a specific figure or table), but then it is important to provide the required inputs (e.g., "Requires: file X in folder Y, execution of chunk Z").
 
-```{r setup,eval=TRUE}
-knitr::opts_chunk$set(eval=TRUE) # Use eval=TRUE for reproducing everything.
+```{r eval,echo=FALSE,eval=TRUE}
+knitr::opts_chunk$set(eval=FALSE)
+sim.app <- FALSE # reproduce simulation and application?
+fig.tab <- FALSE # reproduce figures and tables?
+```
+
+```{r setup,eval=sim.app|fig.tab}
 path <- "C:/Users/arauschenberger/Desktop/sparselink" # LIH (Windows)
 #path <- "/Users/armin.rauschenberger/Desktop/LIH/sparselink" # LCSB (Mac)
 
@@ -55,7 +60,7 @@ This chunk generates the figure for the methods section.
 
 - Ensures: file `fig_flow.eps` in folder `manuscript`
 
-```{r method_figure,eval=TRUE}
+```{r method_figure,eval=fig.tab}
 #<<setup>>
 
 grDevices::postscript(file=file.path(path,"manuscript","fig_flow.eps"),width=6,height=2.5)
@@ -101,7 +106,7 @@ This chunk performs the simulation.
 
 - Ensures: files `simulation_transfer.RData` (transfer learning),  `simulation_multiple.RData` (multi-task learning) and `info_sim.txt` (session information) in folder `results`
 
-```{r simulation}
+```{r simulation,eval=sim.app}
 #<<setup>>
 
 alpha.init <- 0.95; type <- "exp";  repetitions <- 10
@@ -154,7 +159,7 @@ The following chunk generate the figures for the simulation study.
 
 - Ensures: files `fig_sim_multiple.eps` and `fig_sim_transfer.eps` in folder `manuscript`
 
-```{r simulation_figure,eval=TRUE}
+```{r simulation_figure,eval=fig.tab}
 #<<setup>>
 
 caption <- paste(c("\\textbf{Multi-task learning.}","\\textbf{Transfer learning.}"),"Comparison of different measures (rows) between an available method (red) and the proposed method (blue) in different simulation settings (columns), based on the average of three problems",c("(tasks)","(datasets)"),"for each repetition out of ten. Measures: performance metric (mean squared error on hold-out data, as a fraction of the one from standard lasso regression; a point below the dashed line means that",c("multi-task","transfer"),"learning improves predictions), sparsity (number of non-zero coefficients), precision (number of coefficients with correct signs divided by number of non-zero coefficients). The arrows point in the direction of improvement. Settings: percentage of features with a common effect for all problems ($\\pi_\\theta$), percentage of features with a specific effect for each problem ($\\pi_\\delta$).",c("\\label{fig_sim_multiple}","\\label{fig_sim_transfer}"))
@@ -219,7 +224,7 @@ This chunk defines the references and the project identifiers for the applicatio
 
 - Ensures: list `project` in working environment
 
-```{r define_projects,eval=TRUE}
+```{r define_projects,eval=fig.tab}
 project <- list()
 project$IBD <- c("Tew (2016)"="SRP063496",
                  "Haberman (2019)"="SRP129004",
@@ -239,7 +244,7 @@ This chunk downloads the data for the application.
 
 - Ensures: files `recount3_data.RData` (data sets) and `info_data.txt` (system information) in folder `results`  
 
-```{r download_data}
+```{r download_data,eval=sim.app}
 #<<setup>>
 #<<define_projects>>
 
@@ -266,7 +271,7 @@ This chunk preprocesses the data.
 
 - Ensures: lists `y` (targets) and `x` (features) in working environment
 
-```{r preprocess_data}
+```{r preprocess_data,eval=sim.app}
 #<<setup>>
 #<<define_projects>>
 
@@ -391,7 +396,7 @@ This chunk performs the exploratory data analysis.
 
 - Ensures: files `explore_data.RData` (results) and `info_explore.txt` (session information) in folder `results`
 
-```{r explore_apply}
+```{r explore_apply,eval=sim.app}
 #<<setup>>
 #<<define_projects>>
 #<<preprocess_data>>
@@ -440,7 +445,7 @@ This chunk generates the tables for the exploratory data analysis.
 
 - Ensures: files `tab_cor.tex` and `tab_auc.tex` in folder `manuscript`
 
-```{r explore_tables,eval=TRUE,results="asis"}
+```{r explore_tables,eval=fig.tab,results="asis"}
 #<<setup>>
 #if(any(unlist(project)!=names(refs))){stop("not compatible")}
 
@@ -505,7 +510,7 @@ This chunk performs the transfer learning analysis.
 
 - Ensures: `application.RData` (results) and `info_app.txt` (session information) in folder `results`
 
-```{r transfer_apply}
+```{r transfer_apply,eval=sim.app}
 #<<setup>>
 #<<define_projects>>
 #<<preprocess_data>>
@@ -536,7 +541,7 @@ This chunk generates the figure on the predictive performance.
 
 - Ensures: file `fig_app.eps` in folder `manuscript`
 
-```{r transfer_figure,eval=TRUE}
+```{r transfer_figure,eval=fig.tab}
 #<<setup>>
 
 grDevices::postscript(file=file.path(path,"manuscript","fig_app.eps"),width=6.5,height=4)
@@ -591,7 +596,7 @@ This chunk generates the figure on feature selection.
 
 - Ensures: file `fig_coef.eps` in folder `manuscript`
 
-```{r interpret_models,eval=TRUE}
+```{r interpret_models,eval=fig.tab}
 #<<setup>>
 
 load(file.path(path,"results","application.RData"))
@@ -638,6 +643,6 @@ grDevices::dev.off()
 
 This chunk saves the session information for generating figures and tables.
 
-```{r session_info,echo=FALSE,eval=TRUE}
+```{r session_info,echo=FALSE,eval=fig.tab}
 writeLines(text=capture.output(utils::sessionInfo(),cat("\n"),      sessioninfo::session_info()),con=paste0(path,"/results/info_figtab.txt"))
 ```
