@@ -29,22 +29,22 @@ testthat::test_that("logit followed by sigmoid returns identity",{
 
 testthat::test_that("Gaussian mean and link functions return identity",{
   eta <- stats::runif(n=n)
-  mu <- mean.function(eta=eta,family="gaussian")
-  eta_new <- link.function(mu=mu,family="gaussian")
+  mu <- mean_function(eta=eta,family="gaussian")
+  eta_new <- link_function(mu=mu,family="gaussian")
   testthat::expect_true(all(eta==mu) & all(eta==eta_new))
 })
 
 testthat::test_that("binomial mean followed by link function returns identity",{
   eta <- stats::rnorm(n=n)
-  mu <- mean.function(eta=eta,family="binomial")
-  eta_new <- link.function(mu=mu,family="binomial")
+  mu <- mean_function(eta=eta,family="binomial")
+  eta_new <- link_function(mu=mu,family="binomial")
   testthat::expect_true(all(abs(eta-eta_new)<=eps))
 })
 
 testthat::test_that("binomial link followed by mean function returns identity",{
   mu <- stats::runif(n=n)
-  eta <- link.function(mu=mu,family="binomial")
-  mu_new <- mean.function(eta=eta,family="binomial")
+  eta <- link_function(mu=mu,family="binomial")
+  mu_new <- mean_function(eta=eta,family="binomial")
   testthat::expect_true(all(abs(mu-mu_new)<=eps))
 })
 

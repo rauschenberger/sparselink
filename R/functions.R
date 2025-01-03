@@ -295,7 +295,7 @@ make.folds.multi <- function(y,family,nfolds=10){
       } else {
         cands <- seq_len(length.out=nfolds)
       }
-      warning("Improve this function!")
+      #warning("Improve this function!")
       if(sum(cond)==1){ # Should this be sum(cond)<=nfolds?
         foldid[cond] <- cands
       } else {
