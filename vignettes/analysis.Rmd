@@ -51,11 +51,13 @@ for(i in seq_along(pkgs)){
 
 blue <- "blue"; red <- "red"
 
-if(!sim.app&fig.tab){
-  files <- c("simulation_multiple.RData","simulation_transfer.RData","recount3_data.RData","explore_data.RData","application.RData")
-  for(i in seq_along(files)){
-    if(!file.exists(file.path(path,"results",files[i]))){
-      stop("File",files[i],"is missing.")
+if(exists("sim.app")&exists("fig.tab")){
+  if(!sim.app&fig.tab){
+    files <- c("simulation_multiple.RData","simulation_transfer.RData","recount3_data.RData","explore_data.RData","application.RData")
+    for(i in seq_along(files)){
+      if(!file.exists(file.path(path,"results",files[i]))){
+        stop("File",files[i],"is missing.")
+      }
     }
   }
 }
@@ -616,9 +618,9 @@ load(file.path(path,"results","application.RData"))
 
 coefs <- list()
 for(i in seq_along(result$IBD)){
-  coefs[[i]] <- result$IBD[[i]]$refit$coef$comb
+  coefs[[i]] <- result$IBD[[i]]$refit$coef$sparselink
   colnames(coefs[[i]]) <- names(project$IBD)
-  rownames(coefs[[i]]) <- rownames(result$IBD[[1]]$refit$coef$transfer) # try to avoid this
+  rownames(coefs[[i]]) <- rownames(result$IBD[[1]]$refit$coef$glm.transfer) # try to avoid this
 }
 
 any <- rowSums(sapply(coefs,function(x) apply(x,1,function(x) any(x!=0))))!=0
