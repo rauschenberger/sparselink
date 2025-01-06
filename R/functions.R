@@ -548,7 +548,7 @@ comb_split_trial <- function(coef,id){
 
   #--- external weights ---
 
-  warning("put back max/min (instead of sum)")
+  #warning("put back max/min (instead of sum)")
   #positive <- apply(X=cor*coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) max(c(0,x)))
   #negative <- apply(X=cor*coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) abs(min(c(0,x))))
 
@@ -564,7 +564,7 @@ comb_split_trial <- function(coef,id){
   negative <- abs(pmin(0,coef[,id]))
   weight.int <- c(positive,negative)
 
-  warning("removed weight standardisation")
+  #warning("removed weight standardisation")
   #warning("reactivated weight standardisation")
   #if(any(weight.ext!=0)){
   #  weight.ext <- weight.ext/sum(weight.ext)
