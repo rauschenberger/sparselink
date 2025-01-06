@@ -23,10 +23,10 @@ $^{\dagger}$Petr V. Nazarov and Enrico Glaab share senior authorship.
 
 # Abstract
 
-to be completed
+Here we propose a simple two-stage procedure for sharing information between related high-dimensional prediction or classification problems. In both stages, we perform sparse regression separately for each problem. While this is done without prior information in the first stage, we use the coefficients from the first stage as prior information for the second stage. Specifically, we designed feature-specific and sign-specific adaptive weights to share information on feature selection, effect directions and effect sizes between different problems. The proposed approach is applicable to multi-task learning as well as transfer learning. It provides sparse models (i.e., with few non-zero coefficients for each problem) that are easy to interpret. We show by simulation and application that it tends to select fewer features while achieving a similar predictive performance as compared to available methods. An implementation is available in the R package 'sparselink' (https://github.com/rauschenberger/sparselink).
 
-# Full text (open access)
+# Full text
 
-Rauschenberger et al. (2024).
+Rauschenberger et al. (2025).
 "Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation".
-*Manuscript in preparation*.
+*Manuscript in preparation*. (Available on [ORBilu](https://hdl.handle.net/10993/63425).)
