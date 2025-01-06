@@ -590,11 +590,12 @@ graphics::axis(side=1,at=length(project$IBD)+0.5,labels="|",tick=FALSE,line=-0.2
 graphics::abline(h=0,lty=2,col="grey")
 grDevices::dev.off()
 
-# percentage change (keep this)
+# percentage change
+# (reported in section 4 "application" subsection 4.3 "transfer learning")
 
 disease <- ifelse(rownames(metric) %in% project$IBD,"IBD",ifelse(rownames(metric) %in% project$RA,"RA",NA))
 
-round(100*colMeans(metric)-100,digits=2)
+#round(100*colMeans(metric)-100,digits=2)
 round(100*colMeans(metric[disease=="IBD",])-100,digits=2)
 round(100*colMeans(metric[disease=="RA",])-100,digits=2)
 
