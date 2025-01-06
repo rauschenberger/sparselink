@@ -16,12 +16,16 @@ Install the current release from
 #install.packages("sparselink") # not yet available
 ```
 
-or the latest development version from [GitHub](https://github.com/rauschenberger/sparselink) or [GitLab](https://gitlab.com/uniluxembourg/lcsb/biomedical-data-science/bds/sparselink):
+or the latest development version from [GitHub](https://github.com/rauschenberger/sparselink):
 
 ``` r
 #install.packages("remotes")
 remotes::install_github("rauschenberger/sparselink")
 ```
+
+This repository is mirrored on two institutional GitLab instances
+([LIH](https://git.lih.lu/bioinformatics-and-ai/sparselink),
+[LCSB](https://gitlab.com/uniluxembourg/lcsb/biomedical-data-science/bds/sparselink)).
 
 ## Reference
 
