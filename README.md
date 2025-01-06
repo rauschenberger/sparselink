@@ -16,7 +16,7 @@ Install the current release from
 #install.packages("sparselink") # not yet available
 ```
 
-or the latest development version from [GitHub](https://github.com/lcsb-bds/sparselink) or [GitLab](https://gitlab.lcsb.uni.lu/bds/sparselink):
+or the latest development version from [GitHub](https://github.com/rauschenberger/sparselink) or [GitLab](https://gitlab.com/uniluxembourg/lcsb/biomedical-data-science/bds/sparselink):
 
 ``` r
 #install.packages("remotes")
@@ -36,7 +36,7 @@ and Enrico Glaab
 
 ## Reproducibility
 
-The code for reproducing the simulations and applications shown in the manuscript is available in a vignette (...). After installing the package with `remotes::install_github("rauschenberger/sparselink",build_vignettes=TRUE)` and restarting R, the vignette can also be loaded with `vignette(topic="...",package="sparselink")`.
+The code for reproducing the simulations and applications shown in the manuscript is available in a vignette ([analysis](https://rauschenberger.github.io/sparselink/articles/analysis.html)). After installing the package with `remotes::install_github("rauschenberger/sparselink",build_vignettes=TRUE)` and restarting R, the vignette can also be loaded with `vignette(topic="analysis",package="sparselink")`.
 
 <!--
 [![CRAN version](https://www.r-pkg.org/badges/version/sparselink)](https://CRAN.R-project.org/package=sparselink)
