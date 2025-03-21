@@ -703,7 +703,6 @@ for(i in seq_len(5)){ # 5 repetitions of 10-fold CV
 }
 
 #test <- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")
-
 ```
 
 
