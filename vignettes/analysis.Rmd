@@ -249,6 +249,7 @@ project$IBD <- c("Tew (2016)"="SRP063496",
 project$RA <- c("Baker (2019)"="SRP169062",
                 "Moncrieffe (2017)"="SRP074736",
                 "Goldberg (2018)"="SRP155483")
+extra <- c("Lewis (2019)"="ERP104864") # https://doi.org/10.1016/j.celrep.2019.07.091
 ```
 
 This chunk downloads the data for the application.
@@ -264,7 +265,7 @@ This chunk downloads the data for the application.
 #<<define_projects>>
 
 data <- list()
-for(i in unlist(project)){
+for(i in c(unlist(project),extra)){
   data[[i]] <- recount3::create_rse_manual(
     project=i,
     project_home="data_sources/sra",
@@ -298,13 +299,13 @@ load(file.path(path,"results/recount3_data.RData"))
 
 # extract features
 x <- list()
-for(i in unlist(project)){
+for(i in c(unlist(project),extra)){
   counts <- t(SummarizedExperiment::assays(data[[i]])$raw_counts)
   colnames(counts) <- SummarizedExperiment::rowRanges(data[[i]])$gene_name
   x[[i]] <- counts
 }
 
-# select most expressed protein-coding genes (for all projects together)
+# select most expressed protein-coding genes (for all TL projects together)
 select <- list()
 total <- numeric()
 for(i in unlist(project)){
@@ -316,13 +317,18 @@ cond <- type=="protein_coding"
 total[,!cond] <- 0
 rank <- apply(X=total,MARGIN=1,FUN=rank)
 mean_rank <- rowMeans(rank)
-temp <- cond & apply(total,2,function(x) all(x>0)) & (mean_rank >= sort(mean_rank[cond],decreasing=TRUE)[2000])
+temp <- cond & apply(total,2,function(x) all(x>0)) & (mean_rank >= sort(mean_rank[cond],decreasing=TRUE)[2000]) # double-check (remove?) second condition
 for(i in unlist(project)){
   select[[i]] <- temp
 }
 
+# select most expressed protein-coding genes (for MTL project)
+mean <- apply(X=x[[extra]],MARGIN=2,FUN=mean)
+temp <- cond & mean >= sort(mean[cond],decreasing=TRUE)[250] # change number
+select[[extra]] <- temp
+
 # pre-processing
-for(i in unlist(project)){
+for(i in c(unlist(project),extra)){
   lib.size <- Matrix::rowSums(x[[i]])
   x[[i]] <- x[[i]][,select[[i]],drop=FALSE]
   norm.factors <- edgeR::calcNormFactors(object=t(x[[i]]),lib.size=lib.size)
@@ -339,7 +345,7 @@ for(i in unlist(project)){
 
 # extract information on samples
 frame <- list()
-for(i in unlist(project)){
+for(i in c(unlist(project),extra)){
   list <- strsplit(data[[i]]$sra.sample_attributes,split="\\|")
   data[[i]]$sra.experiment_attributes
   # What about sra.experiment_attributes?
@@ -656,6 +662,46 @@ for(i in seq_len(nrow(table))){
 graphics::abline(v=seq(from=0.5,to=5.5,by=1))
 grDevices::dev.off()
 ```
+
+## Multi-task learning (under development)
+
+```{r multi-task,eval=FALSE}
+vars <- c("CCP","CRP","crp","DAS28","ESR","esr","HAQ","VAS","SWOLLEN","TENDER") # "inflammatory score" dropped due to NA # "RF" dropped because binary
+Y <- frame$ERP104864[,vars]
+if(any(!is.na(Y$CRP)&!is.na(Y$crp))){
+  stop("Invalid.")
+} else {
+  Y$CRP[is.na(Y$CRP)] <- Y$crp[is.na(Y$CRP)]
+  Y$crp <- NULL
+}
+if(any(!is.na(Y$ESR)&!is.na(Y$esr))){
+  stop("Invalid.")
+} else {
+  Y$ESR[is.na(Y$ESR)] <- Y$esr[is.na(Y$ESR)]
+  Y$esr <- NULL
+}
+for(i in seq_len(ncol(Y))){
+  class(Y[[i]]) <- "numeric"
+}
+cor <- cor(Y,use="pairwise.complete.obs",method="spearman")
+image(t(cor)[,ncol(cor):1])
+
+X <- x$ERP104864
+
+cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x)))
+Y <- as.matrix(Y)[cond,]
+X <- X[cond,]
+
+alpha.init <- 0.95; type <- "exp"
+
+result <- list()
+for(i in seq_len(5)){ # 5 repetitions of 10-fold CV
+  set.seed(i)
+  result[[i]] <- cv.multiple(y=Y,X=X,family="gaussian",method=c("glm.separate","glm.mgaussian","sparselink"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
+}
+
+```
+
 
 This chunk saves the session information for generating figures and tables.
 
