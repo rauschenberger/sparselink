@@ -1263,7 +1263,7 @@ crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.t
 
 
 
-# This cross-validation function only works for transfer learning (not for multi-task learning).
+# This cross-validation function only works for multi-task learning (not for transfer learning).
 cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink"),alpha.init,type){
   mode <- "multiple"
   foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
