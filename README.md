@@ -24,7 +24,7 @@ remotes::install_github("rauschenberger/sparselink")
 ```
 
 This repository is mirrored on two institutional GitLab instances
-([LIH](https://git.lih.lu/bioinformatics-and-ai/sparselink),
+(see [LIH](https://git.lih.lu/bioinformatics-and-ai/sparselink) and 
 [LCSB](https://gitlab.com/uniluxembourg/lcsb/biomedical-data-science/bds/sparselink)).
 
 ## Reference
