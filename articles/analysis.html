@@ -788,13 +788,17 @@ second</p></li>
 <span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">[</span><span class="va">cond</span>,<span class="op">]</span></span>
 <span><span class="va">X</span> <span class="op">&lt;-</span> <span class="va">X</span><span class="op">[</span><span class="va">cond</span>,<span class="op">]</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">)</span>,<span class="va">Y</span>,method<span class="op">=</span><span class="st">"spearman"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">alpha.init</span> <span class="op">&lt;-</span> <span class="fl">0.95</span>; <span class="va">type</span> <span class="op">&lt;-</span> <span class="st">"exp"</span></span>
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">{</span> <span class="co"># 5 repetitions of 10-fold CV</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span></span>
 <span>  <span class="va">result</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">cv.multiple</span><span class="op">(</span>y<span class="op">=</span><span class="va">Y</span>,X<span class="op">=</span><span class="va">X</span>,family<span class="op">=</span><span class="st">"gaussian"</span>,method<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"glm.separate"</span>,<span class="st">"glm.mgaussian"</span>,<span class="st">"sparselink"</span><span class="op">)</span>,nfolds<span class="op">=</span><span class="fl">10</span>,alpha<span class="op">=</span><span class="fl">1</span>,alpha.init<span class="op">=</span><span class="va">alpha.init</span>,type<span class="op">=</span><span class="va">type</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co">#test &lt;- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")</span></span></code></pre></div>
 <p>This chunk saves the session information for generating figures and
 tables.</p>
 </div>
