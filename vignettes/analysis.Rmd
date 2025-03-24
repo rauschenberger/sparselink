@@ -666,6 +666,11 @@ grDevices::dev.off()
 ## Multi-task learning (under development)
 
 ```{r multi-task,eval=FALSE}
+rm(list=ls())
+<<setup>>
+<<define_projects>>
+<<preprocess_data>>
+
 vars <- c("CCP","CRP","crp","DAS28","ESR","esr","HAQ","VAS","SWOLLEN","TENDER") # "inflammatory score" dropped due to NA # "RF" dropped because binary
 Y <- frame$ERP104864[,vars]
 if(any(!is.na(Y$CRP)&!is.na(Y$crp))){
@@ -689,18 +694,18 @@ image(t(cor)[,ncol(cor):1])
 X <- x$ERP104864
 
 cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x)))
-Y <- as.matrix(Y)[cond,]
-X <- X[cond,]
+y <- as.matrix(Y)[cond,]
+x <- X[cond,]
 
-cor(rowSums(scale(Y)),Y,method="spearman")
+#cor(rowSums(scale(Y)),Y,method="spearman")
 
-alpha.init <- 0.95; type <- "exp"
+#alpha.init <- 0.95; type <- "exp"
 
-result <- list()
-for(i in seq_len(5)){ # 5 repetitions of 10-fold CV
-  set.seed(i)
-  result[[i]] <- cv.multiple(y=Y,X=X,family="gaussian",method=c("glm.separate","glm.mgaussian","sparselink"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
-}
+#result <- list()
+#for(i in seq_len(5)){ # 5 repetitions of 10-fold CV
+#  set.seed(i)
+#  result[[i]] <- cv.multiple(y=Y,X=X,family="gaussian",method=c("glm.separate","glm.mgaussian","sparselink"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
+#}
 
 #test <- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")
 ```
