@@ -56,7 +56,7 @@
                         <h4 data-toc-skip class="author">Armin
 Rauschenberger</h4>
             
-            <h4 data-toc-skip class="date">2025-03-24</h4>
+            <h4 data-toc-skip class="date">2025-03-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rauschenberger/sparselink/blob/main/vignettes/analysis.Rmd" class="external-link"><code>vignettes/analysis.Rmd</code></a></small>
       <div class="d-none name"><code>analysis.Rmd</code></div>
@@ -956,13 +956,13 @@ second</p></li>
 <span></span>
 <span><span class="co">#cor(rowSums(scale(Y)),Y,method="spearman")</span></span>
 <span></span>
-<span><span class="co">#alpha.init &lt;- 0.95; type &lt;- "exp"</span></span>
+<span><span class="va">alpha.init</span> <span class="op">&lt;-</span> <span class="cn">NA</span>; <span class="va">type</span> <span class="op">&lt;-</span> <span class="st">"exp"</span></span>
 <span></span>
-<span><span class="co">#result &lt;- list()</span></span>
-<span><span class="co">#for(i in seq_len(5)){ # 5 repetitions of 10-fold CV</span></span>
-<span><span class="co">#  set.seed(i)</span></span>
-<span><span class="co">#  result[[i]] &lt;- cv.multiple(y=Y,X=X,family="gaussian",method=c("glm.separate","glm.mgaussian","sparselink"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)</span></span>
-<span><span class="co">#}</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">{</span> <span class="co"># 5 repetitions of 10-fold CV</span></span>
+<span> <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span></span>
+<span> <span class="va">result</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">cv.multiple</span><span class="op">(</span>y<span class="op">=</span><span class="va">y</span>,X<span class="op">=</span><span class="va">x</span>,family<span class="op">=</span><span class="st">"gaussian"</span>,method<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"glm.separate"</span>,<span class="st">"glm.mgaussian"</span>,<span class="st">"sparselink"</span><span class="op">)</span>,nfolds<span class="op">=</span><span class="fl">10</span>,alpha<span class="op">=</span><span class="fl">1</span>,alpha.init<span class="op">=</span><span class="va">alpha.init</span>,type<span class="op">=</span><span class="va">type</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
 <span></span>
 <span><span class="co">#test &lt;- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")</span></span></code></pre></div>
 <p>This chunk saves the session information for generating figures and
