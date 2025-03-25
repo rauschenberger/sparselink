@@ -56,8 +56,8 @@ penfac <- function(prop,sep,com){
   return(pf)
 }
 
-devel <- function(x,y,family,family="gaussian",alpha=1,nfolds=10){
-  if(family!="gaussian"){stop("not implemented")}
+devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
+  if(any(family!="gaussian")){stop("not implemented")}
   if(alpha!=1){stop("not implemented")}
   
   if(is.matrix(y) & is.matrix(x)){
@@ -170,6 +170,10 @@ predict.devel <- function(object,newx){
     y_hat[[i]] <- stats::predict(object=object$model[[i]][[object$id.grid[i]]],newx=cbind(newx,-newx),s=object$lambda.min[i])
   }
   return(y_hat)
+}
+
+coef.devel <- function(object){
+  return(list(alpha=NA,beta=NA))
 }
 
 #y_hat <- predict(object=object,newx=x)
