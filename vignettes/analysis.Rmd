@@ -702,9 +702,9 @@ x <- X[cond,]
 alpha.init <- NA; type <- "exp"
 
 result <- list()
-for(i in seq_len(5)){ # 5 repetitions of 10-fold CV
+for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
  set.seed(i)
- result[[i]] <- cv.multiple(y=y,X=x,family="gaussian",method=c("glm.separate","glm.mgaussian","sparselink"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
+ result[[i]] <- cv.multiple(y=y,X=x,family="gaussian",method=c("glm.separate","glm.mgaussian","sparselink","devel"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
 }
 
 dev <- result[[1]]$deviance
