@@ -2,14 +2,14 @@
 fuse <- function(x,y,mode){
   slot <- list(sep=list(),com=numeric())
   list <- list(y=slot,x=slot)
-  # standardise data (MTL and TL)
+  #--- standardise data (MTL and TL) ---
   for(i in seq_along(x)){
     list$x$sep[[i]] <- scale(x[[i]])
   }
   for(i in seq_along(y)){
     list$y$sep[[i]] <- scale(y[[i]])
   }
-  # average (MTL) or concatenate (TL) data
+  #--- average (MTL) or concatenate (TL) data ---
   if(mode=="multiple"){
     list$y$com <- rowSums(sapply(X=y,FUN=scale))
     list$x$com <- x[[1]]
@@ -21,7 +21,7 @@ fuse <- function(x,y,mode){
 }
 
 # alpha=NA returns Spearman's correlation coefficients
-init.coef <- function(list,alpha=NA,lambda.sep=NULL,lambda.com=NULL){
+init.coef <- function(list,alpha=0.95,lambda.sep=NULL,lambda.com=NULL){
   if(is.null(lambda.sep)!=is.null(lambda.com)){stop()}
   cv <- is.null(lambda.sep) & is.null(lambda.com)
   q <- length(list$x$sep)
@@ -29,7 +29,7 @@ init.coef <- function(list,alpha=NA,lambda.sep=NULL,lambda.com=NULL){
   if(!is.na(alpha) & cv){
     lambda.sep <- numeric() 
   }
-  # separate models
+  #--- separate models ---
   for(i in seq_len(q)){
     if(is.na(alpha)){
       coef.sep[[i]] <- as.numeric(stats::cor(x=list$x$sep[[i]],y=list$y$sep[[i]],method="spearman"))
@@ -42,7 +42,7 @@ init.coef <- function(list,alpha=NA,lambda.sep=NULL,lambda.com=NULL){
       coef.sep[[i]] <- stats::coef(glm.sep[[i]],s=lambda.sep[i])[-1]
     }
   }
-  # common model
+  #--- common model ---
   if(is.na(alpha)){
     n <- sapply(X=list$x$sep,FUN=nrow)
     coef.com <- sapply(X=coef.sep,function(x) x) %*% n/sum(n) #
@@ -72,7 +72,7 @@ penfac <- function(sep,com,exp.sep,exp.com){ # prop,
   return(pf)
 }
 
-devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
+devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
   if(any(family!="gaussian")){stop("not implemented")}
   if(alpha!=1){stop("not implemented")}
   
@@ -98,16 +98,16 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
   }
   
   if(length(family)==1){
-    family <- rep(family,times=q)
+    family <- rep(x=family,times=q)
   }
   
   list.ext <- fuse(x=x,y=y,mode=mode)
-  init.ext <- init.coef(list=list.ext)
+  init.ext <- init.coef(list=list.ext,alpha=alpha.init)
 
   #ncand <- 11
   #prop <- seq(from=0,to=1,length.out=ncand)
-  exp <- c(0,0.5,1,2,10) # flexible
-  #exp <- seq(from=0,to=1,by=0.2) # unit interval
+  #exp <- c(0,0.5,1,2,10) # flexible
+  exp <- seq(from=0,to=1,by=0.2) # unit interval
   grid <- expand.grid(sep=exp,com=exp)
   ncand <- nrow(grid)
   model.ext <- list()
@@ -123,12 +123,12 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
     }
   }
   
-  # create empty matrices
+  #--- initialise matrices ---
   pred <- list()
   for(j in seq_len(q)){
     pred[[j]] <- list()
     for(k in seq_len(ncand)){
-      pred[[j]][[k]] <- matrix(NA,nrow=n[j],ncol=length(model.ext[[j]][[k]]$lambda))
+      pred[[j]][[k]] <- matrix(data=NA,nrow=n[j],ncol=length(model.ext[[j]][[k]]$lambda))
     }
   }
   
@@ -142,7 +142,7 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
       x.test[[j]] <- x[[j]][cond,,drop=FALSE]
     }
     list.int <- fuse(x=x.train,y=y.train,mode=mode)
-    init.int <- init.coef(list=list.int,lambda.sep=init.ext$lambda.sep,lambda.com=init.ext$lambda.com)
+    init.int <- init.coef(list=list.int,lambda.sep=init.ext$lambda.sep,lambda.com=init.ext$lambda.com,alpha=alpha.init)
 
     for(j in seq_len(q)){
       cond <- foldid[[j]]==i
@@ -158,7 +158,7 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
     }
   }
   
-  # calculate MSE
+  #--- calculate MSE ---
   mse <- list()
   id.grid <- lambda.min <- numeric()
   for(j in seq_len(q)){
@@ -187,6 +187,54 @@ predict.devel <- function(object,newx){
 
 coef.devel <- function(object){
   return(list(alpha=NA,beta=NA))
+}
+
+#--- exploratory simulation ---
+
+if(FALSE){
+  metric <- list()
+  for(k in 1:10){
+    
+    n0 <- 100
+    n1 <- 10000
+    n <- n0 + n1
+    p <- 200
+    x <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
+    beta <- stats::rbinom(n=p,size=1,prob=0.15)*stats::rnorm(n=p)
+    eta <- as.numeric(x %*% beta)
+    y1 <- eta + stats::rnorm(n=n,sd=sd(eta))
+    y2 <- eta + stats::rnorm(n=n,sd=sd(eta))
+    y <- cbind(y1,y2)
+    fold <- rep(x=c(0,1),times=c(n0,n1))
+    y_hat <- list()
+    y_hat$empty <- matrix(colMeans(y[fold==0,]),nrow=n1,ncol=2,byrow=TRUE)
+    
+    y_hat$lasso <- matrix(data=NA,nrow=n1,ncol=2)
+    for(i in 1:2){
+      object <- glmnet::cv.glmnet(x=x[fold==0,],y=y[fold==0,i])
+      y_hat$lasso[,i] <- predict(object=object,newx=x[fold==1,],s="lambda.min")
+    }
+    
+    object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=0.95)
+    temp <- predict(object=object,newx=x[fold==1,])
+    y_hat$devel <- do.call(what="cbind",args=temp)
+    
+    object <- sparselink(x=x[fold==0,],y=y[fold==0,],family="gaussian")
+    temp <- predict(object,newx=x[fold==1,])
+    y_hat$sparselink <- do.call(what="cbind",args=temp)
+    
+    mse <- matrix(data=NA,nrow=length(y_hat),ncol=2,dimnames=list(names(y_hat),NULL))
+    for(i in seq_along(y_hat)){
+      for(j in seq_len(2)){
+        mse[i,j] <- mean((y[fold==1,j]-y_hat[[i]][,j])^2)
+      }
+    }
+    
+    metric[[k]] <- mse
+    
+  }
+  rowMeans(do.call(what="cbind",args=metric))
+  Reduce(f="+",x=metric)
 }
 
 #object <- devel(x=x,y=y,family="gaussian")
