@@ -699,7 +699,7 @@ x <- X[cond,]
 
 #cor(rowSums(scale(Y)),Y,method="spearman")
 
-alpha.init <- NA; type <- "exp"
+alpha.init <- 0.95; type <- "exp"
 
 result <- list()
 for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
@@ -710,7 +710,14 @@ for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
 dev <- result[[1]]$deviance
 colMeans(dev/dev[,"glm.separate"])
 
-#test <- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")
+
+#test <- list()
+#for(i in 1:5){
+#  test[[i]] <- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")
+#}
+#rowMeans(sapply(test,function(x) rowMeans(apply(x,2,rank))))
+
+
 ```
 
 
