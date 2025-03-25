@@ -956,7 +956,7 @@ second</p></li>
 <span></span>
 <span><span class="co">#cor(rowSums(scale(Y)),Y,method="spearman")</span></span>
 <span></span>
-<span><span class="va">alpha.init</span> <span class="op">&lt;-</span> <span class="cn">NA</span>; <span class="va">type</span> <span class="op">&lt;-</span> <span class="st">"exp"</span></span>
+<span><span class="va">alpha.init</span> <span class="op">&lt;-</span> <span class="fl">0.95</span>; <span class="va">type</span> <span class="op">&lt;-</span> <span class="st">"exp"</span></span>
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">{</span> <span class="co"># 5 repetitions of 10-fold CV</span></span>
@@ -967,7 +967,12 @@ second</p></li>
 <span><span class="va">dev</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">deviance</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">dev</span><span class="op">/</span><span class="va">dev</span><span class="op">[</span>,<span class="st">"glm.separate"</span><span class="op">]</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#test &lt;- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")</span></span></code></pre></div>
+<span></span>
+<span><span class="co">#test &lt;- list()</span></span>
+<span><span class="co">#for(i in 1:5){</span></span>
+<span><span class="co">#  test[[i]] &lt;- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")</span></span>
+<span><span class="co">#}</span></span>
+<span><span class="co">#rowMeans(sapply(test,function(x) rowMeans(apply(x,2,rank))))</span></span></code></pre></div>
 <p>This chunk saves the session information for generating figures and
 tables.</p>
 </div>
