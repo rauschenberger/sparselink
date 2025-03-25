@@ -159,7 +159,7 @@ devel <- function(x,y,family,nfolds=10){
   return(list)
 }
 
-object <- devel(x=x,y=y,family="gaussian")
+#object <- devel(x=x,y=y,family="gaussian")
 
 predict.devel <- function(object,newx){
   q <- length(object$model)
@@ -170,6 +170,6 @@ predict.devel <- function(object,newx){
   return(y_hat)
 }
 
-y_hat <- predict(object=object,newx=x)
+#y_hat <- predict(object=object,newx=x)
 
 
