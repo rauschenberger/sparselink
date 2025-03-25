@@ -672,6 +672,7 @@ rm(list=ls())
 <<preprocess_data>>
 
 vars <- c("CCP","CRP","crp","DAS28","ESR","esr","HAQ","VAS","SWOLLEN","TENDER") # "inflammatory score" dropped due to NA # "RF" dropped because binary
+vars <- c("DAS28","SWOLLEN","TENDER")
 Y <- frame$ERP104864[,vars]
 if(any(!is.na(Y$CRP)&!is.na(Y$crp))){
   stop("Invalid.")
@@ -704,24 +705,21 @@ alpha.init <- 0.95; type <- "exp"
 result <- list()
 for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
   set.seed(i)
-  method <- c("glm.separate","glm.mgaussian","sparselink","devel")
+  #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
   method <- c("glm.separate","devel")
+  #method <- c("glm.separate","sparselink")
   result[[i]] <- cv.multiple(y=y,X=x,family="gaussian",method=method,nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
 }
 
 dev <- result[[1]]$deviance
 colMeans(dev/dev[,"glm.separate"])
 
-
-#test <- list()
-#for(i in 1:5){
-#  test[[i]] <- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")
-#}
-#rowMeans(sapply(test,function(x) rowMeans(apply(x,2,rank))))
-
-
+test <- list()
+for(i in 1:5){
+  test[[i]] <- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")
+}
+rowMeans(sapply(test,function(x) rowMeans(apply(x,2,rank))))
 ```
-
 
 This chunk saves the session information for generating figures and tables.
 
