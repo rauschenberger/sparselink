@@ -707,7 +707,7 @@ for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
   set.seed(i)
   #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
   method <- c("glm.separate","devel")
-  #method <- c("glm.separate","sparselink")
+  method <- c("glm.separate","devel","sparselink")
   result[[i]] <- cv.multiple(y=y,X=x,family="gaussian",method=method,nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
 }
 

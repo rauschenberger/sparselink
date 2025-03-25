@@ -194,7 +194,7 @@ coef.devel <- function(object){
 if(FALSE){
   metric <- list()
   for(k in 1:10){
-    
+    # simulate data
     n0 <- 100
     n1 <- 10000
     n <- n0 + n1
@@ -207,31 +207,30 @@ if(FALSE){
     y <- cbind(y1,y2)
     fold <- rep(x=c(0,1),times=c(n0,n1))
     y_hat <- list()
+    # intercept-only model
     y_hat$empty <- matrix(colMeans(y[fold==0,]),nrow=n1,ncol=2,byrow=TRUE)
-    
+    # standard lasso
     y_hat$lasso <- matrix(data=NA,nrow=n1,ncol=2)
     for(i in 1:2){
       object <- glmnet::cv.glmnet(x=x[fold==0,],y=y[fold==0,i])
       y_hat$lasso[,i] <- predict(object=object,newx=x[fold==1,],s="lambda.min")
     }
-    
+    # sparselink
+    object <- sparselink(x=x[fold==0,],y=y[fold==0,],family="gaussian")
+    temp <- predict(object=object,newx=x[fold==1,])
+    y_hat$sparselink <- do.call(what="cbind",args=temp)
+    # development
     object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=0.95)
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$devel <- do.call(what="cbind",args=temp)
-    
-    object <- sparselink(x=x[fold==0,],y=y[fold==0,],family="gaussian")
-    temp <- predict(object,newx=x[fold==1,])
-    y_hat$sparselink <- do.call(what="cbind",args=temp)
-    
+    # prediction error
     mse <- matrix(data=NA,nrow=length(y_hat),ncol=2,dimnames=list(names(y_hat),NULL))
     for(i in seq_along(y_hat)){
       for(j in seq_len(2)){
         mse[i,j] <- mean((y[fold==1,j]-y_hat[[i]][,j])^2)
       }
     }
-    
     metric[[k]] <- mse
-    
   }
   rowMeans(do.call(what="cbind",args=metric))
   Reduce(f="+",x=metric)
