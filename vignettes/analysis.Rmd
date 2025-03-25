@@ -699,13 +699,13 @@ x <- X[cond,]
 
 #cor(rowSums(scale(Y)),Y,method="spearman")
 
-#alpha.init <- 0.95; type <- "exp"
+alpha.init <- NA; type <- "exp"
 
-#result <- list()
-#for(i in seq_len(5)){ # 5 repetitions of 10-fold CV
-#  set.seed(i)
-#  result[[i]] <- cv.multiple(y=Y,X=X,family="gaussian",method=c("glm.separate","glm.mgaussian","sparselink"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
-#}
+result <- list()
+for(i in seq_len(5)){ # 5 repetitions of 10-fold CV
+ set.seed(i)
+ result[[i]] <- cv.multiple(y=y,X=x,family="gaussian",method=c("glm.separate","glm.mgaussian","sparselink"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
+}
 
 #test <- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")
 ```
