@@ -714,6 +714,8 @@ for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
 dev <- result[[1]]$deviance
 colMeans(dev/dev[,"glm.separate"])
 
+# Consider using different candidate values, e.g., 0.01,0.5,1,1.5,2,10 also for sparselink. Removing 0 might be a good choice. (If 0 is not included, however, initial ridge regression might be better.)
+
 test <- list()
 for(i in 1:5){
   test[[i]] <- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")
