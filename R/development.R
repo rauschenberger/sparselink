@@ -2,12 +2,14 @@
 fuse <- function(x,y,mode){
   slot <- list(sep=list(),com=numeric())
   list <- list(y=slot,x=slot)
+  # standardise data (MTL and TL)
   for(i in seq_along(x)){
     list$x$sep[[i]] <- scale(x[[i]])
   }
   for(i in seq_along(y)){
     list$y$sep[[i]] <- scale(y[[i]])
   }
+  # average (MTL) or concatenate (TL) data
   if(mode=="multiple"){
     list$y$com <- rowSums(sapply(X=y,FUN=scale))
     list$x$com <- x[[1]]
@@ -23,11 +25,14 @@ init.coef <- function(list,alpha=0.95,lambda.sep=NULL,lambda.com=NULL){
   cv <- is.null(lambda.sep) & is.null(lambda.com)
   q <- length(list$x$sep)
   glm.sep <- coef.sep <- list()
-  if(cv){
+  if(!is.na(alpha) & cv){
     lambda.sep <- numeric() 
   }
+  # separate models
   for(i in seq_len(q)){
-    if(cv){
+    if(is.na(alpha)){
+      coef.sep[[i]] <- as.numeric(stats::cor(x=list$x$sep[[i]],y=list$y$sep[[i]],method="spearman"))
+    } else if(cv){
       glm.sep[[i]] <- glmnet::cv.glmnet(x=list$x$sep[[i]],y=list$y$sep[[i]],alpha=alpha)
       coef.sep[[i]] <- stats::coef(glm.sep[[i]],s="lambda.min")[-1]
       lambda.sep[i] <- glm.sep[[i]]$lambda.min
@@ -36,7 +41,12 @@ init.coef <- function(list,alpha=0.95,lambda.sep=NULL,lambda.com=NULL){
       coef.sep[[i]] <- stats::coef(glm.sep[[i]],s=lambda.sep[i])[-1]
     }
   }
-  if(cv){
+  # common model
+  if(is.na(alpha)){
+    n <- sapply(X=list$x$sep,FUN=nrow)
+    #stop() # check dimensions!
+    coef.com <- sapply(X=coef.sep,function(x) x) %*% n/sum(n) #
+  } else if(cv){
     glm.com <- glmnet::cv.glmnet(x=list$x$com,y=list$y$com,alpha=alpha)
     coef.com <- stats::coef(glm.com,s="lambda.min")[-1]
     lambda.com <- glm.com$lambda.min
@@ -94,7 +104,8 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
 
   #ncand <- 11
   #prop <- seq(from=0,to=1,length.out=ncand)
-  exp <- c(0,0.5,1,2,10)
+  exp <- c(0,0.5,1,2,10) # 
+  exp <- seq(from=0,to=1,by=0.2)
   grid <- expand.grid(sep=exp,com=exp)
   ncand <- nrow(grid)
   model.ext <- list()
