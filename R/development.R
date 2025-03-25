@@ -20,7 +20,8 @@ fuse <- function(x,y,mode){
   return(list)
 }
 
-init.coef <- function(list,alpha=0.95,lambda.sep=NULL,lambda.com=NULL){
+# alpha=NA returns Spearman's correlation coefficients
+init.coef <- function(list,alpha=NA,lambda.sep=NULL,lambda.com=NULL){
   if(is.null(lambda.sep)!=is.null(lambda.com)){stop()}
   cv <- is.null(lambda.sep) & is.null(lambda.com)
   q <- length(list$x$sep)
@@ -44,8 +45,9 @@ init.coef <- function(list,alpha=0.95,lambda.sep=NULL,lambda.com=NULL){
   # common model
   if(is.na(alpha)){
     n <- sapply(X=list$x$sep,FUN=nrow)
-    #stop() # check dimensions!
     coef.com <- sapply(X=coef.sep,function(x) x) %*% n/sum(n) #
+    # Use Fisher transform instead!
+    warning("Use Fisher transform.") # no 
   } else if(cv){
     glm.com <- glmnet::cv.glmnet(x=list$x$com,y=list$y$com,alpha=alpha)
     coef.com <- stats::coef(glm.com,s="lambda.min")[-1]
@@ -104,19 +106,19 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
 
   #ncand <- 11
   #prop <- seq(from=0,to=1,length.out=ncand)
-  exp <- c(0,0.5,1,2,10) # 
-  exp <- seq(from=0,to=1,by=0.2)
+  exp <- c(0,0.5,1,2,10) # flexible
+  #exp <- seq(from=0,to=1,by=0.2) # unit interval
   grid <- expand.grid(sep=exp,com=exp)
   ncand <- nrow(grid)
   model.ext <- list()
-  for(i in seq_len(length.out=q)){
-    model.ext[[i]] <- list()
-    for(j in seq_len(ncand)){
-      pf <- penfac(sep=init.ext$sep[[i]],com=init.ext$com,exp.sep=grid$sep[j],exp.com=grid$com[j])
+  for(j in seq_len(q)){
+    model.ext[[j]] <- list()
+    for(k in seq_len(ncand)){
+      pf <- penfac(sep=init.ext$sep[[j]],com=init.ext$com,exp.sep=grid$sep[k],exp.com=grid$com[k]) # prop=grid$prop[k]
       if(all(is.infinite(pf))){
-        model.ext[[i]][[j]] <- glmnet::glmnet(x=cbind(x[[i]],-x[[i]]),y=y[[i]],family=family[i],lambda=99e99)
+        model.ext[[j]][[k]] <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]]),y=y[[j]],family=family[j],lambda=99e99)
       } else {
-        model.ext[[i]][[j]] <- glmnet::glmnet(x=cbind(x[[i]],-x[[i]]),y=y[[i]],family=family[i],lower.limits=0,penalty.factor=pf)
+        model.ext[[j]][[k]] <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]]),y=y[[j]],family=family[j],lower.limits=0,penalty.factor=pf)
       }
     }
   }
@@ -145,7 +147,7 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
     for(j in seq_len(q)){
       cond <- foldid[[j]]==i
       for(k in seq_len(ncand)){
-        pf <- penfac(sep=init.int$sep[[j]],com=init.int$com,exp.sep=grid$sep[k],exp.com=grid$com[k]) # prop=prop[k],
+        pf <- penfac(sep=init.int$sep[[j]],com=init.int$com,exp.sep=grid$sep[k],exp.com=grid$com[k]) # prop=grid$prop[k],
         if(all(is.infinite(pf))){
           model.int <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]])[!cond,],y=y[[j]][!cond],family=family[j],lambda=99e99)
         } else {
