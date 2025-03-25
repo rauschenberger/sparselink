@@ -56,7 +56,9 @@ penfac <- function(prop,sep,com){
   return(pf)
 }
 
-devel <- function(x,y,family,nfolds=10){
+devel <- function(x,y,family,family="gaussian",alpha=1,nfolds=10){
+  if(family!="gaussian"){stop("not implemented")}
+  if(alpha!=1){stop("not implemented")}
   
   if(is.matrix(y) & is.matrix(x)){
     message("mode: multi-target learning")
