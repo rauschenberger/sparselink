@@ -18,7 +18,7 @@ fuse <- function(x,y,mode){
   return(list)
 }
 
-init.coef <- function(list,lambda.sep=NULL,lambda.com=NULL){
+init.coef <- function(list,alpha=0.95,lambda.sep=NULL,lambda.com=NULL){
   if(is.null(lambda.sep)!=is.null(lambda.com)){stop()}
   cv <- is.null(lambda.sep) & is.null(lambda.com)
   q <- length(list$x$sep)
@@ -28,29 +28,33 @@ init.coef <- function(list,lambda.sep=NULL,lambda.com=NULL){
   }
   for(i in seq_len(q)){
     if(cv){
-      glm.sep[[i]] <- glmnet::cv.glmnet(x=list$x$sep[[i]],y=list$y$sep[[i]])
+      glm.sep[[i]] <- glmnet::cv.glmnet(x=list$x$sep[[i]],y=list$y$sep[[i]],alpha=alpha)
       coef.sep[[i]] <- stats::coef(glm.sep[[i]],s="lambda.min")[-1]
       lambda.sep[i] <- glm.sep[[i]]$lambda.min
     } else {
-      glm.sep[[i]] <- glmnet::glmnet(x=list$x$sep[[i]],y=list$y$sep[[i]])
+      glm.sep[[i]] <- glmnet::glmnet(x=list$x$sep[[i]],y=list$y$sep[[i]],alpha=alpha)
       coef.sep[[i]] <- stats::coef(glm.sep[[i]],s=lambda.sep[i])[-1]
     }
   }
   if(cv){
-    glm.com <- glmnet::cv.glmnet(x=list$x$com,y=list$y$com)
+    glm.com <- glmnet::cv.glmnet(x=list$x$com,y=list$y$com,alpha=alpha)
     coef.com <- stats::coef(glm.com,s="lambda.min")[-1]
     lambda.com <- glm.com$lambda.min
   } else {
-    glm.com <- glmnet::glmnet(x=list$x$com,y=list$y$com)
+    glm.com <- glmnet::glmnet(x=list$x$com,y=list$y$com,alpha=alpha)
     coef.com <- stats::coef(glm.com,s=lambda.com)[-1]
   }
   list <- list(com=coef.com,sep=coef.sep,lambda.sep=lambda.sep,lambda.com=lambda.com)
   return(list)
 }
 
-penfac <- function(prop,sep,com){
-  positive <- (1-prop)*pmax(0,sep)+prop*pmax(0,com)
-  negative <- -(1-prop)*pmin(0,sep)-prop*pmin(0,com)
+penfac <- function(sep,com,exp.sep,exp.com){ # prop, 
+  # combining with proportion
+  #positive <- (1-prop)*pmax(0,sep)+prop*pmax(0,com)
+  #negative <- -(1-prop)*pmin(0,sep)-prop*pmin(0,com)
+  # combining with exponents
+  positive <- pmax(0,sep)^exp.sep + pmax(0,com)^exp.com
+  negative <- (-pmin(0,sep))^exp.sep + (-pmin(0,com))^exp.com
   pf <- 1/c(positive,negative)
   pf[pf==-Inf] <- Inf
   return(pf)
@@ -66,7 +70,7 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
     q <- ncol(y)
     n <- rep(x=nrow(x),times=q)
     foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
-    y <- apply(y,2,function(x) x,simplify=FALSE)
+    y <- apply(X=y,MARGIN=2,FUN=function(x) x,simplify=FALSE)
     x <- replicate(n=q,expr=x,simplify=FALSE)
     foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
     mode <- "multiple"
@@ -88,13 +92,16 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
   list.ext <- fuse(x=x,y=y,mode=mode)
   init.ext <- init.coef(list=list.ext)
 
-  ncand <- 11
-  prop <- seq(from=0,to=1,length.out=ncand)
+  #ncand <- 11
+  #prop <- seq(from=0,to=1,length.out=ncand)
+  exp <- c(0,0.5,1,2,10)
+  grid <- expand.grid(sep=exp,com=exp)
+  ncand <- nrow(grid)
   model.ext <- list()
   for(i in seq_len(length.out=q)){
     model.ext[[i]] <- list()
     for(j in seq_len(ncand)){
-      pf <- penfac(prop=prop[j],sep=init.ext$sep[[i]],com=init.ext$com)
+      pf <- penfac(sep=init.ext$sep[[i]],com=init.ext$com,exp.sep=grid$sep[j],exp.com=grid$com[j])
       if(all(is.infinite(pf))){
         model.ext[[i]][[j]] <- glmnet::glmnet(x=cbind(x[[i]],-x[[i]]),y=y[[i]],family=family[i],lambda=99e99)
       } else {
@@ -102,8 +109,6 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
       }
     }
   }
-  
-
   
   # create empty matrices
   pred <- list()
@@ -126,12 +131,10 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
     list.int <- fuse(x=x.train,y=y.train,mode=mode)
     init.int <- init.coef(list=list.int,lambda.sep=init.ext$lambda.sep,lambda.com=init.ext$lambda.com)
 
-    #model.int <- pred <- list()
     for(j in seq_len(q)){
       cond <- foldid[[j]]==i
-      #model.int[[j]] <- pred[[j]] <- list()
       for(k in seq_len(ncand)){
-        pf <- penfac(prop=prop[k],sep=init.int$sep[[j]],com=init.int$com)
+        pf <- penfac(sep=init.int$sep[[j]],com=init.int$com,exp.sep=grid$sep[k],exp.com=grid$com[k]) # prop=prop[k],
         if(all(is.infinite(pf))){
           model.int <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]])[!cond,],y=y[[j]][!cond],family=family[j],lambda=99e99)
         } else {
@@ -148,20 +151,17 @@ devel <- function(x,y,family="gaussian",alpha=1,nfolds=10){
   for(j in seq_len(q)){
     mse[[j]] <- list()
     for(k in seq_len(ncand)){
-      mse[[j]][[k]] <- apply(pred[[j]][[k]],2,FUN=function(x) mean((x-y[[j]])^2))
-      #lamdba[[j]][[k]]
+      mse[[j]][[k]] <- apply(X=pred[[j]][[k]],MARGIN=2,FUN=function(x) mean((x-y[[j]])^2))
     }
     id.grid[j] <- which.min(sapply(mse[[j]],min))
     lambda.min[j] <- model.ext[[j]][[id.grid[j]]]$lambda[which.min(mse[[j]][[id.grid[j]]])]
-    graphics::plot(x=prop,sapply(mse[[j]],min),type="o")
+    graphics::plot(sapply(X=mse[[j]],FUN=min),type="o")
   }
   
   list <- list(model=model.ext,id.grid=id.grid,lambda.min=lambda.min)
   class(list) <- "devel"
   return(list)
 }
-
-#object <- devel(x=x,y=y,family="gaussian")
 
 predict.devel <- function(object,newx){
   q <- length(object$model)
@@ -176,6 +176,5 @@ coef.devel <- function(object){
   return(list(alpha=NA,beta=NA))
 }
 
+#object <- devel(x=x,y=y,family="gaussian")
 #y_hat <- predict(object=object,newx=x)
-
-
