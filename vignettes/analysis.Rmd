@@ -719,7 +719,7 @@ alpha.init <- 0.95; alpha <- 1; type <- "exp"
 results <- list()
 for(k in seq_along(problem)){
   results[[k]] <- list()
-  for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
+  for(i in seq_len(3)){ # 5 repetitions of 10-fold CV
     set.seed(i)
     method <- c("glm.separate","glm.mgaussian","sparselink","devel")
     #method <- c("glm.separate","devel")
