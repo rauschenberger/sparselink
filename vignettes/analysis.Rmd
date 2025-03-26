@@ -721,14 +721,14 @@ for(k in seq_along(problem)){
   results[[k]] <- list()
   for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
     set.seed(i)
-    #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
-    method <- c("glm.separate","devel")
-    method <- c("glm.separate","devel","sparselink")
+    method <- c("glm.separate","glm.mgaussian","sparselink","devel")
+    #method <- c("glm.separate","devel")
+    #method <- c("glm.separate","devel","sparselink")
     results[[k]][[i]] <-  cv.multiple(y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type)
   }
 }
 
-dev <- results[[2]][[1]]$deviance
+dev <- results[[1]][[1]]$deviance
 colMeans(dev/dev[,"glm.separate"])
 
 # unit interval
