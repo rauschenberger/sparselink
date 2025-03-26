@@ -671,8 +671,9 @@ rm(list=ls())
 <<define_projects>>
 <<preprocess_data>>
 
+#--- prepare data ---
 vars <- c("CCP","CRP","crp","DAS28","ESR","esr","HAQ","VAS","SWOLLEN","TENDER") # "inflammatory score" dropped due to NA # "RF" dropped because binary
-vars <- c("DAS28","SWOLLEN","TENDER")
+#vars <- c("DAS28","SWOLLEN","TENDER")
 Y <- frame$ERP104864[,vars]
 if(any(!is.na(Y$CRP)&!is.na(Y$crp))){
   stop("Invalid.")
@@ -689,8 +690,16 @@ if(any(!is.na(Y$ESR)&!is.na(Y$esr))){
 for(i in seq_len(ncol(Y))){
   class(Y[[i]]) <- "numeric"
 }
+
+#--- explore similarity ---
 cor <- cor(Y,use="pairwise.complete.obs",method="spearman")
 image(t(cor)[,ncol(cor):1])
+
+stats::heatmap(x=as.matrix(Y),Rowv=NA)
+
+d <- stats::dist(x=t(Y))
+hclust <- stats::hclust(d=d)
+plot(hclust)
 
 X <- x$ERP104864
 
@@ -698,20 +707,28 @@ cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x)))
 y <- as.matrix(Y)[cond,]
 x <- X[cond,]
 
+problem <- list()
+problem$joint <- c("SWOLLEN","TENDER")
+problem$proms <- c("VAS","HAQ")
+problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
+
 #cor(rowSums(scale(Y)),Y,method="spearman")
 
-alpha.init <- 0.95; type <- "exp"
+alpha.init <- 0.95; alpha <- 1; type <- "exp"
 
-result <- list()
-for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
-  set.seed(i)
-  #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
-  method <- c("glm.separate","devel")
-  method <- c("glm.separate","devel","sparselink")
-  result[[i]] <- cv.multiple(y=y,X=x,family="gaussian",method=method,nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
+results <- list()
+for(k in seq_along(problem)){
+  results[[k]] <- list()
+  for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
+    set.seed(i)
+    #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
+    method <- c("glm.separate","devel")
+    method <- c("glm.separate","devel","sparselink")
+    results[[k]][[i]] <-  cv.multiple(y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type)
+  }
 }
 
-dev <- result[[1]]$deviance
+dev <- results[[2]][[1]]$deviance
 colMeans(dev/dev[,"glm.separate"])
 
 # unit interval
@@ -725,9 +742,13 @@ colMeans(dev/dev[,"glm.separate"])
 # Consider using different candidate values, e.g., 0.01,0.5,1,1.5,2,10 also for sparselink. Removing 0 might be a good choice. (If 0 is not included, however, initial ridge regression might be better.)
 
 test <- list()
-for(i in 1:5){
-  test[[i]] <- joinet:::cv.joinet(Y=Y,X=X,family="gaussian")
+for(k in seq_along(problem)){
+  test[[k]] <- list()
+  for(i in 1){
+    test[[k]][[i]] <- joinet:::cv.joinet(Y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian")
+  }
 }
+
 rowMeans(sapply(test,function(x) rowMeans(apply(x,2,rank))))
 ```
 

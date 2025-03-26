@@ -74,7 +74,7 @@ penfac <- function(sep,com,exp.sep,exp.com){ # prop,
 
 devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
   if(any(family!="gaussian")){stop("not implemented")}
-  if(alpha!=1){stop("not implemented")}
+  #if(alpha!=1){stop("not implemented")}
   
   if(is.matrix(y) & is.matrix(x)){
     message("mode: multi-target learning")
@@ -106,7 +106,7 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
 
   #ncand <- 11
   #prop <- seq(from=0,to=1,length.out=ncand)
-  exp <- c(0.1,0.5,1.0,1.5,2,5) # flexible
+  exp <- c(0.0,0.2,0.5,1.0,2.0,5.0) # flexible
   #exp <- seq(from=0,to=1,by=0.2) # unit interval
   grid <- expand.grid(sep=exp,com=exp)
   ncand <- nrow(grid)
@@ -116,9 +116,9 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
     for(k in seq_len(ncand)){
       pf <- penfac(sep=init.ext$sep[[j]],com=init.ext$com,exp.sep=grid$sep[k],exp.com=grid$com[k]) # prop=grid$prop[k]
       if(all(is.infinite(pf))){
-        model.ext[[j]][[k]] <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]]),y=y[[j]],family=family[j],lambda=99e99)
+        model.ext[[j]][[k]] <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]]),y=y[[j]],family=family[j],lambda=99e99,alpha=alpha)
       } else {
-        model.ext[[j]][[k]] <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]]),y=y[[j]],family=family[j],lower.limits=0,penalty.factor=pf)
+        model.ext[[j]][[k]] <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]]),y=y[[j]],family=family[j],lower.limits=0,penalty.factor=pf,alpha=alpha)
       }
     }
   }
@@ -149,9 +149,9 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
       for(k in seq_len(ncand)){
         pf <- penfac(sep=init.int$sep[[j]],com=init.int$com,exp.sep=grid$sep[k],exp.com=grid$com[k]) # prop=grid$prop[k],
         if(all(is.infinite(pf))){
-          model.int <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]])[!cond,],y=y[[j]][!cond],family=family[j],lambda=99e99)
+          model.int <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]])[!cond,],y=y[[j]][!cond],family=family[j],lambda=99e99,alpha=alpha)
         } else {
-          model.int <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]])[!cond,],y=y[[j]][!cond],family=family[j],lower.limits=0,penalty.factor=pf)
+          model.int <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]])[!cond,],y=y[[j]][!cond],family=family[j],lower.limits=0,penalty.factor=pf,alpha=alpha)
         }
         pred[[j]][[k]][cond,] <- stats::predict(object=model.int,newx=cbind(x[[j]],-x[[j]])[cond,],s=model.ext[[j]][[k]]$lambda)
       }
@@ -192,6 +192,7 @@ coef.devel <- function(object){
 #--- exploratory simulation ---
 
 if(FALSE){
+  alpha.init <- 0.95
   metric <- list()
   for(k in 1:10){
     # simulate data
@@ -216,11 +217,11 @@ if(FALSE){
       y_hat$lasso[,i] <- predict(object=object,newx=x[fold==1,],s="lambda.min")
     }
     # sparselink
-    object <- sparselink(x=x[fold==0,],y=y[fold==0,],family="gaussian")
+    object <- sparselink(x=x[fold==0,],y=y[fold==0,],family="gaussian",alpha.init=alpha.init)
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$sparselink <- do.call(what="cbind",args=temp)
     # development
-    object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=0.95)
+    object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=alpha.init)
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$devel <- do.call(what="cbind",args=temp)
     # prediction error

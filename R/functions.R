@@ -1180,6 +1180,8 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
     if(method[i]=="sparselink"){
       object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha,type=type)
       hyperpar <- object$weight.min
+    } else if(method[i]=="devel"){
+      object <- func(x=X_train,y=y_train,family=family,alpha=alpha,alpha.init=alpha.init)
     } else {
       object <- func(x=X_train,y=y_train,family=family,alpha=alpha)
     }
@@ -1884,7 +1886,7 @@ plotWeight <- function(x,y){
 #' y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
 #' object <- sparselink(x=x,y=y,family=family)
 #' 
-sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,trial=TRUE){ # was alpha.init=0.95 and alpha=1
+sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,trial=FALSE){ # was alpha.init=0.95 and alpha=1
   
   alpha.one <- alpha.init
   alpha.two <- alpha
@@ -1959,7 +1961,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
   
   if(type %in% c("geo","exp","rem","ari")){
     if(trial){
-      cands <- c(0.1,0.5,1.0,1.5,2,5)
+      cands <- c(0.0,0.2,0.5,1.0,2.0,5.0)
     } else {
       cands <- seq(from=0,to=1,by=0.2)
     }
