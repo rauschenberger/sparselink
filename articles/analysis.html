@@ -985,8 +985,21 @@ second</p></li>
 <span>  <span class="op">}</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="va">dev</span> <span class="op">&lt;-</span> <span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">deviance</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">dev</span><span class="op">/</span><span class="va">dev</span><span class="op">[</span>,<span class="st">"glm.separate"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">cm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">k</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">problem</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>    <span class="va">dev</span> <span class="op">&lt;-</span> <span class="va">results</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">deviance</span></span>
+<span>    <span class="va">temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">dev</span><span class="op">/</span><span class="va">dev</span><span class="op">[</span>,<span class="st">"glm.separate"</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="va">cm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">cm</span>,<span class="va">temp</span><span class="op">)</span></span>
+<span>    <span class="co">#cat(cm,"\n")</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">cm</span><span class="op">)</span></span>
+<span><span class="co"># separate, mgaussian, sparselink and devel have similar performance (i.e., MTL has no benefit with any of these three approaches), examine whether other approaches are better</span></span>
+<span></span>
+<span><span class="co"># examine whether group lasso for TL/MTL performs better</span></span>
+<span></span>
+<span></span>
 <span></span>
 <span><span class="co"># unit interval</span></span>
 <span><span class="co">#glm.separate        devel   sparselink </span></span>
