@@ -1884,7 +1884,7 @@ plotWeight <- function(x,y){
 #' y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
 #' object <- sparselink(x=x,y=y,family=family)
 #' 
-sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){ # was alpha.init=0.95 and alpha=1
+sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,trial=TRUE){ # was alpha.init=0.95 and alpha=1
   
   alpha.one <- alpha.init
   alpha.two <- alpha
@@ -1958,7 +1958,11 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10){
   #weight <- seq(from=0,to=0.5,by=0.1)
   
   if(type %in% c("geo","exp","rem","ari")){
-    cands <- seq(from=0,to=1,by=0.2)
+    if(trial){
+      cands <- c(0.1,0.5,1.0,1.5,2,5)
+    } else {
+      cands <- seq(from=0,to=1,by=0.2)
+    }
     weight <- expand.grid(source=cands,target=cands)
   } else if(type %in% c("geo.con","exp.con","rem.con","ari.con")){
     cands <- seq(from=0,to=1,by=0.05)

@@ -714,6 +714,14 @@ for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
 dev <- result[[1]]$deviance
 colMeans(dev/dev[,"glm.separate"])
 
+# unit interval
+#glm.separate        devel   sparselink 
+#   1.0000000    0.9742187    0.9598362 
+
+# flexible
+#glm.separate        devel   sparselink 
+#   1.0000000    0.9745329    0.9475552 
+
 # Consider using different candidate values, e.g., 0.01,0.5,1,1.5,2,10 also for sparselink. Removing 0 might be a good choice. (If 0 is not included, however, initial ridge regression might be better.)
 
 test <- list()

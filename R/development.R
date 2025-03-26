@@ -106,7 +106,7 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
 
   #ncand <- 11
   #prop <- seq(from=0,to=1,length.out=ncand)
-  exp <- c(0.5,1,1.5,2,5) # flexible
+  exp <- c(0.1,0.5,1.0,1.5,2,5) # flexible
   #exp <- seq(from=0,to=1,by=0.2) # unit interval
   grid <- expand.grid(sep=exp,com=exp)
   ncand <- nrow(grid)
