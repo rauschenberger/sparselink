@@ -206,6 +206,7 @@ if(FALSE){
     y1 <- eta + stats::rnorm(n=n,sd=sd(eta))
     y2 <- eta + stats::rnorm(n=n,sd=sd(eta))
     y <- cbind(y1,y2)
+    q <- ncol(y)
     fold <- rep(x=c(0,1),times=c(n0,n1))
     y_hat <- list()
     # intercept-only model
@@ -224,6 +225,9 @@ if(FALSE){
     object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=alpha.init)
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$devel <- do.call(what="cbind",args=temp)
+    #--- group lasso start ---
+    
+    #--- group lasso end ---
     # prediction error
     mse <- matrix(data=NA,nrow=length(y_hat),ncol=2,dimnames=list(names(y_hat),NULL))
     for(i in seq_along(y_hat)){
@@ -239,3 +243,23 @@ if(FALSE){
 
 #object <- devel(x=x,y=y,family="gaussian")
 #y_hat <- predict(object=object,newx=x)
+
+#---- GROUP LASSO ---
+
+if(FALSE){
+  # requires simulation from above
+  yy <- as.numeric(y)
+  xx <- rbind(x,x)
+  zz <- rep(c(0,1),each=n)
+  ff <- c(fold,fold)
+  xx_int <- cbind(xx,xx)
+  group <- c(1,rep(x=seq(from=2,to=p+1),times=2))
+  # define foldid! (putting all entries from the same sample in the same group)
+  test <- gglasso::cv.gglasso(x=cbind(zz,xx_int)[ff==0,],y=yy[ff==0],group=group,pf=c(0,rep(1,times=p)))
+  # CONTINUE HERE
+  temp <- predict(test,newx=cbind(zz,xx_int)[ff==1,])
+  a <- matrix(temp,ncol=2)
+}
+
+
+
