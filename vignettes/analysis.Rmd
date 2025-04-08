@@ -757,12 +757,14 @@ colMeans(cm)
 test <- list()
 for(k in seq_along(problem)){
   test[[k]] <- list()
-  for(i in 1){
+  for(i in 1:5){
     test[[k]][[i]] <- joinet:::cv.joinet(Y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian")
   }
 }
 
-rowMeans(sapply(test,function(x) rowMeans(apply(x,2,rank))))
+rowMeans(sapply(test[[1]],function(x) rowMeans(apply(x,2,rank))))
+
+#rowMeans(sapply(test,function(x) rowMeans(apply(x,2,rank))))
 ```
 
 This chunk saves the session information for generating figures and tables.
