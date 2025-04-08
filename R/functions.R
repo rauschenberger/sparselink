@@ -1155,7 +1155,7 @@ coef.glm.transfer <- function(object){
 #' @param method character vector
 #' @param type character
 #'
-traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.separate","glm.transfer","sparselink","glm.common"),alpha.init,type){
+traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.separate","glm.transfer","sparselink","glm.common"),alpha.init,type,trial=FALSE){
   if(is.list(y_train)){
     q <- length(y_train)
   } else {
@@ -1178,7 +1178,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
     start <- Sys.time()
     hyperpar <- NULL
     if(method[i]=="sparselink"){
-      object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha,type=type)
+      object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha,type=type,trial=trial)
       hyperpar <- object$weight.min
     } else if(method[i]=="devel"){
       object <- func(x=X_train,y=y_train,family=family,alpha=alpha,alpha.init=alpha.init)
@@ -1266,7 +1266,7 @@ crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.t
 
 
 # This cross-validation function only works for multi-task learning (not for transfer learning).
-cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink"),alpha.init,type){
+cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink"),alpha.init,type,trial=FALSE){
   mode <- "multiple"
   foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
   n <- nrow(y)
@@ -1283,7 +1283,7 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
     y_test <- y[foldid==i,]
     X_train <- X[foldid!=i,,drop=FALSE]
     X_test <- X[foldid==i,,drop=FALSE]
-    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,y_test=y_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type)
+    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,y_test=y_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
     for(k in method){
         y_hat[[k]][foldid==i,] <- as.matrix(as.data.frame(test$y_hat[[k]]))
     }
@@ -1886,14 +1886,14 @@ plotWeight <- function(x,y){
 #' y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
 #' object <- sparselink(x=x,y=y,family=family)
 #' 
-sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,trial=FALSE){ # was alpha.init=0.95 and alpha=1
+sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,trial=FALSE){ # was alpha.init=0.95, alpha=1 and trial=FALSE
   
   alpha.one <- alpha.init
   alpha.two <- alpha
   
   #warning("remove seed")
   #set.seed(1)
-  cat("type=",type,"\n")
+  cat(paste0("alpha.init=",alpha.init,", alpha=",alpha,", trial=",trial,", type=",type,"\n"))
   
   #trial <- TRUE # was FALSE
   #mode <- ""
