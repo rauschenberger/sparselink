@@ -714,17 +714,19 @@ problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
 
 #cor(rowSums(scale(Y)),Y,method="spearman")
 
-alpha.init <- 0.95; alpha <- 1; type <- "exp"
+alpha.init <- 0.95; alpha <- 1; type <- "exp"; trial <- FALSE
+
+alpha.init <- NA; alpha <- 1; type <- "exp"; trial <- TRUE
 
 results <- list()
 for(k in seq_along(problem)){
   results[[k]] <- list()
   for(i in seq_len(3)){ # 5 repetitions of 10-fold CV
     set.seed(i)
-    method <- c("glm.separate","glm.mgaussian","sparselink","devel")
+    #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
     #method <- c("glm.separate","devel")
-    #method <- c("glm.separate","devel","sparselink")
-    results[[k]][[i]] <-  cv.multiple(y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type)
+    method <- c("glm.separate","glm.mgaussian","sparselink")
+    results[[k]][[i]] <-  cv.multiple(y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
 
