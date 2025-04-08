@@ -1004,7 +1004,12 @@ coef.glm.common <- function(object){
 #y_hat <- predict(object,newx=X_test)
 #coef <- coef(object)
 
-glm.separate <- function(x,y,family,alpha=1){
+glm.empty <- function(x,y,family,alpha=1){
+  object <- glm.separate(x=x,y=y,family=family,alpha=alpha,lambda=c(99e99,99e98))
+  return(object)
+}
+
+glm.separate <- function(x,y,family,alpha=1,lambda=NULL){
   if(is.matrix(x) & is.matrix(y)){
     q <- ncol(y)
     x <- replicate(n=q,expr=x,simplify=FALSE)
@@ -1017,7 +1022,7 @@ glm.separate <- function(x,y,family,alpha=1){
   object$info <- get.info(x=x,y=y,family=family)
   object$cv.glmnet <- list()
   for(i in seq_len(object$info$q)){
-    object$cv.glmnet[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family[i],alpha=alpha)
+    object$cv.glmnet[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family[i],alpha=alpha,lambda=lambda)
   }
   class(object) <- "glm.separate"
   return(object)
