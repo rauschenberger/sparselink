@@ -739,6 +739,11 @@ for(k in seq_along(problem)){
   }
 }
 
+names(results) <- names(problem)
+
+lapply(results,function(x) rowMeans(sapply(x,function(x) rowMeans(apply(x$deviance,1,rank)))))
+
+
 cm <- numeric()
 for(k in seq_along(problem)){
   for(i in seq_len(1)){
