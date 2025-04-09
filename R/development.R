@@ -21,7 +21,7 @@ fuse <- function(x,y,mode){
 }
 
 # alpha=NA returns Spearman's correlation coefficients
-init.coef <- function(list,alpha=0.95,lambda.sep=NULL,lambda.com=NULL){
+init.coef <- function(list,alpha=0.95,lambda.sep=NULL,lambda.com=NULL,trial=FALSE){
   if(is.null(lambda.sep)!=is.null(lambda.com)){stop()}
   cv <- is.null(lambda.sep) & is.null(lambda.com)
   q <- length(list$x$sep)
@@ -29,6 +29,24 @@ init.coef <- function(list,alpha=0.95,lambda.sep=NULL,lambda.com=NULL){
   if(!is.na(alpha) & cv){
     lambda.sep <- numeric() 
   }
+  #--- group lasso (currently only for Gaussian MTL)
+  if(trial){
+    cat("trial","\n")
+    y_temp <- sapply(list$y$sep,function(x) x)
+    x_temp <- list$x$sep[[1]]
+    if(cv){
+      object <- glmnet::cv.glmnet(x=x_temp,y=y_temp,family="mgaussian",alpha=alpha)
+      coef <- stats::coef(object,s="lambda.min")
+      lambda.com <- lambda.sep <- object$lambda.min
+    } else {
+      object <- glmnet::glmnet(x=x_temp,y=y_temp,family="mgaussian",alpha=alpha)
+      coef <- stats::coef(object=object,s=lambda.com)
+    }
+    coef.sep <- lapply(coef,function(x) x[-1])
+    coef.com <- do.call(what="+",args=coef.sep)
+  }
+  
+  if(!trial){
   #--- separate models ---
   for(i in seq_len(q)){
     if(is.na(alpha)){
@@ -56,6 +74,8 @@ init.coef <- function(list,alpha=0.95,lambda.sep=NULL,lambda.com=NULL){
     glm.com <- glmnet::glmnet(x=list$x$com,y=list$y$com,alpha=alpha)
     coef.com <- stats::coef(glm.com,s=lambda.com)[-1]
   }
+  }  
+    
   list <- list(com=coef.com,sep=coef.sep,lambda.sep=lambda.sep,lambda.com=lambda.com)
   return(list)
 }
@@ -72,7 +92,7 @@ penfac <- function(sep,com,exp.sep,exp.com){ # prop,
   return(pf)
 }
 
-devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
+devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10,trial=FALSE){
   if(any(family!="gaussian")){stop("not implemented")}
   #if(alpha!=1){stop("not implemented")}
   
@@ -102,7 +122,7 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
   }
   
   list.ext <- fuse(x=x,y=y,mode=mode)
-  init.ext <- init.coef(list=list.ext,alpha=alpha.init)
+  init.ext <- init.coef(list=list.ext,alpha=alpha.init,trial=trial)
 
   #ncand <- 11
   #prop <- seq(from=0,to=1,length.out=ncand)
@@ -142,7 +162,7 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
       x.test[[j]] <- x[[j]][cond,,drop=FALSE]
     }
     list.int <- fuse(x=x.train,y=y.train,mode=mode)
-    init.int <- init.coef(list=list.int,lambda.sep=init.ext$lambda.sep,lambda.com=init.ext$lambda.com,alpha=alpha.init)
+    init.int <- init.coef(list=list.int,lambda.sep=init.ext$lambda.sep,lambda.com=init.ext$lambda.com,alpha=alpha.init,trial=trial)
 
     for(j in seq_len(q)){
       cond <- foldid[[j]]==i
