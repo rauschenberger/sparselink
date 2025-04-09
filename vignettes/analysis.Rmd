@@ -719,14 +719,26 @@ for(i in seq_len(ncol(y))){
 problem <- list()
 #problem$joint <- c("SWOLLEN","TENDER")
 #problem$proms <- c("VAS","HAQ")
-problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
-#problem$trial <- c("CRP","ESR","SWOLLEN")
+#problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
+problem$trial <- c("CRP","ESR","SWOLLEN")
+#problem$all <- colnames(y)
+
+#--- examine correlation between coefficients ---
+coef <- matrix(data=NA,nrow=ncol(x),ncol=ncol(y),dimnames=list(NULL,colnames(y)))
+for(i in seq_len(ncol(y))){
+  object <- glmnet::cv.glmnet(x=x,y=y[,i],family="gaussian",alpha=0)
+  coef[,i] <- stats::coef(object=object,s="lambda.min")[-1]
+}
+round(stats::cor(coef,method="spearman"),digits=2)
+
+
 
 #cor(rowSums(scale(Y)),Y,method="spearman")
 
 alpha.init <- 0.95; alpha <- 1; type <- "exp"; trial <- FALSE
 
 alpha.init <- NA; alpha <- 1; type <- "exp"; trial <- TRUE
+# also try with alpha.init <- NA
 
 results <- list()
 for(k in seq_along(problem)){
@@ -735,10 +747,12 @@ for(k in seq_along(problem)){
     set.seed(i)
     #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
     #method <- c("glm.separate","devel")
-    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink","devel")
+    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink")
     results[[k]][[i]] <-  cv.multiple(y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
+
+colMeans(results[[1]][[1]]$deviance/results[[1]][[1]]$deviance[,"glm.empty"])
 
 names(results) <- names(problem)
 
@@ -759,8 +773,6 @@ colMeans(cm)
 
 # examine whether group lasso for TL/MTL performs better
 
-
-
 # unit interval
 #glm.separate        devel   sparselink 
 #   1.0000000    0.9742187    0.9598362 
@@ -779,8 +791,11 @@ for(k in seq_along(problem)){
   }
 }
 
+#--- for single problem 
+lapply(test[[1]],function(x) colMeans(t(x)/x["none",]))
+
 rowMeans(sapply(test[[1]],function(x) rowMeans(apply(x,2,rank))))
-rowMeans(sapply(test[[2]],function(x) rowMeans(apply(x,2,rank))))
+
 
 #rowMeans(sapply(test,function(x) rowMeans(apply(x,2,rank))))
 ```
