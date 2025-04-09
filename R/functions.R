@@ -534,13 +534,14 @@ comb_split_trial <- function(coef,id){
   # cor <- 1*(metric[-id]<metric.mean)
 
   # #--- correlation ---
-  #cor <- stats::cor(x=coef[,id],y=coef[,-id])
+  #cor <- stats::cor(x=coef[,id],y=coef[,-id],method="spearman")
   #cor[is.na(cor)] <- 0
-  #cor[cor>0] <- 1
-  #cor[cor<0] <- 0
+  ##cor[cor>0] <- 1
+  ##cor[cor<0] <- 0
   #cor <- matrix(data=cor,nrow=nrow(coef),ncol=length(cor),byrow=TRUE)
 
   #--- equality ---
+  #warning("Next line was active until revision.")
   cor <- 1
 
   #warning("remove binarisation!")
