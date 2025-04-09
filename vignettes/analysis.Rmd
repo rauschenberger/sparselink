@@ -670,6 +670,7 @@ rm(list=ls())
 <<setup>>
 <<define_projects>>
 <<preprocess_data>>
+source(file.path(path,"package/R/development.R"))
 
 #--- prepare data ---
 vars <- c("CCP","CRP","crp","DAS28","ESR","esr","HAQ","VAS","SWOLLEN","TENDER") # "inflammatory score" dropped due to NA # "RF" dropped because binary
@@ -711,7 +712,7 @@ x <- X[cond,]
 
 graphics::par(mfrow=c(2,4),mar=c(2,2,1,1))
 for(i in seq_len(ncol(y))){
-    pvalue <- apply(x,2,function(x) cor.test(x,y[,i])$p.value)
+    pvalue <- apply(x,2,function(x) cor.test(x,y[,i],method="spearman")$p.value)
     graphics::hist(x=pvalue,main=colnames(y)[i])
 }
 
