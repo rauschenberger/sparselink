@@ -672,10 +672,20 @@ rm(list=ls())
 <<preprocess_data>>
 source(file.path(path,"package/R/development.R"))
 
+#--- START TRIAL ---
+#test <- frame[[2]][,c("histology severity score","total mayo score")]
+#frame[[8]]$[,c("das score","")]
+#class(test[[1]]) <- "numeric"
+#class(test[[2]]) <- "numeric"
+#cor(test,use="pairwise.complete.obs")
+#cor(as.numeric(,use="pairwise.complete.obs"))
+#--- END TRIAL ---
+
 #--- prepare data ---
 vars <- c("CCP","CRP","crp","DAS28","ESR","esr","HAQ","VAS","SWOLLEN","TENDER") # "inflammatory score" dropped due to NA # "RF" dropped because binary
 #vars <- c("DAS28","SWOLLEN","TENDER")
 Y <- frame$ERP104864[,vars]
+pathotype <- frame$ERP104864$pathotype
 #Y <- Y[Y$pathotype=="lymphoid",vars]
 
 if(any(!is.na(Y$CRP)&!is.na(Y$crp))){
@@ -696,6 +706,7 @@ for(i in seq_len(ncol(Y))){
 
 #--- explore similarity ---
 cor <- cor(Y,use="pairwise.complete.obs",method="spearman")
+round(cor,digits=2)
 image(t(cor)[,ncol(cor):1])
 
 stats::heatmap(x=as.matrix(Y),Rowv=NA)
@@ -706,7 +717,7 @@ plot(hclust)
 
 X <- x$ERP104864
 
-cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x)))
+cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x))) # & pathotype=="lymphoid"
 y <- as.matrix(Y)[cond,]
 x <- X[cond,]
 
@@ -722,6 +733,7 @@ problem <- list()
 #problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
 problem$trial <- c("CRP","ESR","SWOLLEN")
 #problem$all <- colnames(y)
+#problem$test <- c("DAS28","SWOLLEN","TENDER")
 
 #--- examine correlation between coefficients ---
 coef <- matrix(data=NA,nrow=ncol(x),ncol=ncol(y),dimnames=list(NULL,colnames(y)))
@@ -730,8 +742,6 @@ for(i in seq_len(ncol(y))){
   coef[,i] <- stats::coef(object=object,s="lambda.min")[-1]
 }
 round(stats::cor(coef,method="spearman"),digits=2)
-
-
 
 #cor(rowSums(scale(Y)),Y,method="spearman")
 
@@ -743,11 +753,11 @@ alpha.init <- NA; alpha <- 1; type <- "exp"; trial <- TRUE
 results <- list()
 for(k in seq_along(problem)){
   results[[k]] <- list()
-  for(i in seq_len(3)){ # 5 repetitions of 10-fold CV
+  for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
     set.seed(i)
     #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
     #method <- c("glm.separate","devel")
-    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink")
+    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink","devel")
     results[[k]][[i]] <-  cv.multiple(y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
