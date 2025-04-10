@@ -228,15 +228,17 @@ if(FALSE){
     eta <- as.numeric(x %*% beta)
     y1 <- eta + 0.5*stats::rnorm(n=n,sd=sd(eta))
     y2 <- eta + 0.5*stats::rnorm(n=n,sd=sd(eta))
-    y <- cbind(y1,y2)
+    y3 <- 0.5*stats::rnorm(n=n,sd=sd(eta))
+    y <- cbind(y1,y2,y3)
+    #y <- cbind(y1,y2)
     q <- ncol(y)
     fold <- rep(x=c(0,1),times=c(n0,n1))
     y_hat <- list()
     # intercept-only model
-    y_hat$empty <- matrix(colMeans(y[fold==0,]),nrow=n1,ncol=2,byrow=TRUE)
+    y_hat$empty <- matrix(colMeans(y[fold==0,]),nrow=n1,ncol=q,byrow=TRUE)
     # standard lasso
-    y_hat$lasso <- matrix(data=NA,nrow=n1,ncol=2)
-    for(i in 1:2){
+    y_hat$lasso <- matrix(data=NA,nrow=n1,ncol=q)
+    for(i in seq_len(q)){
       object <- glmnet::cv.glmnet(x=x[fold==0,],y=y[fold==0,i])
       y_hat$lasso[,i] <- predict(object=object,newx=x[fold==1,],s="lambda.min")
     }
@@ -244,27 +246,32 @@ if(FALSE){
     object <- sparselink(x=x[fold==0,],y=y[fold==0,],family="gaussian",alpha.init=alpha.init)
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$sparselink <- do.call(what="cbind",args=temp)
-    # development
-    object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=alpha.init)
-    temp <- predict(object=object,newx=x[fold==1,])
-    y_hat$devel <- do.call(what="cbind",args=temp)
-    #--- group lasso start ---
-    yy <- as.numeric(y)
-    xx <- rbind(x,x)
-    zz <- rep(c(0,1),each=n)
-    ff <- c(fold,fold)
-    xx_int <- cbind(xx,xx)
-    group <- c(1,rep(x=seq(from=2,to=p+1),times=2))
-    # define foldid! (putting all entries from the same sample in the same group)
-    test <- gglasso::cv.gglasso(x=cbind(zz,xx_int)[ff==0,],y=yy[ff==0],group=group,pf=c(0,rep(1,times=p)))
-    # CONTINUE HERE
-    temp <- predict(test,newx=cbind(zz,xx_int)[ff==1,])
-    y_hat$group <- matrix(temp,ncol=2)
+    #--- development old ---
+    #object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=alpha.init)
+    #temp <- predict(object=object,newx=x[fold==1,])
+    #y_hat$devel <- do.call(what="cbind",args=temp)
+    ##--- group lasso start ---
+    #yy <- as.numeric(y)
+    #xx <- rbind(x,x)
+    #zz <- rep(c(0,1),each=n)
+    #ff <- c(fold,fold)
+    #xx_int <- cbind(xx,xx)
+    #group <- c(1,rep(x=seq(from=2,to=p+1),times=2))
+    ## define foldid! (putting all entries from the same sample in the same group)
+    #test <- gglasso::cv.gglasso(x=cbind(zz,xx_int)[ff==0,],y=yy[ff==0],group=group,pf=c(0,rep(1,times=p)))
+    ## CONTINUE HERE
+    #temp <- predict(test,newx=cbind(zz,xx_int)[ff==1,])
+    #y_hat$group <- matrix(temp,ncol=2)
     #--- group lasso end ---
+    
+    object <- cordev(x=x[fold==0,],y=y[fold==0,],family="gaussian")
+    temp <- predict(object=object,newx=x[fold==1,])
+    y_hat$cordev <- do.call(what="cbind",args=temp)
+    
     # prediction error
-    mse <- matrix(data=NA,nrow=length(y_hat),ncol=2,dimnames=list(names(y_hat),NULL))
+    mse <- matrix(data=NA,nrow=length(y_hat),ncol=q,dimnames=list(names(y_hat),NULL))
     for(i in seq_along(y_hat)){
-      for(j in seq_len(2)){
+      for(j in seq_len(q)){
         mse[i,j] <- mean((y[fold==1,j]-y_hat[[i]][,j])^2)
       }
     }
@@ -277,11 +284,123 @@ if(FALSE){
 #object <- devel(x=x,y=y,family="gaussian")
 #y_hat <- predict(object=object,newx=x)
 
-#---- GROUP LASSO ---
+#---- correlation-based re-implementation ---
 
-if(FALSE){
-
+cordev <- function(x,y,family="gaussian",nfolds=10){
+  
+  if(is.matrix(y) & is.matrix(x)){
+    message("mode: multi-target learning")
+    p <- ncol(x)
+    q <- ncol(y)
+    n <- rep(x=nrow(x),times=q)
+    foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
+    y <- apply(X=y,MARGIN=2,FUN=function(x) x,simplify=FALSE)
+    x <- replicate(n=q,expr=x,simplify=FALSE)
+    foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
+    mode <- "multiple"
+  } else if(is.list(y) & is.list(x)){
+    message("mode: transfer learning")
+    n <- sapply(X=y,FUN=base::length)
+    p <- ncol(x[[1]])
+    q <- length(x)
+    foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+    mode <- "transfer"
+  } else {
+    stop("Provide both x and y either as matrices (multi-target learning) or lists (transfer learning).")
+  }
+  
+  cor.ext <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    cor.ext[,i] <- stats::cor(y=y[[i]],x=x[[i]],method="spearman")
+  }
+  rel.ext <- stats::cor(cor.ext,method="spearman")
+  
+  #cand <- c(0,0.2,0.5,1,2,5)
+  #grid <- expand.grid(sep=cand,com=cand)
+  grid <- expand.grid(com=seq(from=0,to=10,length.out=21))
+  
+  weight.ext <- list()
+  weight.ext$ind <- rbind(pmax(cor.ext,0),-pmin(cor.ext,0))
+  # switch for Fisher-transform (next line, matters for TL; at least account for n)
+  #weight.ext$com <- c(rowSums(pmax(cor.ext,0)),rowSums(-pmin(cor.ext,0)))
+  object.ext <- list()
+  for(i in seq_len(q)){
+    object.ext[[i]] <- list()
+    for(j in seq_len(nrow(grid))){
+      weight <- rel.ext[i,]
+      #weight[i] <- 0
+      temp <- rbind(pmax(cor.ext %*% weight,0),-pmin(cor.ext %*% weight,0)) 
+      #pf.ext <- 1/(weight.ext$ind[,i]^grid$sep[j]+temp^grid$com[j])
+      pf.ext <- 1/(temp^grid$com[j])
+      object.ext[[i]][[j]] <- glmnet::glmnet(x=cbind(x[[i]],-x[[i]]),y=y[[i]],family=family,lower.limits=0,penalty.factor=pf.ext)
+    }
+  }
+  
+  y_hat <- list()
+  for(i in seq_len(q)){
+    y_hat[[i]] <- list()
+    for(j in seq_len(nrow(grid))){
+      y_hat[[i]][[j]] <- matrix(data=NA,nrow=n[i],ncol=length(object.ext[[i]][[j]]$lambda))
+    }
+  }
+  
+  # cross-validation
+  for(k in seq_len(nfolds)){
+    cond <- foldid[[i]]==k
+    cor.int <- matrix(data=NA,nrow=p,ncol=q)
+    for(i in seq_len(q)){
+      cor.int[,i] <- stats::cor(y=y[[i]][!cond],x=x[[i]][!cond,],method="spearman")
+    }
+    rel.int <- stats::cor(cor.int,method="spearman")
+    weight.int <- list()
+    weight.int$ind <- rbind(pmax(cor.int,0),-pmin(cor.int,0))
+    #weight.int$com <- c(rowSums(pmax(cor.int,0)),rowSums(-pmin(cor.int,0)))
+    object.int <- list()
+    for(i in seq_len(q)){
+      for(j in seq_len(nrow(grid))){
+        weight <- rel.int[i,]
+        #weight[i] <- 0
+        temp <- rbind(pmax(cor.int %*% weight,0),-pmin(cor.int %*% weight,0))
+        #pf.int <- 1/(weight.int$ind[,i]^grid$sep[j]+temp^grid$com[j])
+        pf.int <- 1/(temp^grid$com[j])
+        object.int <- glmnet::glmnet(x=cbind(x[[i]],-x[[i]])[!cond,],y=y[[i]][!cond],family=family,lower.limits=0,penalty.factor=pf.int)
+        y_hat[[i]][[j]][cond] <- predict(object=object.int,newx=cbind(x[[i]],-x[[i]])[cond,],s=object.ext[[i]][[j]]$lambda,type="response") 
+      }
+    }
+  }
+  
+  # metric
+  metric <- list()
+  lambda.min <- numeric()
+  for(i in seq_len(q)){
+    metric[[i]] <-  list()
+    for(j in seq_len(nrow(grid))){
+      metric[[i]][[j]] <- apply(y_hat[[i]][[j]],2,function(x) mean((y[[i]]-x)^2))
+      #lambda.min[[i]][j] <- object.ext[[i]][[j]]$lambda[which.min(metric[[i]][[j]])]
+    }
+    id <- which.min(sapply(metric[[i]],min))
+    object.ext[[i]] <- object.ext[[i]][[id]]
+    metric[[i]] <- metric[[i]][[id]]
+    lambda.min[i] <- object.ext[[i]]$lambda[which.min(metric[[i]])]
+  }
+  
+  #grid.min <- lapply(metric,function(x) sapply(x,which.min))
+  
+  list <- list(model=object.ext,lambda.min=lambda.min)
+  class(list) <- "cordev"
+  return(list)
 }
 
+predict.cordev <- function(object,newx){
+  q <- length(object$model)
+  y_hat <- list()
+  for(i in seq_len(q)){
+    y_hat[[i]] <- stats::predict(object=object$model[[i]],newx=cbind(newx,-newx),s=object$lambda.min[i])
+  }
+  return(y_hat)
+}
 
+coef.cordev <- function(object){
+  return(list(alpha=NA,beta=NA))
+}
 

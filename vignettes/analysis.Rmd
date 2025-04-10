@@ -717,7 +717,7 @@ plot(hclust)
 
 X <- x$ERP104864
 
-cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x))) # & pathotype=="lymphoid"
+cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x))) & pathotype=="lymphoid" # subtypes seem to be defined based on clinical scores
 y <- as.matrix(Y)[cond,]
 x <- X[cond,]
 
@@ -727,33 +727,40 @@ for(i in seq_len(ncol(y))){
     graphics::hist(x=pvalue,main=colnames(y)[i])
 }
 
-problem <- list()
-#problem$joint <- c("SWOLLEN","TENDER")
-#problem$proms <- c("VAS","HAQ")
-#problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
-problem$trial <- c("CRP","ESR","SWOLLEN")
-#problem$all <- colnames(y)
-#problem$test <- c("DAS28","SWOLLEN","TENDER")
+#--- relationship between cor coef and cor p-value ---
+coef <- stats::cor(y=y[,"CRP"],x=x,method="spearman")
+pval <- apply(X=x,MARGIN=2,FUN=function(x) stats::cor.test(x=x,y=y[,"CRP"],method="spearman")$p.value)
+graphics::plot(x=coef,y=sign(coef)*(-log10(pval))^0.5)
+#--- conclusion: equivalent ---
 
-#--- examine correlation between coefficients ---
+#--- examine correlation between ridge coefficients ---
 coef <- matrix(data=NA,nrow=ncol(x),ncol=ncol(y),dimnames=list(NULL,colnames(y)))
 for(i in seq_len(ncol(y))){
   object <- glmnet::cv.glmnet(x=x,y=y[,i],family="gaussian",alpha=0)
   coef[,i] <- stats::coef(object=object,s="lambda.min")[-1]
 }
 round(stats::cor(coef,method="spearman"),digits=2)
+#--- conclusion: some sets are strongly correlated ---
+
+problem <- list()
+#problem$joint <- c("SWOLLEN","TENDER")
+#problem$proms <- c("VAS","HAQ")
+#problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
+problem$trial <- c("CRP","ESR","SWOLLEN","TENDER")
+#problem$all <- colnames(y)
+#problem$test <- c("DAS28","SWOLLEN","TENDER")
 
 #cor(rowSums(scale(Y)),Y,method="spearman")
 
-alpha.init <- 0.95; alpha <- 1; type <- "exp"; trial <- FALSE
+alpha.init <- 0.95; alpha <- 1; type <- "exp"; trial <- TRUE
 
-alpha.init <- NA; alpha <- 1; type <- "exp"; trial <- TRUE
+alpha.init <- NA; alpha <- 1; type <- "exp"; trial <- FALSE
 # also try with alpha.init <- NA
 
 results <- list()
 for(k in seq_along(problem)){
   results[[k]] <- list()
-  for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
+  for(i in seq_len(3)){ # 5 repetitions of 10-fold CV
     set.seed(i)
     #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
     #method <- c("glm.separate","devel")
@@ -762,12 +769,13 @@ for(k in seq_along(problem)){
   }
 }
 
+
 colMeans(results[[1]][[1]]$deviance/results[[1]][[1]]$deviance[,"glm.empty"])
 
 names(results) <- names(problem)
-
 lapply(results,function(x) rowMeans(sapply(x,function(x) rowMeans(apply(x$deviance,1,rank)))))
 
+object <- devel(y=y[,problem$trial],x=x,family="gaussian")
 
 cm <- numeric()
 for(k in seq_along(problem)){
@@ -796,7 +804,7 @@ colMeans(cm)
 test <- list()
 for(k in seq_along(problem)){
   test[[k]] <- list()
-  for(i in 1:5){
+  for(i in 1:3){
     test[[k]][[i]] <- joinet:::cv.joinet(Y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian")
   }
 }
