@@ -2100,6 +2100,9 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
       lambda.min[l,i] <- glm.two.ext[[i]][[l]]$lambda[lambda.ind[l,i]]
     }
     cvm.min[,i] <- sapply(X=metric[[i]],FUN=min)
+    if(trial){
+      tryCatch(expr=plotWeight(x=weight,y=cvm.min[,i]),error=function(x) NULL)
+    }
   }
   weight.ind <- apply(X=cvm.min,MARGIN=2,FUN=which.min)
   weight.min <- weight[weight.ind,]
