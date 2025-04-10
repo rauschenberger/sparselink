@@ -188,7 +188,10 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10,trial=
     }
     id.grid[j] <- which.min(sapply(mse[[j]],min))
     lambda.min[j] <- model.ext[[j]][[id.grid[j]]]$lambda[which.min(mse[[j]][[id.grid[j]]])]
-    graphics::plot(sapply(X=mse[[j]],FUN=min),type="o")
+    #graphics::plot(sapply(X=mse[[j]],FUN=min),type="o")
+    temp <- grid
+    names(temp) <- c("source","target")
+    tryCatch(expr=plotWeight(x=temp,y=sapply(X=mse[[j]],FUN=min)),error=function(x) NULL)
   }
   
   list <- list(model=model.ext,id.grid=id.grid,lambda.min=lambda.min)
