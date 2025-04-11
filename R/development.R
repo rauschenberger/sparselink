@@ -258,7 +258,10 @@ cordev <- function(x,y,family="gaussian",nfolds=10){
     for(j in seq_len(nrow(grid))){
       weight <- rel.ext[i,]
       #weight[i] <- 0
-      temp <- rbind(pmax(cor.ext %*% weight,0),-pmin(cor.ext %*% weight,0)) 
+      # Remove multiplication with %*% weight outside of pmax/pmin!!!
+      #temp <- rbind(pmax(cor.ext %*% weight,0),-pmin(cor.ext %*% weight,0))
+      #temp <- c(rowSums(pmax(cor.ext,0)),rowSums(-pmin(cor.ext,0)))
+      temp <- c(rowSums(pmax(t(t(cor.ext)*weight),0)),rowSums(-pmin(t(t(cor.ext)*weight),0)))
       pf.ext <- 1/(weight.ext$ind[,i]^grid$sep[j]+temp^grid$com[j])
       #pf.ext <- 1/(temp^grid$com[j])
       object.ext[[i]][[j]] <- glmnet::glmnet(x=cbind(x[[i]],-x[[i]]),y=y[[i]],family=family,lower.limits=0,penalty.factor=pf.ext)
@@ -289,7 +292,9 @@ cordev <- function(x,y,family="gaussian",nfolds=10){
       for(j in seq_len(nrow(grid))){
         weight <- rel.int[i,]
         #weight[i] <- 0
-        temp <- rbind(pmax(cor.int %*% weight,0),-pmin(cor.int %*% weight,0))
+        #temp <- rbind(pmax(cor.int %*% weight,0),-pmin(cor.int %*% weight,0))
+        #temp <- c(rowSums(pmax(cor.int,0)),rowSums(-pmin(cor.int,0)))
+        temp <- c(rowSums(pmax(t(t(cor.int)*weight),0)),rowSums(-pmin(t(t(cor.int)*weight),0)))
         pf.int <- 1/(weight.int$ind[,i]^grid$sep[j]+temp^grid$com[j])
         #pf.int <- 1/(temp^grid$com[j])
         object.int <- glmnet::glmnet(x=cbind(x[[i]],-x[[i]])[!cond,],y=y[[i]][!cond],family=family,lower.limits=0,penalty.factor=pf.int)
@@ -350,8 +355,9 @@ group.init <- function(x,y,alpha.init,lambda.min=NULL){
   return(list)
 }
 
-group.devel <- function(x,y,family="gaussian",nfolds=10,alpha.init=0.95){
-
+group.devel <- function(x,y,family="gaussian",nfolds=10,alpha=1,alpha.init=0.95){
+  if(alpha!=1){warning("arg not implemented")}
+  
   p <- ncol(x)
   q <- ncol(y)
   n <- rep(x=nrow(x),times=q)
@@ -363,35 +369,39 @@ group.devel <- function(x,y,family="gaussian",nfolds=10,alpha.init=0.95){
 
   cand <- c(0,0.2,0.5,1,2,5)
   grid <- expand.grid(sep=cand,com=cand)
+  #cand <- seq(from=0,to=1,by=0.2)
+  #grid <- data.frame(w=cand)
   
   object.ext <- list()
   for(i in seq_len(q)){
     object.ext[[i]] <- list()
     for(j in seq_len(nrow(grid))){
-      pf.ext <- 1/(init.ext$sep[,i]^grid$sep[j]+init.ext$com^grid$com[j])
       #pf.ext <- rep(1,times=2*p)# remove this line
+      pf.ext <- 1/(init.ext$sep[,i]^grid$sep[j]+init.ext$com^grid$com[j])
+      #pf.ext <- 1/(init.ext$sep[,i]*(1-grid$w[j])+init.ext$com*grid$w[j])
       object.ext[[i]][[j]] <- glmnet::glmnet(x=cbind(x,-x),y=y[,i],penalty.factor=pf.ext,lower.limits=0)
       #beta <- coef(object.ext[[i]][[j]],s=0.1)[-1]
       #plot(x=1/pf.ext,y=beta)
-    }
-  }
+    }; rm(j)
+  }; rm(i)
   
   y_hat <- list()
   for(i in seq_len(q)){
     y_hat[[i]] <- list()
     for(j in seq_len(nrow(grid))){
       y_hat[[i]][[j]] <- matrix(data=NA,nrow=n,ncol=length(object.ext[[i]][[j]]$lambda))
-    }
-  }
+    }; rm(j)
+  }; rm(i)
   
   for(k in seq_len(nfolds)){
     init.int <- group.init(x=x[foldid!=k,],y=y[foldid!=k,],alpha.init=alpha.init,lambda.min=init.ext$lambda.min)
     for(i in seq_len(q)){
       for(j in seq_len(nrow(grid))){
-        pf.int <- 1/(init.int$sep[,i]^grid$sep[j]+init.int$com^grid$com[j]) 
-        #pf.int <- rep(1,times=2*p) # remove this line
+        #pf.int <- rep(x=1,times=2*p) # remove this line
+        pf.int <- 1/(init.int$sep[,i]^grid$sep[j]+init.int$com^grid$com[j])
+        #pf.int <- 1/(init.int$sep[,i]*(1-grid$w[j])+init.int$com*grid$w[j])
         object.int <- glmnet::glmnet(x=cbind(x,-x)[foldid!=k,],y=y[foldid!=k,i],penalty.factor=pf.int,lower.limits=0)
-        y_hat[[i]][[j]][foldid==k,] <- stats::predict(object=object.int,newx=cbind(x,-x)[foldid==k,],s=object.ext[[i]][[j]]$lambda)
+        y_hat[[i]][[j]][foldid==k,] <- stats::predict(object=object.int,newx=cbind(x,-x)[foldid==k,],s=object.ext[[i]][[j]]$lambda,type="response")
       }
     }
   }
@@ -402,16 +412,17 @@ group.devel <- function(x,y,family="gaussian",nfolds=10,alpha.init=0.95){
     for(j in seq_len(nrow(grid))){
       mse[[i]][[j]] <- apply(X=y_hat[[i]][[j]],MARGIN=2,FUN=function(x) mean((x-y[,i])^2))
     }
-  }
+  }; rm(i)
   
   
   model <- list()
-  id.grid <- lambda.min <- numeric()
+  lambda.min <- numeric()
   for(i in seq_len(q)){
-    id.grid[i] <- which.min(sapply(X=mse[[i]],FUN=min))
-    lambda.min[i] <- object.ext[[i]][[id.grid[i]]]$lambda[which.min(mse[[i]][[id.grid[i]]])]
-    model[[i]] <- object.ext[[i]][[id.grid[i]]]
-  }
+    mse.min <- sapply(X=mse[[i]],FUN=min)
+    id.grid <- which.min(mse.min)
+    lambda.min[i] <- object.ext[[i]][[id.grid]]$lambda[which.min(mse[[i]][[id.grid]])]
+    model[[i]] <- object.ext[[i]][[id.grid]]
+  }; rm(i)
   
   list <- list(model=model,lambda.min=lambda.min)
   class(list) <- "cordev"
@@ -421,7 +432,6 @@ group.devel <- function(x,y,family="gaussian",nfolds=10,alpha.init=0.95){
 #--- exploratory simulation ---
 
 if(FALSE){
-  alpha.init <- 0.95
   #alpha.init <- 0
   metric <- list()
   for(k in 1:10){
@@ -434,9 +444,12 @@ if(FALSE){
     x <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
     beta <- stats::rbinom(n=p,size=1,prob=0.1)*stats::rnorm(n=p)
     eta <- as.numeric(x %*% beta)
-    y1 <- eta + 0.5*stats::rnorm(n=n,sd=sd(eta))
-    y2 <- eta + 1*stats::rnorm(n=n,sd=sd(eta))
-    y3 <- stats::rnorm(n=n,sd=sd(eta))
+    y1 <- eta + 0.3*stats::rnorm(n=n,sd=sd(eta))
+    y2 <- eta + 0.7*stats::rnorm(n=n,sd=sd(eta))
+    y3 <- 0.5*stats::rnorm(n=n,sd=sd(eta))
+    #y1 <- eta + 0.2*stats::rnorm(n=n,sd=sd(eta))
+    #y2 <- eta + 0.4*stats::rnorm(n=n,sd=sd(eta))
+    #y3 <- eta + 0.6*stats::rnorm(n=n,sd=sd(eta))
     y <- cbind(y1,y2,y3)
     y <- scale(y)
     #y <- cbind(y1,y2)
@@ -455,7 +468,7 @@ if(FALSE){
     object <- glmnet::cv.glmnet(x=x[fold==0,],y=y[fold==0,],family="mgaussian")
     y_hat$mgaussian <- predict(object=object,newx=x[fold==1,],s="lambda.min")[,,1]
     #--- sparselink ---
-    object <- sparselink(x=x[fold==0,],y=y[fold==0,],family="gaussian",alpha.init=alpha.init)
+    object <- sparselink(x=x[fold==0,],y=y[fold==0,],family="gaussian",alpha.init=0.95)
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$sparselink <- do.call(what="cbind",args=temp)
     #--- development old ---
@@ -482,7 +495,7 @@ if(FALSE){
     y_hat$cordev <- do.call(what="cbind",args=temp)
     
     #--- group-lasso based approach ---
-    object <- group.devel(x=x[fold==0,],y=y[fold==0,],family="gaussian")
+    object <- group.devel(x=x[fold==0,],y=y[fold==0,],family="gaussian",alpha.init=0.95)
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$group <- do.call(what="cbind",args=temp)
     
@@ -495,8 +508,9 @@ if(FALSE){
     }
     metric[[k]] <- mse
   }
-  rowMeans(do.call(what="cbind",args=metric))
-  Reduce(f="+",x=metric)
+  rowMeans(sapply(metric,function(x) colMeans(t(x)/x["empty",])))
+  #rowMeans(do.call(what="cbind",args=metric))
+  #Reduce(f="+",x=metric)
 }
 
 #object <- devel(x=x,y=y,family="gaussian")

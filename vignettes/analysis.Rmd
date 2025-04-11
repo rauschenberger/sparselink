@@ -324,7 +324,7 @@ for(i in unlist(project)){
 
 # select most expressed protein-coding genes (for MTL project)
 mean <- apply(X=x[[extra]],MARGIN=2,FUN=mean)
-temp <- cond & mean >= sort(mean[cond],decreasing=TRUE)[250] # change number
+temp <- cond & mean >= sort(mean[cond],decreasing=TRUE)[2000] # change number
 select[[extra]] <- temp
 
 # pre-processing
@@ -673,21 +673,28 @@ rm(list=ls())
 source(file.path(path,"package/R/development.R"))
 
 #--- START TRIAL ---
-#test <- frame[[2]][,c("histology severity score","total mayo score")]
+X <- x$SRP129004
+vars <- c("histology severity score","total mayo score")
+Y <- frame$SRP129004[,vars]
+names <- intersect(rownames(X),rownames(Y))
+X <- X[names,]
+Y <- Y[names,]
+
+#test <- frame[[2]][,]
 #frame[[8]]$[,c("das score","")]
 #class(test[[1]]) <- "numeric"
 #class(test[[2]]) <- "numeric"
-#cor(test,use="pairwise.complete.obs")
+#cor(test,use="pairwise.complete.obs",method="spearman")
 #cor(as.numeric(,use="pairwise.complete.obs"))
 #--- END TRIAL ---
 
 #--- prepare data ---
+X <- x$ERP104864
 vars <- c("CCP","CRP","crp","DAS28","ESR","esr","HAQ","VAS","SWOLLEN","TENDER") # "inflammatory score" dropped due to NA # "RF" dropped because binary
-#vars <- c("DAS28","SWOLLEN","TENDER")
 Y <- frame$ERP104864[,vars]
 pathotype <- frame$ERP104864$pathotype
+if(any(rownames(X)!=rownames(Y))){stop()}
 #Y <- Y[Y$pathotype=="lymphoid",vars]
-
 if(any(!is.na(Y$CRP)&!is.na(Y$crp))){
   stop("Invalid.")
 } else {
@@ -700,24 +707,23 @@ if(any(!is.na(Y$ESR)&!is.na(Y$esr))){
   Y$ESR[is.na(Y$ESR)] <- Y$esr[is.na(Y$ESR)]
   Y$esr <- NULL
 }
+#--- --- ---
+
 for(i in seq_len(ncol(Y))){
   class(Y[[i]]) <- "numeric"
 }
 
+
 #--- explore similarity ---
-cor <- cor(Y,use="pairwise.complete.obs",method="spearman")
+cor <- stats::cor(Y,use="pairwise.complete.obs",method="spearman")
 round(cor,digits=2)
-image(t(cor)[,ncol(cor):1])
-
-stats::heatmap(x=as.matrix(Y),Rowv=NA)
-
+graphics::image(t(cor)[,ncol(cor):1])
+#stats::heatmap(x=as.matrix(Y),Rowv=NA)
 d <- stats::dist(x=t(Y))
 hclust <- stats::hclust(d=d)
 plot(hclust)
 
-X <- x$ERP104864
-
-cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x))) & pathotype=="lymphoid" # subtypes seem to be defined based on clinical scores
+cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x))) #& pathotype=="lymphoid" # subtypes seem to be defined based on clinical scores
 y <- scale(as.matrix(Y)[cond,]) # temporary scaling
 x <- X[cond,]
 
@@ -742,33 +748,28 @@ for(i in seq_len(ncol(y))){
 round(stats::cor(coef,method="spearman"),digits=2)
 #--- conclusion: some sets are strongly correlated ---
 
-problem <- list()
+#problem <- list()
 #problem$joint <- c("SWOLLEN","TENDER")
 #problem$proms <- c("VAS","HAQ")
 #problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
-problem$trial <- c("CRP","ESR","SWOLLEN","TENDER")
-#problem$all <- colnames(y)
-#problem$test <- c("DAS28","SWOLLEN","TENDER")
+
+problem <- list()
+problem$unique <- colnames(y)
 
 #cor(rowSums(scale(Y)),Y,method="spearman")
 
 alpha.init <- 0.95; alpha <- 1; type <- "exp"; trial <- TRUE
-
-alpha.init <- NA; alpha <- 1; type <- "exp"; trial <- FALSE
-# also try with alpha.init <- NA
+#alpha.init <- NA; alpha <- 1; type <- "exp"; trial <- FALSE
 
 results <- list()
 for(k in seq_along(problem)){
   results[[k]] <- list()
-  for(i in seq_len(3)){ # 5 repetitions of 10-fold CV
+  for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
     set.seed(i)
-    #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
-    #method <- c("glm.separate","devel")
-    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink")
+    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink","group.devel")
     results[[k]][[i]] <-  cv.multiple(y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
-
 
 colMeans(results[[1]][[1]]$deviance/results[[1]][[1]]$deviance[,"glm.empty"])
 
@@ -787,33 +788,25 @@ for(k in seq_along(problem)){
   }
 }
 colMeans(cm)
+
 # separate, mgaussian, sparselink and devel have similar performance (i.e., MTL has no benefit with any of these three approaches), examine whether other approaches are better
 
 # examine whether group lasso for TL/MTL performs better
-
-# unit interval
-#glm.separate        devel   sparselink 
-#   1.0000000    0.9742187    0.9598362 
-
-# flexible
-#glm.separate        devel   sparselink 
-#   1.0000000    0.9745329    0.9475552 
 
 # Consider using different candidate values, e.g., 0.01,0.5,1,1.5,2,10 also for sparselink. Removing 0 might be a good choice. (If 0 is not included, however, initial ridge regression might be better.)
 
 test <- list()
 for(k in seq_along(problem)){
   test[[k]] <- list()
-  for(i in 1:3){
+  for(i in 1){
     test[[k]][[i]] <- joinet:::cv.joinet(Y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian")
   }
 }
+lapply(test,function(x) sapply(x,function(x) colMeans(t(x)/x["none",])))
 
-#--- for single problem 
-lapply(test[[1]],function(x) colMeans(t(x)/x["none",]))
 
-rowMeans(sapply(test[[1]],function(x) rowMeans(apply(x,2,rank))))
-
+sapply(test,function(x)
+rowMeans(sapply(x,function(x) rowMeans(apply(x,2,rank)))))
 
 #rowMeans(sapply(test,function(x) rowMeans(apply(x,2,rank))))
 ```
