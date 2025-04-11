@@ -718,7 +718,7 @@ plot(hclust)
 X <- x$ERP104864
 
 cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x))) & pathotype=="lymphoid" # subtypes seem to be defined based on clinical scores
-y <- as.matrix(Y)[cond,]
+y <- scale(as.matrix(Y)[cond,]) # temporary scaling
 x <- X[cond,]
 
 graphics::par(mfrow=c(2,4),mar=c(2,2,1,1))
@@ -764,7 +764,7 @@ for(k in seq_along(problem)){
     set.seed(i)
     #method <- c("glm.separate","glm.mgaussian","sparselink","devel")
     #method <- c("glm.separate","devel")
-    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink","devel")
+    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink")
     results[[k]][[i]] <-  cv.multiple(y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
