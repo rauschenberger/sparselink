@@ -672,6 +672,13 @@ rm(list=ls())
 <<preprocess_data>>
 source(file.path(path,"package/R/development.R"))
 
+#--- TRIAL ---
+X <- x$SRP155483
+vars <- c("disease activity","das score")
+Y <- frame$SRP155483[,vars]
+sapply(unique(Y$`disease activity`),function(x) range(as.numeric(Y$`das score`[Y$`disease activity`==x])))
+# DAS score defines disease activity!
+
 #--- START TRIAL ---
 X <- x$SRP129004
 vars <- c("histology severity score","total mayo score")
@@ -679,6 +686,9 @@ Y <- frame$SRP129004[,vars]
 names <- intersect(rownames(X),rownames(Y))
 X <- X[names,]
 Y <- Y[names,]
+#cond <- frame$SRP129004[names,"diagnosis"]=="Ulcerative Colitis"
+#X <- X[cond,]
+#Y <- Y[cond,]
 
 #test <- frame[[2]][,]
 #frame[[8]]$[,c("das score","")]
