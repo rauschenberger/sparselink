@@ -325,7 +325,7 @@ for(i in unlist(project)){
 # select most expressed protein-coding genes (for MTL project)
 mean <- apply(X=x[[extra]],MARGIN=2,FUN=mean)
 warning("change number in next line")
-temp <- cond & mean >= sort(mean[cond],decreasing=TRUE)[2000] # change number
+temp <- cond & mean >= sort(mean[cond],decreasing=TRUE)[100] # increase to 2000!
 select[[extra]] <- temp
 
 # pre-processing
@@ -673,11 +673,13 @@ rm(list=ls())
 <<preprocess_data>>
 source(file.path(path,"package/R/development.R"))
 
-#--------------------
-#--- prepare data ---
-#--------------------
+#- - - - - - - - - - 
+#- - prepare data - -
+#- - - - - - - - - - 
 
-project <- "SRP129004"
+# explore SRP048801
+
+project <- "ERP104864"
 if(project=="SRP155483"){
   X <- x$SRP155483
   vars <- c("disease activity","das score")
@@ -685,7 +687,7 @@ if(project=="SRP155483"){
   sapply(unique(Y$`disease activity`),function(x) range(as.numeric(Y$`das score`[Y$`disease activity`==x])))
   warning("DAS score defines disease activity!")
   problem <- list()
-  problem$unique <- colnames(y)
+  problem$unique <- colnames(Y)
 } else if(project=="SRP129004"){
   X <- x$SRP129004
   vars <- c("histology severity score","total mayo score")
@@ -697,7 +699,7 @@ if(project=="SRP155483"){
   X <- X[cond,]
   Y <- Y[cond,]
   problem <- list()
-  problem$unique <- colnames(y)
+  problem$unique <- colnames(Y)
 } else if(project=="ERP104864"){
   X <- x$ERP104864
   vars <- c("CCP","CRP","crp","DAS28","ESR","esr","HAQ","VAS","SWOLLEN","TENDER") # "inflammatory score" dropped due to NA # "RF" dropped because binary
@@ -718,31 +720,32 @@ if(project=="SRP155483"){
     Y$esr <- NULL
   }
   problem <- list()
-  problem$joint <- c("SWOLLEN","TENDER")
-  problem$proms <- c("VAS","HAQ")
-  problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
-  problem$all <- colnames(y)
+  #problem$joint <- c("SWOLLEN","TENDER")
+  #problem$proms <- c("VAS","HAQ")
+  #problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
+  problem$trial <- c("CRP","ESR","SWOLLEN")
+  #problem$all <- colnames(y)
 }
 
 for(i in seq_len(ncol(Y))){
   class(Y[[i]]) <- "numeric"
 }
 
-#--------------------------
-#--- explore similarity ---
-#--------------------------
+cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x))) #& pathotype=="lymphoid" # subtypes seem to be defined based on clinical scores
+y <- scale(as.matrix(Y)[cond,]) # temporary scaling
+x <- X[cond,]
 
-cor <- stats::cor(Y,use="pairwise.complete.obs",method="spearman")
+#- - - - - - - - - - - - - 
+#- - explore similarity - -
+#- - - - - - - - - - - - - 
+
+cor <- stats::cor(y,use="pairwise.complete.obs",method="spearman")
 round(x=cor,digits=2)
 graphics::image(t(cor)[,ncol(cor):1])
 #stats::heatmap(x=as.matrix(Y),Rowv=NA)
 d <- stats::dist(x=t(Y))
 hclust <- stats::hclust(d=d)
 graphics::plot(hclust)
-
-cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x))) #& pathotype=="lymphoid" # subtypes seem to be defined based on clinical scores
-y <- scale(as.matrix(Y)[cond,]) # temporary scaling
-x <- X[cond,]
 
 graphics::par(mfrow=c(2,4),mar=c(2,2,1,1))
 for(i in seq_len(ncol(y))){
@@ -767,23 +770,26 @@ round(stats::cor(coef,method="spearman"),digits=2)
 
 #cor(rowSums(scale(Y)),Y,method="spearman")
 
-#------------------------
-#--- cross-validation ---
-#------------------------
+#- - - - - - - - - - - - - 
+#- - cross-validation - -
+#- - - - - - - - - - - - - 
 
-alpha.init <- 0.95; alpha <- 1; type <- "exp"; trial <- TRUE
-#alpha.init <- NA; alpha <- 1; type <- "exp"; trial <- FALSE
+#alpha.init <- 0.95; alpha <- 1; type <- "exp"; trial <- FALSE
+#alpha.init <- NA; alpha <- 1; type <- "exp"; trial <- TRUE
 results <- list()
 for(k in seq_along(problem)){
   results[[k]] <- list()
   for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
     set.seed(i)
-    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink") #,"group.devel"
+    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink") #"group.devel"
     results[[k]][[i]] <-  cv.multiple(y=y[,problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
 colMeans(results[[1]][[1]]$deviance/results[[1]][[1]]$deviance[,"glm.empty"])
 names(results) <- names(problem)
+
+colMeans(results$trial[[1]]$deviance/results$trial[[1]]$deviance[,"glm.empty"])
+
 lapply(results,function(x) rowMeans(sapply(x,function(x) rowMeans(apply(x$deviance,1,rank)))))
 
 object <- devel(y=y[,problem$trial],x=x,family="gaussian")
@@ -805,25 +811,26 @@ colMeans(cm)
 
 # Consider using different candidate values, e.g., 0.01,0.5,1,1.5,2,10 also for sparselink. Removing 0 might be a good choice. (If 0 is not included, however, initial ridge regression might be better.)
 
-#----------------------
-#--- learning curve ---
-#----------------------
+#- - - - - - - - - - - -
+#- - learning curve - -
+#- - - - - - - - - - - -
 
 size <- unique(c(seq(from=50,to=nrow(x),by=25),nrow(x)))
-iter <- 1
+iter <- 10 # increase to 10
 
 metric <- list()
 setting <- expand.grid(problem=names(problem),size=size,iter=seq_len(iter))
 for(i in seq_len(nrow(setting))){
+  cat(progress=paste0(100*i/nrow(setting),"%"),"\n")
   cond <- sample(rep(x=c(FALSE,TRUE),times=c(nrow(x)-setting$size[i],setting$size[i])))
   vars <- problem[[setting$problem[i]]]
-  #metric[[i]] <- joinet:::cv.joinet(Y=y[cond,vars],X=x[cond,],family="gaussian")
-  method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink")
-  metric[[i]] <-  cv.multiple(y=y[cond,vars],X=x[cond,],family="gaussian",method=method,nfolds=10,alpha.init=0.95,alpha=1,type="exp",trial=TRUE)
+  metric[[i]] <- joinet:::cv.joinet(Y=y[cond,vars],X=x[cond,],family="gaussian",compare="mnorm")
+  #method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink")
+  #metric[[i]] <-  cv.multiple(y=y[cond,vars],X=x[cond,],family="gaussian",method=method,nfolds=10,alpha.init=0.95,alpha=1,type="exp",trial=TRUE)
 }
-frac <- sapply(X=metric,FUN=function(x) rowMeans(x/x["none",]))
+frac <- sapply(X=metric,FUN=function(x) colMeans(t(x)/x["none",]))
 
-frac <- sapply(X=metric,FUN=function(x) colMeans(x$deviance/x$deviance[,"glm.empty"]))
+#frac <- sapply(X=metric,FUN=function(x) colMeans(x$deviance/x$deviance[,"glm.empty"]))
 
 graphics::par(mfrow=c(1,length(problem)),mar=c(3,3,2,0.5))
 for(i in seq_along(problem)){
@@ -835,14 +842,31 @@ for(i in seq_along(problem)){
   graphics::axis(side=2)
   graphics::abline(h=1,col="grey",lty=2)
   cond <- setting$problem==names(problem)[i]
-  #col <- c(base="red",meta="blue")
-  col <- c(glm.separate="red",sparselink="blue")
+  col <- c(base="red",mnorm="orange",meta="blue")
+  #col <- c(glm.separate="red",sparselink="blue")
   for(j in names(col)){
     val <- tapply(X=frac[j,cond],INDEX=setting$size[cond],FUN=mean)
     graphics::points(x=setting$size[cond],y=frac[j,cond],col=col[j])
     graphics::lines(x=size,y=val,col=col[j],type="o",pch=16)
   }
 }
+
+#--- --- --- --- --- --- ---
+#--- explore other datasets ---
+#--- --- --- --- --- --- ---
+
+#data <- xlsx::read.xlsx(paste0(path,"/results/PPMI_Curated_Data_Cut_Public_20250321.xlsx"),sheetIndex=1)
+Y <- read.csv(paste0(path,"/results/PPMI_Curated_Data_Cut_Public_20250321.csv"))
+colnames(Y) <- tolower(colnames(Y))
+
+Y <- Y[Y$cohort==1 & Y$event_id %in% c("V04","V06","V08"),]
+colnames(Y)[colnames(Y)=="updrs_totscore"] <- "updrs"
+vars <- c("moca","quip","updrs","gds","scopa","ess","bjlot","rem")
+# too few levels: "NP1HALL","NP1DPRS"
+Y <- Y[,c("event_id","patno",vars)]
+Y <- reshape(Y,idvar="patno",timevar="event_id",direction="wide")
+rownames(Y) <- Y$patno; Y$patno <- NULL
+
 ```
 
 This chunk saves the session information for generating figures and tables.

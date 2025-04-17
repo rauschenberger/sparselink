@@ -471,6 +471,7 @@ if(FALSE){
     object <- sparselink(x=x[fold==0,],y=y[fold==0,],family="gaussian",alpha.init=0.95)
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$sparselink <- do.call(what="cbind",args=temp)
+    
     #--- development old ---
     #object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=alpha.init)
     #temp <- predict(object=object,newx=x[fold==1,])
