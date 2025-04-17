@@ -324,6 +324,7 @@ for(i in unlist(project)){
 
 # select most expressed protein-coding genes (for MTL project)
 mean <- apply(X=x[[extra]],MARGIN=2,FUN=mean)
+warning("change number in next line")
 temp <- cond & mean >= sort(mean[cond],decreasing=TRUE)[2000] # change number
 select[[extra]] <- temp
 
@@ -672,57 +673,65 @@ rm(list=ls())
 <<preprocess_data>>
 source(file.path(path,"package/R/development.R"))
 
-#--- explore other datasets ---
-#X <- x$SRP155483
-#vars <- c("disease activity","das score")
-#Y <- frame$SRP155483[,vars]
-#sapply(unique(Y$`disease activity`),function(x) range(as.numeric(Y$`das score`[Y$`disease activity`==x])))
-# DAS score defines disease activity!
-#
-#X <- x$SRP129004
-#vars <- c("histology severity score","total mayo score")
-#Y <- frame$SRP129004[,vars]
-#names <- intersect(rownames(X),rownames(Y))
-#X <- X[names,]
-#Y <- Y[names,]
-##cond <- frame$SRP129004[names,"diagnosis"]=="Ulcerative Colitis"
-##X <- X[cond,]
-##Y <- Y[cond,]
-#problem <- list()
-#problem$unique <- colnames(y)
-
+#--------------------
 #--- prepare data ---
-X <- x$ERP104864
-vars <- c("CCP","CRP","crp","DAS28","ESR","esr","HAQ","VAS","SWOLLEN","TENDER") # "inflammatory score" dropped due to NA # "RF" dropped because binary
-Y <- frame$ERP104864[,vars]
-pathotype <- frame$ERP104864$pathotype
-if(any(rownames(X)!=rownames(Y))){stop()}
-#Y <- Y[Y$pathotype=="lymphoid",vars]
-if(any(!is.na(Y$CRP)&!is.na(Y$crp))){
-  stop("Invalid.")
-} else {
-  Y$CRP[is.na(Y$CRP)] <- Y$crp[is.na(Y$CRP)]
-  Y$crp <- NULL
-}
-if(any(!is.na(Y$ESR)&!is.na(Y$esr))){
-  stop("Invalid.")
-} else {
-  Y$ESR[is.na(Y$ESR)] <- Y$esr[is.na(Y$ESR)]
-  Y$esr <- NULL
-}
-problem <- list()
-problem$joint <- c("SWOLLEN","TENDER")
-problem$proms <- c("VAS","HAQ")
-problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
-problem$all <- colnames(y)
+#--------------------
 
+project <- "SRP129004"
+if(project=="SRP155483"){
+  X <- x$SRP155483
+  vars <- c("disease activity","das score")
+  Y <- frame$SRP155483[,vars]
+  sapply(unique(Y$`disease activity`),function(x) range(as.numeric(Y$`das score`[Y$`disease activity`==x])))
+  warning("DAS score defines disease activity!")
+  problem <- list()
+  problem$unique <- colnames(y)
+} else if(project=="SRP129004"){
+  X <- x$SRP129004
+  vars <- c("histology severity score","total mayo score")
+  Y <- frame$SRP129004[,vars]
+  names <- intersect(rownames(X),rownames(Y))
+  X <- X[names,]
+  Y <- Y[names,]
+  cond <- frame$SRP129004[names,"diagnosis"]=="Ulcerative Colitis"
+  X <- X[cond,]
+  Y <- Y[cond,]
+  problem <- list()
+  problem$unique <- colnames(y)
+} else if(project=="ERP104864"){
+  X <- x$ERP104864
+  vars <- c("CCP","CRP","crp","DAS28","ESR","esr","HAQ","VAS","SWOLLEN","TENDER") # "inflammatory score" dropped due to NA # "RF" dropped because binary
+  Y <- frame$ERP104864[,vars]
+  pathotype <- frame$ERP104864$pathotype
+  if(any(rownames(X)!=rownames(Y))){stop()}
+  #Y <- Y[Y$pathotype=="lymphoid",vars]
+  if(any(!is.na(Y$CRP)&!is.na(Y$crp))){
+    stop("Invalid.")
+  } else {
+    Y$CRP[is.na(Y$CRP)] <- Y$crp[is.na(Y$CRP)]
+    Y$crp <- NULL
+  }
+  if(any(!is.na(Y$ESR)&!is.na(Y$esr))){
+    stop("Invalid.")
+  } else {
+    Y$ESR[is.na(Y$ESR)] <- Y$esr[is.na(Y$ESR)]
+    Y$esr <- NULL
+  }
+  problem <- list()
+  problem$joint <- c("SWOLLEN","TENDER")
+  problem$proms <- c("VAS","HAQ")
+  problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
+  problem$all <- colnames(y)
+}
 
 for(i in seq_len(ncol(Y))){
   class(Y[[i]]) <- "numeric"
 }
 
-
+#--------------------------
 #--- explore similarity ---
+#--------------------------
+
 cor <- stats::cor(Y,use="pairwise.complete.obs",method="spearman")
 round(x=cor,digits=2)
 graphics::image(t(cor)[,ncol(cor):1])
@@ -758,6 +767,10 @@ round(stats::cor(coef,method="spearman"),digits=2)
 
 #cor(rowSums(scale(Y)),Y,method="spearman")
 
+#------------------------
+#--- cross-validation ---
+#------------------------
+
 alpha.init <- 0.95; alpha <- 1; type <- "exp"; trial <- TRUE
 #alpha.init <- NA; alpha <- 1; type <- "exp"; trial <- FALSE
 results <- list()
@@ -765,8 +778,8 @@ for(k in seq_along(problem)){
   results[[k]] <- list()
   for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
     set.seed(i)
-    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink","group.devel")
-    results[[k]][[i]] <-  cv.multiple(y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
+    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink") #,"group.devel"
+    results[[k]][[i]] <-  cv.multiple(y=y[,problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
 colMeans(results[[1]][[1]]$deviance/results[[1]][[1]]$deviance[,"glm.empty"])
@@ -792,22 +805,9 @@ colMeans(cm)
 
 # Consider using different candidate values, e.g., 0.01,0.5,1,1.5,2,10 also for sparselink. Removing 0 might be a good choice. (If 0 is not included, however, initial ridge regression might be better.)
 
-#--- fast version with JOINET ---
-test <- list()
-for(k in seq_along(problem)){
-  test[[k]] <- list()
-  for(i in seq_len(3)){
-    test[[k]][[i]] <- joinet:::cv.joinet(Y=y[,colnames(y) %in% problem[[k]]],X=x,family="gaussian")
-  }
-}
-lapply(test,function(x) sapply(x,function(x) colMeans(t(x)/x["none",])))
-
-sapply(test,function(x)
-rowMeans(sapply(x,function(x) rowMeans(apply(x,2,rank)))))
-
-#rowMeans(sapply(test,function(x) rowMeans(apply(x,2,rank))))
-
+#----------------------
 #--- learning curve ---
+#----------------------
 
 size <- unique(c(seq(from=50,to=nrow(x),by=25),nrow(x)))
 iter <- 1
@@ -823,6 +823,8 @@ for(i in seq_len(nrow(setting))){
 }
 frac <- sapply(X=metric,FUN=function(x) rowMeans(x/x["none",]))
 
+frac <- sapply(X=metric,FUN=function(x) colMeans(x$deviance/x$deviance[,"glm.empty"]))
+
 graphics::par(mfrow=c(1,length(problem)),mar=c(3,3,2,0.5))
 for(i in seq_along(problem)){
   graphics::plot.new()
@@ -833,15 +835,14 @@ for(i in seq_along(problem)){
   graphics::axis(side=2)
   graphics::abline(h=1,col="grey",lty=2)
   cond <- setting$problem==names(problem)[i]
-  col <- c(base="red",meta="blue")
+  #col <- c(base="red",meta="blue")
+  col <- c(glm.separate="red",sparselink="blue")
   for(j in names(col)){
     val <- tapply(X=frac[j,cond],INDEX=setting$size[cond],FUN=mean)
     graphics::points(x=setting$size[cond],y=frac[j,cond],col=col[j])
     graphics::lines(x=size,y=val,col=col[j],type="o",pch=16)
   }
 }
-
-
 ```
 
 This chunk saves the session information for generating figures and tables.
