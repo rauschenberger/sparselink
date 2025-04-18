@@ -391,7 +391,8 @@ group.devel <- function(x,y,family="gaussian",nfolds=10,alpha=1,alpha.init=0.95)
       #pf.ext <- rep(1,times=2*p)# remove this line
       #pf.ext <- 1/(init.ext$sep[,i]^grid$sep[j]+init.ext$com^grid$com[j])
       #pf.ext <- 1/(init.ext$sep[,i]*(1-grid$w[j])+init.ext$com*grid$w[j])
-      pf.ext <- 1/(init.ext$com^grid$w[j])
+      #pf.ext <- 1/(init.ext$com^grid$w[j])
+      pf.ext <- 1/(init.ext$sep[,i]^grid$w[j])
       object.ext[[i]][[j]] <- glmnet::glmnet(x=cbind(x,-x),y=y[,i],penalty.factor=pf.ext,lower.limits=0)
       #beta <- coef(object.ext[[i]][[j]],s=0.1)[-1]
       #plot(x=1/pf.ext,y=beta)
@@ -413,7 +414,8 @@ group.devel <- function(x,y,family="gaussian",nfolds=10,alpha=1,alpha.init=0.95)
         #pf.int <- rep(x=1,times=2*p) # remove this line
         #pf.int <- 1/(init.int$sep[,i]^grid$sep[j]+init.int$com^grid$com[j])
         #pf.int <- 1/(init.int$sep[,i]*(1-grid$w[j])+init.int$com*grid$w[j])
-        pf.int <- 1/(init.int$com^grid$w[j])
+        #pf.int <- 1/(init.int$com^grid$w[j])
+        pf.int <- 1/(init.int$sep[,i]^grid$w[j])
         object.int <- glmnet::glmnet(x=cbind(x,-x)[foldid!=k,],y=y[foldid!=k,i],penalty.factor=pf.int,lower.limits=0)
         y_hat[[i]][[j]][foldid==k,] <- stats::predict(object=object.int,newx=cbind(x,-x)[foldid==k,],s=object.ext[[i]][[j]]$lambda,type="response")
       }

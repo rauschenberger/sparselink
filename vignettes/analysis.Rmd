@@ -779,12 +779,13 @@ alpha.init <- 0.95; alpha <- 1; type <- "exp"; trial <- FALSE
 results <- list()
 for(k in seq_along(problem)){
   results[[k]] <- list()
-  for(i in seq_len(2)){ # 5 repetitions of 10-fold CV
-    set.seed(i+1)
-    method <- c("glm.empty","glm.separate","glm.mgaussian","devel") #"sparselink" "group.devel"
+  for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
+    set.seed(i)
+    method <- c("glm.empty","glm.separate","glm.mgaussian","group.devel") #"sparselink" "group.devel"
     results[[k]][[i]] <-  cv.multiple(y=y[,problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
+
 colMeans(results[[1]][[1]]$deviance/results[[1]][[1]]$deviance[,"glm.empty"])
 names(results) <- names(problem)
 
@@ -855,17 +856,46 @@ for(i in seq_along(problem)){
 #--- explore other datasets ---
 #--- --- --- --- --- --- ---
 
-#data <- xlsx::read.xlsx(paste0(path,"/results/PPMI_Curated_Data_Cut_Public_20250321.xlsx"),sheetIndex=1)
-Y <- read.csv(paste0(path,"/results/PPMI_Curated_Data_Cut_Public_20250321.csv"))
-colnames(Y) <- tolower(colnames(Y))
+#projects <- recount3::available_projects(organism="human")
+#recount3::read_metadata()
 
-Y <- Y[Y$cohort==1 & Y$event_id %in% c("V04","V06","V08"),]
-colnames(Y)[colnames(Y)=="updrs_totscore"] <- "updrs"
+
+#data <- xlsx::read.xlsx(paste0(path,"/results/PPMI_Curated_Data_Cut_Public_20250321.xlsx"),sheetIndex=1)
+data <- read.csv(paste0(path,"/results/PPMI_Curated_Data_Cut_Public_20250321.csv"))
+
+# baseline data (predictors)
+x <- data[data$COHORT==1 & data$EVENT_ID=="BL",]
+rownames(x) <- x$PATNO
+prop.miss <- colMeans(is.na(x))
+x <- x[,prop.miss<=0.5 & sapply(x,class) %in% c("numeric","integer")]
+x <- x[,which(colnames(x)=="age"):ncol(x)]
+x <- missRanger::missRanger(data=x,pmm.k=3,num.trees=100,verbose=0,seed=1)
+x <- scale(x)
+
+# follow-up data (outcomes)
+visit <- c("V04","V06","V08")
+y <- data[data$COHORT==1 & data$EVENT_ID %in% visit,]
+colnames(y)[colnames(y)=="updrs_totscore"] <- "updrs"
 vars <- c("moca","quip","updrs","gds","scopa","ess","bjlot","rem")
-# too few levels: "NP1HALL","NP1DPRS"
-Y <- Y[,c("event_id","patno",vars)]
-Y <- reshape(Y,idvar="patno",timevar="event_id",direction="wide")
-rownames(Y) <- Y$patno; Y$patno <- NULL
+y <- y[,c("EVENT_ID","PATNO",vars)]
+y <- reshape(data=y,idvar="PATNO",timevar="EVENT_ID",direction="wide")
+rownames(y) <- y$PATNO; y$PATNO <- NULL
+
+# overlap
+names <- intersect(rownames(x),rownames(y))
+x <- x[names,]
+y <- y[names,]
+y <- as.matrix(y)
+
+metric <- list()
+for(i in seq_along(vars)){
+  cols <- paste0(vars[i],".",visit)
+  cond <- rowSums(is.na(y[,cols]))==0 # temporary
+  if(sum(cond)>100){cond[cumsum(cond)>100] <- FALSE} # temporary
+  #metric[[i]] <- joinet:::cv.joinet(Y=y[cond,cols],X=x[cond,],family="gaussian",alpha.base=1,alpha.meta=1)
+  metric[[i]] <- cv.multiple(y=y[cond,cols],X=x[cond,],family="gaussian",method="sparselink",nfolds=10,alpha.init=0.95,alpha=1,type="exp",trial=TRUE)
+}
+
 
 ```
 
