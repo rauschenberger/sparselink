@@ -612,6 +612,7 @@ colMeans(nzero[disease=="RA",])
 
 #--- revision: report AUC ---
 Reduce(f="+",x=lapply(result$IBD,function(x) x$auc))/length(result$IBD)
+lapply(result,function(x) round(colMeans(Reduce(f="+",x=lapply(x,function(x) x$auc))/length(result$IBD)),digits=3))
 ```
 
 This chunk generates the figure on feature selection.
