@@ -485,7 +485,7 @@ penfac <- function(coef,exp){
 }
 
 devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
-  if(any(family!="gaussian")){stop("not implemented")}
+  #if(any(family!="gaussian")){stop("not implemented")}
   #if(alpha!=1){stop("not implemented")}
   
   if(is.matrix(y) & is.matrix(x)){
@@ -516,7 +516,7 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
   init.ext <- init.coef(x=x,y=y,alpha=alpha.init)
   
 
-  exp <- c(0.0,0.2,0.5,0.75,1.0,1.25,1.5,2.0,5.0) # flexible
+  exp <- c(0.0,0.1,0.25,0.5,0.75,1.0,1.25,1.5,2.0,5.0) # flexible
   grid <- expand.grid(exp=exp)
   ncand <- nrow(grid)
   model.ext <- list()
@@ -561,7 +561,7 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
         } else {
           model.int <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]])[!cond,],y=y[[j]][!cond],family=family[j],lower.limits=0,penalty.factor=pf,alpha=alpha)
         }
-        pred[[j]][[k]][cond,] <- stats::predict(object=model.int,newx=cbind(x[[j]],-x[[j]])[cond,],s=model.ext[[j]][[k]]$lambda)
+        pred[[j]][[k]][cond,] <- stats::predict(object=model.int,newx=cbind(x[[j]],-x[[j]])[cond,],s=model.ext[[j]][[k]]$lambda,type="response")
       }
     }
   }
@@ -573,7 +573,8 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
   for(j in seq_len(q)){
     mse[[j]] <- list()
     for(k in seq_len(ncand)){
-      mse[[j]][[k]] <- apply(X=pred[[j]][[k]],MARGIN=2,FUN=function(x) mean((x-y[[j]])^2))
+      #mse[[j]][[k]] <- apply(X=pred[[j]][[k]],MARGIN=2,FUN=function(x) mean((x-y[[j]])^2))
+      mse[[j]][[k]] <- apply(X=pred[[j]][[k]],MARGIN=2,FUN=function(x) calc.metric(y=y[[j]],y_hat=x,family=family[j]))
     }
     id.grid[j] <- which.min(sapply(mse[[j]],min))
     lambda.min[j] <- model.ext[[j]][[id.grid[j]]]$lambda[which.min(mse[[j]][[id.grid[j]]])]
@@ -588,8 +589,14 @@ devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
 predict.devel <- function(object,newx){
   q <- length(object$model)
   y_hat <- list()
-  for(i in seq_len(q)){
-    y_hat[[i]] <- stats::predict(object=object$model[[i]][[object$id.grid[i]]],newx=cbind(newx,-newx),s=object$lambda.min[i])
+  if(is.list(newx)){
+    for(i in seq_len(q)){
+      y_hat[[i]] <- stats::predict(object=object$model[[i]][[object$id.grid[i]]],newx=cbind(newx[[i]],-newx[[i]]),s=object$lambda.min[i],type="response")
+    }
+  } else {
+    for(i in seq_len(q)){
+      y_hat[[i]] <- stats::predict(object=object$model[[i]][[object$id.grid[i]]],newx=cbind(newx,-newx),s=object$lambda.min[i],type="response")
+    }
   }
   return(y_hat)
 }
@@ -670,7 +677,7 @@ if(FALSE){
     y_hat$group <- do.call(what="cbind",args=temp)
     
     #--- development  ---
-    object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=0.95)
+    object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=0.95,family="binomial")
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$devel <- do.call(what="cbind",args=temp)
     

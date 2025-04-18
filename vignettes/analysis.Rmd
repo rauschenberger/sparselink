@@ -889,13 +889,17 @@ y <- as.matrix(y)
 
 metric <- list()
 for(i in seq_along(vars)){
+  cat(vars[i],"\n")
   cols <- paste0(vars[i],".",visit)
   cond <- rowSums(is.na(y[,cols]))==0 # temporary
-  if(sum(cond)>100){cond[cumsum(cond)>100] <- FALSE} # temporary
-  #metric[[i]] <- joinet:::cv.joinet(Y=y[cond,cols],X=x[cond,],family="gaussian",alpha.base=1,alpha.meta=1)
-  metric[[i]] <- cv.multiple(y=y[cond,cols],X=x[cond,],family="gaussian",method="sparselink",nfolds=10,alpha.init=0.95,alpha=1,type="exp",trial=TRUE)
+  if(sum(cond)>250){cond[cumsum(cond)>250] <- FALSE} # temporary
+  metric[[i]] <- joinet:::cv.joinet(Y=y[cond,cols],X=x[cond,],family="gaussian",compare="mnorm")
+  #method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink","devel") # ,"sparselink")
+  #metric[[i]] <- cv.multiple(y=y[cond,cols],X=x[cond,],family="gaussian",method=method,nfolds=10,alpha.init=0.95,alpha=1,type="exp",trial=TRUE)
 }
 
+#rowMeans(sapply(metric,function(x) colMeans(t(x)/x["none",])))
+rowMeans(sapply(metric,function(x) colMeans(x$deviance/x$deviance[,"glm.empty"])))
 
 ```
 
