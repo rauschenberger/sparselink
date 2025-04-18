@@ -605,6 +605,89 @@ coef.devel <- function(object){
   return(list(alpha=NA,beta=NA))
 }
 
+#- - - - - - - - - - - - - - - - - - 
+#---- common support ----
+#- - - - - - - - - - - - - - - - - - 
+
+expand <- function(x,y=NULL,q=NULL){
+  if(is.null(y)){
+    yy <- NULL
+  } else if(is.list(y)){
+    yy <- do.call(what="c",args=y)
+  } else {
+    yy <- unlist(y)
+  }
+  if(is.list(x)){
+    n <- sapply(x,nrow)
+    p <- ncol(x[[1]])
+    q <- length(x)
+    xx <- matrix(data=0,nrow=sum(n),ncol=q*p)
+    cumsum <- c(0,cumsum(n))
+    for(i in seq_len(q)){
+      rows <- (cumsum[i]+1):(cumsum[i+1])
+      cols <- ((i-1)*p+1):(i*p)
+      xx[rows,cols] <- x[[i]]
+    }
+  } else {
+    n <- nrow(x)
+    p <- ncol(x)
+    xx <- matrix(data=0,nrow=q*n,ncol=q*p)
+    for(i in seq_len(q)){
+      rows <- ((i-1)*n+1):(i*n)
+      cols <- ((i-1)*p+1):(i*p)
+      xx[rows,cols] <- x
+    }
+  }
+  list <- list(xx=xx,yy=yy)
+  return(list)
+}
+
+
+common_support <- function(x,y,family){
+  if(is.matrix(y) & is.matrix(x)){
+    message("mode: multi-target learning")
+    p <- ncol(x)
+    q <- ncol(y)
+    n <- rep(x=nrow(x),times=q)
+    foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
+    y <- apply(X=y,MARGIN=2,FUN=function(x) x,simplify=FALSE)
+    x <- replicate(n=q,expr=x,simplify=FALSE)
+    foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
+    mode <- "multiple"
+  } else if(is.list(y) & is.list(x)){
+    message("mode: transfer learning")
+    n <- sapply(X=y,FUN=base::length)
+    p <- ncol(x[[1]])
+    q <- length(x)
+    foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+    mode <- "transfer"
+  } else {
+    stop("Provide both x and y either as matrices (multi-target learning) or lists (transfer learning).")
+  }
+  problem <- rep(x=seq_len(q),times=n)
+  feature <- rep(x=seq_len(p),times=q)
+  group <- c(feature,p+1)
+  pf_group <- rep(x=c(1,0),times=c(p,1))
+  list <- expand(x=x,y=y)
+  object <- sparsegl::cv.sparsegl(x=cbind(list$xx,problem),y=list$yy,group=group,pf_group=pf_group,family=family)
+  list <- list(object=object,q=q)
+  class(list) <- "comsup"
+  return(list)
+}
+
+predict.comsup <- function(object,newx){
+  if(is.list(newx)){
+    problem <- rep(x=seq_along(x),times=sapply(x,nrow))
+    xx <- expand(x=newx)$xx
+  } else {
+    problem <- rep(x=seq_len(object$q),each=nrow(newx))
+    xx <- expand(x=newx,q=object$q)$xx
+  }
+  predict(object=object$object,newx=cbind(xx,problem),type="response",s="lambda.min")
+}
+
+
+
 
 #- - - - - - - - - - - - - - - - - - -
 #---- exploratory simulation ----
@@ -624,8 +707,8 @@ if(FALSE){
     beta <- stats::rbinom(n=p,size=1,prob=0.1)*stats::rnorm(n=p)
     eta <- as.numeric(x %*% beta)
     y1 <- eta + 0.2*stats::rnorm(n=n,sd=sd(eta))
-    y2 <- eta + 0.4*stats::rnorm(n=n,sd=sd(eta))
-    y3 <- 0*eta + 1*stats::rnorm(n=n,sd=sd(eta))
+    y2 <- eta + 0.5*stats::rnorm(n=n,sd=sd(eta))
+    y3 <- eta + 0.7*stats::rnorm(n=n,sd=sd(eta))
     #y1 <- eta + 0.2*stats::rnorm(n=n,sd=sd(eta))
     #y2 <- eta + 0.4*stats::rnorm(n=n,sd=sd(eta))
     #y3 <- eta + 0.6*stats::rnorm(n=n,sd=sd(eta))
@@ -677,9 +760,14 @@ if(FALSE){
     y_hat$group <- do.call(what="cbind",args=temp)
     
     #--- development  ---
-    object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=0.95,family="binomial")
+    object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=0.95,family="gaussian")
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$devel <- do.call(what="cbind",args=temp)
+    
+    #--- common support ---
+    object <- common_support(x=x[fold==0,],y=y[fold==0,],family="gaussian")
+    temp <- predict(object=object,newx=x[fold==1,])
+    y_hat$comsup <- matrix(data=temp,ncol=q)
     
     #--- prediction error ---
     mse <- matrix(data=NA,nrow=length(y_hat),ncol=q,dimnames=list(names(y_hat),NULL))
