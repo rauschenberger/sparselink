@@ -215,7 +215,17 @@ coef.devel <- function(object){
 
 #---- correlation-based re-implementation ---
 
-cordev <- function(x,y,family="gaussian",nfolds=10){
+#cordev.init <- function(x,y,alpha.init=NA){
+#  p <- ncol(x[[1]])
+#  q <- length(x)
+#  cor <- matrix(data=NA,nrow=p,ncol=q)
+#  for(i in seq_len(q)){
+#    cor[,i] <- stats::cor(y=y[[i]],x=x[[i]],method="spearman")
+#  }
+#  return(cor)
+#}
+
+cordev <- function(x,y,family="gaussian",alpha.init=NA,nfolds=10){
   
   if(is.matrix(y) & is.matrix(x)){
     message("mode: multi-target learning")
@@ -242,28 +252,29 @@ cordev <- function(x,y,family="gaussian",nfolds=10){
   for(i in seq_len(q)){
     cor.ext[,i] <- stats::cor(y=y[[i]],x=x[[i]],method="spearman")
   }
-  rel.ext <- stats::cor(cor.ext,method="spearman")
+  #cor.ext <- cordev.init(x=x,y=y,alpha.init=alpha.init)
+  #rel.ext <- stats::cor(cor.ext,method="spearman")
   
   cand <- c(0,0.2,0.5,1,2,5)
-  grid <- expand.grid(sep=cand,com=cand)
-  #grid <- expand.grid(com=seq(from=0,to=10,length.out=21))
+  #grid <- expand.grid(sep=cand,com=cand)
+  grid <- expand.grid(com=seq(from=0,to=10,length.out=21))
   
   weight.ext <- list()
-  weight.ext$ind <- rbind(pmax(cor.ext,0),-pmin(cor.ext,0))
+  #weight.ext$ind <- rbind(pmax(cor.ext,0),-pmin(cor.ext,0))
   # switch for Fisher-transform (next line, matters for TL; at least account for n)
-  #weight.ext$com <- c(rowSums(pmax(cor.ext,0)),rowSums(-pmin(cor.ext,0)))
+  weight.ext$com <- c(rowMeans(pmax(cor.ext,0)),rowMeans(-pmin(cor.ext,0)))
   object.ext <- list()
   for(i in seq_len(q)){
     object.ext[[i]] <- list()
     for(j in seq_len(nrow(grid))){
-      weight <- rel.ext[i,]
+      #weight <- rel.ext[i,]
       #weight[i] <- 0
       # Remove multiplication with %*% weight outside of pmax/pmin!!!
       #temp <- rbind(pmax(cor.ext %*% weight,0),-pmin(cor.ext %*% weight,0))
       #temp <- c(rowSums(pmax(cor.ext,0)),rowSums(-pmin(cor.ext,0)))
-      temp <- c(rowSums(pmax(t(t(cor.ext)*weight),0)),rowSums(-pmin(t(t(cor.ext)*weight),0)))
-      pf.ext <- 1/(weight.ext$ind[,i]^grid$sep[j]+temp^grid$com[j])
-      #pf.ext <- 1/(temp^grid$com[j])
+      #temp <- c(rowSums(pmax(t(t(cor.ext)*weight),0)),rowSums(-pmin(t(t(cor.ext)*weight),0)))
+      #pf.ext <- 1/(weight.ext$ind[,i]^grid$sep[j]+temp^grid$com[j])
+      pf.ext <- 1/(weight.ext$com^grid$com[j])
       object.ext[[i]][[j]] <- glmnet::glmnet(x=cbind(x[[i]],-x[[i]]),y=y[[i]],family=family,lower.limits=0,penalty.factor=pf.ext)
     }
   }
@@ -283,20 +294,21 @@ cordev <- function(x,y,family="gaussian",nfolds=10){
     for(i in seq_len(q)){
       cor.int[,i] <- stats::cor(y=y[[i]][!cond],x=x[[i]][!cond,],method="spearman")
     }
-    rel.int <- stats::cor(cor.int,method="spearman")
+    #cor.int <- cordev.init(x=x[[i]][!cond,],y=y[[i]][!cond],alpha.init=alpha.init)
+    #rel.int <- stats::cor(cor.int,method="spearman")
     weight.int <- list()
-    weight.int$ind <- rbind(pmax(cor.int,0),-pmin(cor.int,0))
-    #weight.int$com <- c(rowSums(pmax(cor.int,0)),rowSums(-pmin(cor.int,0)))
+    #weight.int$ind <- rbind(pmax(cor.int,0),-pmin(cor.int,0))
+    weight.int$com <- c(rowMeans(pmax(cor.int,0)),rowMeans(-pmin(cor.int,0)))
     object.int <- list()
     for(i in seq_len(q)){
       for(j in seq_len(nrow(grid))){
-        weight <- rel.int[i,]
+        #weight <- rel.int[i,]
         #weight[i] <- 0
         #temp <- rbind(pmax(cor.int %*% weight,0),-pmin(cor.int %*% weight,0))
         #temp <- c(rowSums(pmax(cor.int,0)),rowSums(-pmin(cor.int,0)))
-        temp <- c(rowSums(pmax(t(t(cor.int)*weight),0)),rowSums(-pmin(t(t(cor.int)*weight),0)))
-        pf.int <- 1/(weight.int$ind[,i]^grid$sep[j]+temp^grid$com[j])
-        #pf.int <- 1/(temp^grid$com[j])
+        #temp <- c(rowSums(pmax(t(t(cor.int)*weight),0)),rowSums(-pmin(t(t(cor.int)*weight),0)))
+        #pf.int <- 1/(weight.int$ind[,i]^grid$sep[j]+temp^grid$com[j])
+        pf.int <- 1/(weight.int$com^grid$com[j])
         object.int <- glmnet::glmnet(x=cbind(x[[i]],-x[[i]])[!cond,],y=y[[i]][!cond],family=family,lower.limits=0,penalty.factor=pf.int)
         y_hat[[i]][[j]][cond] <- predict(object=object.int,newx=cbind(x[[i]],-x[[i]])[cond,],s=object.ext[[i]][[j]]$lambda,type="response") 
       }
@@ -367,18 +379,19 @@ group.devel <- function(x,y,family="gaussian",nfolds=10,alpha=1,alpha.init=0.95)
   
   #graphics::plot(x=beta,y=init.ext$com[1:p]-init.ext$com[(p+1):(2*p)])
 
-  cand <- c(0,0.2,0.5,1,2,5)
-  grid <- expand.grid(sep=cand,com=cand)
-  #cand <- seq(from=0,to=1,by=0.2)
-  #grid <- data.frame(w=cand)
+  #cand <- c(0,0.2,0.5,1,2,5)
+  #grid <- expand.grid(sep=cand,com=cand)
+  cand <- seq(from=0,to=5,length.out=11)
+  grid <- data.frame(w=cand)
   
   object.ext <- list()
   for(i in seq_len(q)){
     object.ext[[i]] <- list()
     for(j in seq_len(nrow(grid))){
       #pf.ext <- rep(1,times=2*p)# remove this line
-      pf.ext <- 1/(init.ext$sep[,i]^grid$sep[j]+init.ext$com^grid$com[j])
+      #pf.ext <- 1/(init.ext$sep[,i]^grid$sep[j]+init.ext$com^grid$com[j])
       #pf.ext <- 1/(init.ext$sep[,i]*(1-grid$w[j])+init.ext$com*grid$w[j])
+      pf.ext <- 1/(init.ext$com^grid$w[j])
       object.ext[[i]][[j]] <- glmnet::glmnet(x=cbind(x,-x),y=y[,i],penalty.factor=pf.ext,lower.limits=0)
       #beta <- coef(object.ext[[i]][[j]],s=0.1)[-1]
       #plot(x=1/pf.ext,y=beta)
@@ -398,8 +411,9 @@ group.devel <- function(x,y,family="gaussian",nfolds=10,alpha=1,alpha.init=0.95)
     for(i in seq_len(q)){
       for(j in seq_len(nrow(grid))){
         #pf.int <- rep(x=1,times=2*p) # remove this line
-        pf.int <- 1/(init.int$sep[,i]^grid$sep[j]+init.int$com^grid$com[j])
+        #pf.int <- 1/(init.int$sep[,i]^grid$sep[j]+init.int$com^grid$com[j])
         #pf.int <- 1/(init.int$sep[,i]*(1-grid$w[j])+init.int$com*grid$w[j])
+        pf.int <- 1/(init.int$com^grid$w[j])
         object.int <- glmnet::glmnet(x=cbind(x,-x)[foldid!=k,],y=y[foldid!=k,i],penalty.factor=pf.int,lower.limits=0)
         y_hat[[i]][[j]][foldid==k,] <- stats::predict(object=object.int,newx=cbind(x,-x)[foldid==k,],s=object.ext[[i]][[j]]$lambda,type="response")
       }
@@ -429,7 +443,163 @@ group.devel <- function(x,y,family="gaussian",nfolds=10,alpha=1,alpha.init=0.95)
   return(list)
 }
 
-#--- exploratory simulation ---
+
+#- - - - - - - - - - - - - - - - - - -
+#---- simplified re-implementation ----
+#- - - - - - - - - - - - - - - - - - -
+
+# alpha=NA returns Spearman's correlation coefficients
+init.coef <- function(x,y,alpha=0.95,lambda=NULL){
+  cv <- is.null(lambda)
+  q <- length(x)
+  glm <- coef <- list()
+  if(!is.na(alpha) & cv){
+    lambda <- numeric() 
+  }
+  #--- separate models ---
+  for(i in seq_len(q)){
+    if(is.na(alpha)){
+      coef[[i]] <- as.numeric(stats::cor(x=x[[i]],y=y[[i]],method="spearman"))
+    } else if(cv){
+      glm[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],alpha=alpha)
+      coef[[i]] <- stats::coef(glm[[i]],s="lambda.min")[-1]
+      lambda[i] <- glm[[i]]$lambda.min
+    } else {
+      glm[[i]] <- glmnet::glmnet(x=x[[i]],y=y[[i]],alpha=alpha)
+      coef[[i]] <- stats::coef(glm[[i]],s=lambda[i])[-1]
+    }
+  }
+  list <- list(coef=coef,lambda=lambda)
+  return(list)
+}
+
+penfac <- function(coef,exp){
+  coef <- sapply(coef,function(x) x)
+  positive <- rowSums(pmax(coef,0))^exp
+  negative <- rowSums(-pmin(coef,0))^exp
+  pf <- 1/c(positive,negative)
+  pf[pf==-Inf] <- Inf
+  return(pf)
+}
+
+devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10){
+  if(any(family!="gaussian")){stop("not implemented")}
+  #if(alpha!=1){stop("not implemented")}
+  
+  if(is.matrix(y) & is.matrix(x)){
+    message("mode: multi-target learning")
+    p <- ncol(x)
+    q <- ncol(y)
+    n <- rep(x=nrow(x),times=q)
+    foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
+    y <- apply(X=y,MARGIN=2,FUN=function(x) x,simplify=FALSE)
+    x <- replicate(n=q,expr=x,simplify=FALSE)
+    foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
+    mode <- "multiple"
+  } else if(is.list(y) & is.list(x)){
+    message("mode: transfer learning")
+    n <- sapply(X=y,FUN=base::length)
+    p <- ncol(x[[1]])
+    q <- length(x)
+    foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+    mode <- "transfer"
+  } else {
+    stop("Provide both x and y either as matrices (multi-target learning) or lists (transfer learning).")
+  }
+  
+  if(length(family)==1){
+    family <- rep(x=family,times=q)
+  }
+  
+  init.ext <- init.coef(x=x,y=y,alpha=alpha.init)
+  
+
+  exp <- c(0.0,0.2,0.5,0.75,1.0,1.25,1.5,2.0,5.0) # flexible
+  grid <- expand.grid(exp=exp)
+  ncand <- nrow(grid)
+  model.ext <- list()
+  for(j in seq_len(q)){
+    model.ext[[j]] <- list()
+    for(k in seq_len(ncand)){
+      pf <- penfac(coef=init.ext$coef,exp=grid$exp[k])
+      if(all(is.infinite(pf))){
+        model.ext[[j]][[k]] <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]]),y=y[[j]],family=family[j],lambda=99e99,alpha=alpha)
+      } else {
+        model.ext[[j]][[k]] <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]]),y=y[[j]],family=family[j],lower.limits=0,penalty.factor=pf,alpha=alpha)
+      }
+    }
+  }
+  
+  #--- initialise matrices ---
+  pred <- list()
+  for(j in seq_len(q)){
+    pred[[j]] <- list()
+    for(k in seq_len(ncand)){
+      pred[[j]][[k]] <- matrix(data=NA,nrow=n[j],ncol=length(model.ext[[j]][[k]]$lambda))
+    }
+  }
+  
+  #--- cross-validation ---
+  for(i in seq_len(nfolds)){
+    x.train <- y.train <- x.test <- list()
+    for(j in seq_len(q)){
+      cond <- foldid[[j]]==i
+      x.train[[j]] <- x[[j]][!cond,,drop=FALSE]
+      y.train[[j]] <- y[[j]][!cond]
+      x.test[[j]] <- x[[j]][cond,,drop=FALSE]
+    }
+    init.int <- init.coef(x=x.train,y=y.train,lambda=init.ext$lambda,alpha=alpha.init)
+    
+    for(j in seq_len(q)){
+      cond <- foldid[[j]]==i
+      for(k in seq_len(ncand)){
+        pf <- penfac(coef=init.int$coef,exp=grid$exp[k])
+        if(all(is.infinite(pf))){
+          model.int <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]])[!cond,],y=y[[j]][!cond],family=family[j],lambda=99e99,alpha=alpha)
+        } else {
+          model.int <- glmnet::glmnet(x=cbind(x[[j]],-x[[j]])[!cond,],y=y[[j]][!cond],family=family[j],lower.limits=0,penalty.factor=pf,alpha=alpha)
+        }
+        pred[[j]][[k]][cond,] <- stats::predict(object=model.int,newx=cbind(x[[j]],-x[[j]])[cond,],s=model.ext[[j]][[k]]$lambda)
+      }
+    }
+  }
+  
+  #--- calculate MSE ---
+  mse <- list()
+  id.grid <- lambda.min <- numeric()
+  tryCatch(graphics::par(mfrow=c(1,q)))
+  for(j in seq_len(q)){
+    mse[[j]] <- list()
+    for(k in seq_len(ncand)){
+      mse[[j]][[k]] <- apply(X=pred[[j]][[k]],MARGIN=2,FUN=function(x) mean((x-y[[j]])^2))
+    }
+    id.grid[j] <- which.min(sapply(mse[[j]],min))
+    lambda.min[j] <- model.ext[[j]][[id.grid[j]]]$lambda[which.min(mse[[j]][[id.grid[j]]])]
+    tryCatch(expr=graphics::plot(x=grid$exp,y=sapply(X=mse[[j]],FUN=min),type="o"),error=function(x) NULL)
+  }
+  
+  list <- list(model=model.ext,id.grid=id.grid,lambda.min=lambda.min)
+  class(list) <- "devel"
+  return(list)
+}
+
+predict.devel <- function(object,newx){
+  q <- length(object$model)
+  y_hat <- list()
+  for(i in seq_len(q)){
+    y_hat[[i]] <- stats::predict(object=object$model[[i]][[object$id.grid[i]]],newx=cbind(newx,-newx),s=object$lambda.min[i])
+  }
+  return(y_hat)
+}
+
+coef.devel <- function(object){
+  return(list(alpha=NA,beta=NA))
+}
+
+
+#- - - - - - - - - - - - - - - - - - -
+#---- exploratory simulation ----
+#- - - - - - - - - - - - - - - - - - -
 
 if(FALSE){
   #alpha.init <- 0
@@ -444,9 +614,9 @@ if(FALSE){
     x <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
     beta <- stats::rbinom(n=p,size=1,prob=0.1)*stats::rnorm(n=p)
     eta <- as.numeric(x %*% beta)
-    y1 <- eta + 0.3*stats::rnorm(n=n,sd=sd(eta))
-    y2 <- eta + 0.7*stats::rnorm(n=n,sd=sd(eta))
-    y3 <- 0.5*stats::rnorm(n=n,sd=sd(eta))
+    y1 <- eta + 0.2*stats::rnorm(n=n,sd=sd(eta))
+    y2 <- eta + 0.4*stats::rnorm(n=n,sd=sd(eta))
+    y3 <- 0*eta + 1*stats::rnorm(n=n,sd=sd(eta))
     #y1 <- eta + 0.2*stats::rnorm(n=n,sd=sd(eta))
     #y2 <- eta + 0.4*stats::rnorm(n=n,sd=sd(eta))
     #y3 <- eta + 0.6*stats::rnorm(n=n,sd=sd(eta))
@@ -468,14 +638,11 @@ if(FALSE){
     object <- glmnet::cv.glmnet(x=x[fold==0,],y=y[fold==0,],family="mgaussian")
     y_hat$mgaussian <- predict(object=object,newx=x[fold==1,],s="lambda.min")[,,1]
     #--- sparselink ---
+    #warning("reset to alpha.init=0.95")
     object <- sparselink(x=x[fold==0,],y=y[fold==0,],family="gaussian",alpha.init=0.95)
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$sparselink <- do.call(what="cbind",args=temp)
     
-    #--- development old ---
-    #object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=alpha.init)
-    #temp <- predict(object=object,newx=x[fold==1,])
-    #y_hat$devel <- do.call(what="cbind",args=temp)
     ##--- group lasso start ---
     #yy <- as.numeric(y)
     #xx <- rbind(x,x)
@@ -499,6 +666,11 @@ if(FALSE){
     object <- group.devel(x=x[fold==0,],y=y[fold==0,],family="gaussian",alpha.init=0.95)
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$group <- do.call(what="cbind",args=temp)
+    
+    #--- development  ---
+    object <- devel(x=x[fold==0,],y=y[fold==0,],alpha.init=0.95)
+    temp <- predict(object=object,newx=x[fold==1,])
+    y_hat$devel <- do.call(what="cbind",args=temp)
     
     #--- prediction error ---
     mse <- matrix(data=NA,nrow=length(y_hat),ncol=q,dimnames=list(names(y_hat),NULL))
