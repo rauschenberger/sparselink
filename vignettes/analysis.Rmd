@@ -609,6 +609,9 @@ round(100*colMeans(metric[disease=="RA",])-100,digits=2)
 colMeans(nzero)
 colMeans(nzero[disease=="IBD",])
 colMeans(nzero[disease=="RA",])
+
+#--- revision: report AUC ---
+Reduce(f="+",x=lapply(result$IBD,function(x) x$auc))/length(result$IBD)
 ```
 
 This chunk generates the figure on feature selection.
