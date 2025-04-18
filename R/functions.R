@@ -1187,7 +1187,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
       object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha,type=type,trial=trial)
       hyperpar <- object$weight.min
     } else if(method[i]=="devel"){
-      object <- func(x=X_train,y=y_train,family=family,alpha=alpha,alpha.init=alpha.init,trial=trial)
+      object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha)
     } else {
       object <- func(x=X_train,y=y_train,family=family,alpha=alpha)
     }
