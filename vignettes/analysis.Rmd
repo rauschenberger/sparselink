@@ -890,6 +890,7 @@ names <- intersect(rownames(x),rownames(y))
 x <- x[names,]
 y <- y[names,]
 y <- as.matrix(y)
+#y <- scale(y)
 
 metric <- list()
 for(i in seq_along(vars)){

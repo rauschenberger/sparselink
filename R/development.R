@@ -92,7 +92,7 @@ penfac <- function(sep,com,exp.sep,exp.com){ # prop,
   return(pf)
 }
 
-devel <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10,trial=FALSE){
+devel_old <- function(x,y,family="gaussian",alpha.init=0.95,alpha=1,nfolds=10,trial=FALSE){
   if(any(family!="gaussian")){stop("not implemented")}
   #if(alpha!=1){stop("not implemented")}
   
@@ -609,6 +609,10 @@ coef.devel <- function(object){
 #---- common support ----
 #- - - - - - - - - - - - - - - - - - 
 
+# CONTINUE HERE: Re-consider common support approach without group lasso.
+# Add x on the left multiple times (to allow for common effects of x on y for all problems).
+# Then cross-validate weight of common effects and of separate effects.
+
 expand <- function(x,y=NULL,q=NULL){
   if(is.null(y)){
     yy <- NULL
@@ -621,24 +625,28 @@ expand <- function(x,y=NULL,q=NULL){
     n <- sapply(x,nrow)
     p <- ncol(x[[1]])
     q <- length(x)
+    intercept <- matrix(data=0,nrow=sum(n),ncol=q)
     xx <- matrix(data=0,nrow=sum(n),ncol=q*p)
     cumsum <- c(0,cumsum(n))
     for(i in seq_len(q)){
       rows <- (cumsum[i]+1):(cumsum[i+1])
       cols <- ((i-1)*p+1):(i*p)
       xx[rows,cols] <- x[[i]]
+      intercept[rows,i] <- 1
     }
   } else {
     n <- nrow(x)
     p <- ncol(x)
+    intercept <- matrix(data=0,nrow=q*n,ncol=q)
     xx <- matrix(data=0,nrow=q*n,ncol=q*p)
     for(i in seq_len(q)){
       rows <- ((i-1)*n+1):(i*n)
       cols <- ((i-1)*p+1):(i*p)
       xx[rows,cols] <- x
+      intercept[rows,i] <- 1
     }
   }
-  list <- list(xx=xx,yy=yy)
+  list <- list(xx=xx,yy=yy,intercept=intercept)
   return(list)
 }
 
@@ -664,12 +672,13 @@ common_support <- function(x,y,family){
   } else {
     stop("Provide both x and y either as matrices (multi-target learning) or lists (transfer learning).")
   }
-  problem <- rep(x=seq_len(q),times=n)
+  #intercept <- rep(x=paste0("P",seq_len(q)),times=n)
   feature <- rep(x=seq_len(p),times=q)
-  group <- c(feature,p+1)
+  group <- c(feature,rep(p+1,times=q))
   pf_group <- rep(x=c(1,0),times=c(p,1))
   list <- expand(x=x,y=y)
-  object <- sparsegl::cv.sparsegl(x=cbind(list$xx,problem),y=list$yy,group=group,pf_group=pf_group,family=family)
+  pf_sparse <- rep(x=c(0,1),times=c(p*q,q)) # to use standard group lasso (not sparse)
+  object <- sparsegl::cv.sparsegl(x=cbind(list$xx,list$intercept),y=list$yy,group=group,pf_group=pf_group,pf_sparse=pf_sparse,family=family,intercept=FALSE)
   list <- list(object=object,q=q)
   class(list) <- "comsup"
   return(list)
@@ -677,17 +686,14 @@ common_support <- function(x,y,family){
 
 predict.comsup <- function(object,newx){
   if(is.list(newx)){
-    problem <- rep(x=seq_along(x),times=sapply(x,nrow))
-    xx <- expand(x=newx)$xx
+    intercept <- rep(x=seq_along(x),times=sapply(x,nrow))
+    list <- expand(x=newx)
   } else {
-    problem <- rep(x=seq_len(object$q),each=nrow(newx))
-    xx <- expand(x=newx,q=object$q)$xx
+    intercept <- rep(x=seq_len(object$q),each=nrow(newx))
+    list <- expand(x=newx,q=object$q)
   }
-  predict(object=object$object,newx=cbind(xx,problem),type="response",s="lambda.min")
+  predict(object=object$object,newx=cbind(list$xx,list$intercept),type="response",s="lambda.min")
 }
-
-
-
 
 #- - - - - - - - - - - - - - - - - - -
 #---- exploratory simulation ----
@@ -706,9 +712,9 @@ if(FALSE){
     x <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
     beta <- stats::rbinom(n=p,size=1,prob=0.1)*stats::rnorm(n=p)
     eta <- as.numeric(x %*% beta)
-    y1 <- eta + 0.2*stats::rnorm(n=n,sd=sd(eta))
-    y2 <- eta + 0.5*stats::rnorm(n=n,sd=sd(eta))
-    y3 <- eta + 0.7*stats::rnorm(n=n,sd=sd(eta))
+    y1 <- 1+eta + 0.2*stats::rnorm(n=n,sd=sd(eta))
+    y2 <- 2+eta + 0.5*stats::rnorm(n=n,sd=sd(eta))
+    y3 <- 3+eta + 0.7*stats::rnorm(n=n,sd=sd(eta))
     #y1 <- eta + 0.2*stats::rnorm(n=n,sd=sd(eta))
     #y2 <- eta + 0.4*stats::rnorm(n=n,sd=sd(eta))
     #y3 <- eta + 0.6*stats::rnorm(n=n,sd=sd(eta))
@@ -768,6 +774,7 @@ if(FALSE){
     object <- common_support(x=x[fold==0,],y=y[fold==0,],family="gaussian")
     temp <- predict(object=object,newx=x[fold==1,])
     y_hat$comsup <- matrix(data=temp,ncol=q)
+    #image(matrix(coef(object$object)[1:(p*q)],nrow=p,ncol=q))
     
     #--- prediction error ---
     mse <- matrix(data=NA,nrow=length(y_hat),ncol=q,dimnames=list(names(y_hat),NULL))
