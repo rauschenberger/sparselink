@@ -1039,39 +1039,47 @@ coef.glm.spls <- function(object){
 #coef <- coef(object)
 
 
-glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,family="gaussian"){
-  #--- CONTINUE HERE ---
-  # stage 1
-  
-  # regression coefficients from lasso regression
-  
-  # stage 2
+glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
+  family <- unique(family)
+  if(length(family)!=1){stop("XRNET requires single family")}
+  q <- length(x)
+  p <- ncol(x[[1]])
+  #--- stage 1 ---
+  prior <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    object <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],alpha=alpha.init,family=family)
+    prior[,i] <- coef(object=object,s="lambda.min")[-1]
+  }
+  #--- stage 2 ---
   object <- list()
-  
-  # use coefficients from other problems as prior information
-  
-  cond <- apply(prior,2,stats::sd)>0
-  object[[i]] <- xrnet::tune_xrnet(x=X0,y=y0,
+  for(i in seq_len(q)){
+    # use coefficients from other problems as prior information
+    cond <- apply(prior,2,stats::sd)>0 & seq_len(q)!=i
+    object[[i]] <- xrnet::tune_xrnet(x=x[[i]],y=y[[i]],
                                   external=prior[,cond,drop=FALSE],
                                   penalty_main=xrnet::define_penalty(penalty_type=alpha),
                                   family=family,
-                                  foldid=foldid,
-                                  nfolds=nfolds.int,
+                                  foldid=NULL,
+                                  nfolds=nfolds,
                                   loss="deviance")
-  class(object) <- "xrnet"
+  }
+  class(object) <- "glm.xrnet"
+  # CONTINUE HERE: FINISH AND TEST FUNCTION
   return(object)
 }
 
 predict.xrenet <- function(object,newx){
   y_hat <- list()
   for(i in seq_along(object)){
-    y_hat[[i]] <- stats::predict(object[[i]],newdata=X1)
+    y_hat[[i]] <- stats::predict(object[[i]],newdata=newx[[i]])
   }
   return(y_hat)
 }
 
 coef.xrnet <- function(object){
-  
+  for(i in seq_along(object)){
+    # CONTINUE HERE
+  }
 }
 
 
