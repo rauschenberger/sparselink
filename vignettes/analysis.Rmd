@@ -227,6 +227,61 @@ figure_change()
 grDevices::dev.off()
 ```
 
+## Sample size and sparsity (under development)
+
+```{r sim_devel,eval=FALSE}
+#<<setup>>
+
+alpha.init <- 0.95; type <- "exp";  repetitions <- 10
+
+grid <- expand.grid(prob.separate=0.025,prob.common=0.025,family="gaussian",n0=c(25,50,100,150,200)) # effect of sample size
+cand <- c(0.01,0.025,0.05,0.10,0.20,0.25)
+grid <- expand.grid(prob.separate=cand,prob.common=NA,family="gaussian",n0=100) # effect of sparsity/density
+grid <- grid[rep(seq_len(nrow(grid)),each=repetitions),] #
+grid$prob.common[is.na(grid$prob.common)] <- grid$prob.separate[is.na(grid$prob.common)]
+grid$seed <- seq_len(nrow(grid))
+grid$family <- as.character(grid$family)
+
+for(mode in c("transfer","multiple")){
+  
+  deviance <- list()
+  for(i in seq(from=1,to=nrow(grid))){
+    set.seed(seed=grid$seed[i])
+    cat("i=",i,"\n")
+    if(mode=="transfer"){
+      data <- sim.data.transfer(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i],n0=grid$n0[i])
+      method <- c("glm.separate","glm.transfer","sparselink") # add xrnet
+    } else if(mode=="multiple"){
+      #--- multi-task learning ---
+      data <- sim.data.multiple(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i],n0=grid$n0[i])
+      method <- c("glm.separate","glm.mgaussian","sparselink","glm.spls")
+    }
+    result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1)
+    deviance[[i]] <- result$deviance
+  }
+  save(grid,deviance,file=file.path(path,"results",paste0("simulation_devel",mode,".RData")))
+}
+
+
+
+mse <- sapply(deviance,function(x) rowMeans(x))
+params <- grid$n0
+params <- grid$prob.separate
+
+graphics::plot.new()
+graphics::plot.window(xlim=range(params),ylim=range(mse))
+graphics::box()
+graphics::axis(side=1,at=unique(params))
+graphics::axis(side=2)
+col <- c("glm.separate"="grey","glm.transfer"="red","sparselink"="blue")
+for(i in names(col)){
+  val <- tapply(X=mse[i,],INDEX=params,FUN=function(x) mean(x))
+  graphics::lines(x=unique(params),y=val,col=col[i],type="o",pch=16)
+}
+
+
+```
+
 # Application
 
 ## Data preparation
