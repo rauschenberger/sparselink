@@ -1038,6 +1038,43 @@ coef.glm.spls <- function(object){
 #y_hat <- predict(object,newx=X_test)
 #coef <- coef(object)
 
+
+glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,family="gaussian"){
+  #--- CONTINUE HERE ---
+  # stage 1
+  
+  # regression coefficients from lasso regression
+  
+  # stage 2
+  object <- list()
+  
+  # use coefficients from other problems as prior information
+  
+  cond <- apply(prior,2,stats::sd)>0
+  object[[i]] <- xrnet::tune_xrnet(x=X0,y=y0,
+                                  external=prior[,cond,drop=FALSE],
+                                  penalty_main=xrnet::define_penalty(penalty_type=alpha),
+                                  family=family,
+                                  foldid=foldid,
+                                  nfolds=nfolds.int,
+                                  loss="deviance")
+  class(object) <- "xrnet"
+  return(object)
+}
+
+predict.xrenet <- function(object,newx){
+  y_hat <- list()
+  for(i in seq_along(object)){
+    y_hat[[i]] <- stats::predict(object[[i]],newdata=X1)
+  }
+  return(y_hat)
+}
+
+coef.xrnet <- function(object){
+  
+}
+
+
 glm.empty <- function(x,y,family,alpha=1){
   object <- glm.separate(x=x,y=y,family=family,alpha=alpha,lambda=c(99e99,99e98))
   return(object)
