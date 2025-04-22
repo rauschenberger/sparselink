@@ -1012,6 +1012,32 @@ coef.glm.common <- function(object){
 #y_hat <- predict(object,newx=X_test)
 #coef <- coef(object)
 
+glm.spls <- function(x,y,family="gaussian",alpha=1,nfolds=10){
+  if(any(family!="gaussian")){stop("SPLS requires Gaussian family.")}
+  if(alpha!=1){stop("SPLS requires alpha=1")}
+  invisible(utils::capture.output(cv.spls <- spls::cv.spls(x=x,y=y,fold=10,K=seq_len(min(ncol(x),10)),
+                                                           eta=seq(from=0.0,to=0.9,by=0.1),plot.it=FALSE)))
+  object <- spls::spls(x=x,y=y,K=cv.spls$K.opt,eta=cv.spls$eta.opt)
+  class(object) <- "glm.spls"
+  return(object)
+}
+
+predict.glm.spls <- function(object,newx){
+  temp <- spls::predict.spls(object=object,newx=newx,type="fit")
+  y_hat <- apply(X=temp,MARGIN=2,FUN=function(x) x,simplify=FALSE)
+  return(y_hat)
+}
+
+coef.glm.spls <- function(object){
+  coef <- spls::coef.spls(object=object)
+  list <- list(alpha=NA,beta=coef)
+  return(list)
+}
+
+#object <- glm.spls(x=X_train,y=y_train,family=family)
+#y_hat <- predict(object,newx=X_test)
+#coef <- coef(object)
+
 glm.empty <- function(x,y,family,alpha=1){
   object <- glm.separate(x=x,y=y,family=family,alpha=alpha,lambda=c(99e99,99e98))
   return(object)
