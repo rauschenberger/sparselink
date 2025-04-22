@@ -306,6 +306,59 @@ second</p></li>
 <span><span class="va">model.own</span> <span class="op">&lt;-</span> <span class="st">"sparselink"</span></span>
 <span><span class="fu">figure_change</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="sample-size-and-sparsity-under-development">Sample size and sparsity (under development)<a class="anchor" aria-label="anchor" href="#sample-size-and-sparsity-under-development"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
+<span></span>
+<span><span class="va">alpha.init</span> <span class="op">&lt;-</span> <span class="fl">0.95</span>; <span class="va">type</span> <span class="op">&lt;-</span> <span class="st">"exp"</span>;  <span class="va">repetitions</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
+<span></span>
+<span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>prob.separate<span class="op">=</span><span class="fl">0.025</span>,prob.common<span class="op">=</span><span class="fl">0.025</span>,family<span class="op">=</span><span class="st">"gaussian"</span>,n0<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>,<span class="fl">50</span>,<span class="fl">100</span>,<span class="fl">150</span>,<span class="fl">200</span><span class="op">)</span><span class="op">)</span> <span class="co"># effect of sample size</span></span>
+<span><span class="va">cand</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">0.025</span>,<span class="fl">0.05</span>,<span class="fl">0.10</span>,<span class="fl">0.20</span>,<span class="fl">0.25</span><span class="op">)</span></span>
+<span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>prob.separate<span class="op">=</span><span class="va">cand</span>,prob.common<span class="op">=</span><span class="cn">NA</span>,family<span class="op">=</span><span class="st">"gaussian"</span>,n0<span class="op">=</span><span class="fl">100</span><span class="op">)</span> <span class="co"># effect of sparsity/density</span></span>
+<span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="va">grid</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span><span class="op">)</span>,each<span class="op">=</span><span class="va">repetitions</span><span class="op">)</span>,<span class="op">]</span> <span class="co">#</span></span>
+<span><span class="va">grid</span><span class="op">$</span><span class="va">prob.common</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">grid</span><span class="op">$</span><span class="va">prob.common</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">grid</span><span class="op">$</span><span class="va">prob.separate</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">grid</span><span class="op">$</span><span class="va">prob.common</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">grid</span><span class="op">$</span><span class="va">seed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">grid</span><span class="op">$</span><span class="va">family</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">grid</span><span class="op">$</span><span class="va">family</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">mode</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"transfer"</span>,<span class="st">"multiple"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>  </span>
+<span>  <span class="va">deviance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from<span class="op">=</span><span class="fl">1</span>,to<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span>seed<span class="op">=</span><span class="va">grid</span><span class="op">$</span><span class="va">seed</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"i="</span>,<span class="va">i</span>,<span class="st">"\n"</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="va">mode</span><span class="op">==</span><span class="st">"transfer"</span><span class="op">)</span><span class="op">{</span></span>
+<span>      <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.data.transfer.html">sim.data.transfer</a></span><span class="op">(</span>prob.common<span class="op">=</span><span class="va">grid</span><span class="op">$</span><span class="va">prob.common</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,prob.separate<span class="op">=</span><span class="va">grid</span><span class="op">$</span><span class="va">prob.separate</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,family<span class="op">=</span><span class="va">grid</span><span class="op">$</span><span class="va">family</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,n0<span class="op">=</span><span class="va">grid</span><span class="op">$</span><span class="va">n0</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span>      <span class="va">method</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"glm.separate"</span>,<span class="st">"glm.transfer"</span>,<span class="st">"sparselink"</span><span class="op">)</span> <span class="co"># add xrnet</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="va">mode</span><span class="op">==</span><span class="st">"multiple"</span><span class="op">)</span><span class="op">{</span></span>
+<span>      <span class="co">#--- multi-task learning ---</span></span>
+<span>      <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim.data.multiple.html">sim.data.multiple</a></span><span class="op">(</span>prob.common<span class="op">=</span><span class="va">grid</span><span class="op">$</span><span class="va">prob.common</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,prob.separate<span class="op">=</span><span class="va">grid</span><span class="op">$</span><span class="va">prob.separate</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,family<span class="op">=</span><span class="va">grid</span><span class="op">$</span><span class="va">family</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,n0<span class="op">=</span><span class="va">grid</span><span class="op">$</span><span class="va">n0</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span>      <span class="va">method</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"glm.separate"</span>,<span class="st">"glm.mgaussian"</span>,<span class="st">"sparselink"</span>,<span class="st">"glm.spls"</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>    <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/traintest.html">traintest</a></span><span class="op">(</span>y_train<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">y_train</span>,X_train<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">X_train</span>,y_test<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">y_test</span>,X_test<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">X_test</span>,family<span class="op">=</span><span class="va">grid</span><span class="op">$</span><span class="va">family</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,method<span class="op">=</span><span class="va">method</span>,alpha.init<span class="op">=</span><span class="va">alpha.init</span>,type<span class="op">=</span><span class="va">type</span>,alpha<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span>
+<span>    <span class="va">deviance</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">$</span><span class="va">deviance</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">grid</span>,<span class="va">deviance</span>,file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"results"</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"simulation_devel"</span>,<span class="va">mode</span>,<span class="st">".RData"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="va">mse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">deviance</span>,<span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">grid</span><span class="op">$</span><span class="va">n0</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">grid</span><span class="op">$</span><span class="va">prob.separate</span></span>
+<span></span>
+<span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/frame.html" class="external-link">plot.new</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html" class="external-link">plot.window</a></span><span class="op">(</span>xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span>,ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/box.html" class="external-link">box</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span>side<span class="op">=</span><span class="fl">1</span>,at<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span>side<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">col</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"glm.separate"</span><span class="op">=</span><span class="st">"grey"</span>,<span class="st">"glm.transfer"</span><span class="op">=</span><span class="st">"red"</span>,<span class="st">"sparselink"</span><span class="op">=</span><span class="st">"blue"</span><span class="op">)</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">col</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span>X<span class="op">=</span><span class="va">mse</span><span class="op">[</span><span class="va">i</span>,<span class="op">]</span>,INDEX<span class="op">=</span><span class="va">params</span>,FUN<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span>,y<span class="op">=</span><span class="va">val</span>,col<span class="op">=</span><span class="va">col</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,type<span class="op">=</span><span class="st">"o"</span>,pch<span class="op">=</span><span class="fl">16</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="application">Application<a class="anchor" aria-label="anchor" href="#application"></a>
@@ -323,7 +376,7 @@ second</p></li>
 <li><p>Ensures: list <code>project</code> in working
 environment</p></li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">project</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">project</span><span class="op">$</span><span class="va">IBD</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tew (2016)"</span><span class="op">=</span><span class="st">"SRP063496"</span>,</span>
 <span>                 <span class="st">"Haberman (2019)"</span><span class="op">=</span><span class="st">"SRP129004"</span>,</span>
@@ -344,7 +397,7 @@ files</p></li>
 <code>info_data.txt</code> (system information) in folder
 <code>results</code></p></li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span></span>
@@ -372,7 +425,7 @@ seconds</p></li>
 <li><p>Ensures: lists <code>y</code> (targets) and <code>x</code>
 (features) in working environment</p></li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span></span>
@@ -506,7 +559,7 @@ minutes</p></li>
 <code>info_explore.txt</code> (session information) in folder
 <code>results</code></p></li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;preprocess_data&gt;&gt;</span></span>
@@ -557,7 +610,7 @@ second</p></li>
 <li><p>Ensures: files <code>tab_cor.tex</code> and
 <code>tab_auc.tex</code> in folder <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#if(any(unlist(project)!=names(refs))){stop("not compatible")}</span></span>
 <span></span>
@@ -626,7 +679,7 @@ folder <code>results</code> (generated by chunk
 <code>info_app.txt</code> (session information) in folder
 <code>results</code></p></li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;preprocess_data&gt;&gt;</span></span>
@@ -658,7 +711,7 @@ second</p></li>
 <li><p>Ensures: file <code>fig_app.eps</code> in folder
 <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span></span>
 <span><span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/postscript.html" class="external-link">postscript</a></span><span class="op">(</span>file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"manuscript"</span>,<span class="st">"fig_app.eps"</span><span class="op">)</span>,width<span class="op">=</span><span class="fl">6.5</span>,height<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
@@ -719,7 +772,7 @@ second</p></li>
 <li><p>Ensures: file <code>fig_coef.eps</code> in folder
 <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"results"</span>,<span class="st">"application.RData"</span><span class="op">)</span><span class="op">)</span></span>
@@ -766,7 +819,7 @@ second</p></li>
 <div class="section level3">
 <h3 id="multi-task-learning-under-development">Multi-task learning (under development)<a class="anchor" aria-label="anchor" href="#multi-task-learning-under-development"></a>
 </h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span>list<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">path</span> <span class="op">&lt;-</span> <span class="st">"C:/Users/arauschenberger/Desktop/sparselink"</span> <span class="co"># LIH (Windows)</span></span>
 <span><span class="co">#path &lt;- "/Users/armin.rauschenberger/Desktop/LIH/sparselink" # LCSB (Mac)</span></span>
