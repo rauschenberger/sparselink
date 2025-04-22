@@ -136,6 +136,13 @@ mean_function <- function(eta,family){
 #' dim(data$beta)
 #' 
 sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,200),n1=10000,p=200,rho=0.5,family="gaussian"){
+  if(length(n0)==1){
+    n0 <- rep(x=n0,times=q)
+  } else {
+    if(length(n0)!=q){
+      stop("Invalid.")
+    }
+  }
   n <- n0 + n1
   theta <- stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.common)
   X <- beta <- y <- foldid <- list()
