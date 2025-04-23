@@ -645,7 +645,7 @@ for(i in names(project)){
   for(j in seq_len(5)){ # 5 repetitions of 10-fold CV
     set.seed(j)
     codes <- project[[i]]
-    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
+    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.common","glm.xrnet"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
   }
 }
 save(result,project,file=file.path(path,"results","application.RData"))
