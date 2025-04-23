@@ -1008,8 +1008,8 @@ coef.glm.common <- function(object){
   return(list)
 }
 
-#object <- glm.common(x=X_train,y=y_train,family=family)
-#y_hat <- predict(object,newx=X_test)
+#object <- glm.common(x=data$X_train,y=data$y_train,family=family)
+#y_hat <- predict(object,newx=data$X_test)
 #coef <- coef(object)
 
 glm.spls <- function(x,y,family="gaussian",alpha=1,nfolds=10){
@@ -1068,7 +1068,7 @@ glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   return(object)
 }
 
-predict.xrenet <- function(object,newx){
+predict.glm.xrnet <- function(object,newx){
   y_hat <- list()
   for(i in seq_along(object)){
     y_hat[[i]] <- stats::predict(object[[i]],newdata=newx[[i]])
@@ -1076,12 +1076,19 @@ predict.xrenet <- function(object,newx){
   return(y_hat)
 }
 
-coef.xrnet <- function(object){
+coef.glm.xrnet <- function(object){
+  alpha <- beta <- numeric()
   for(i in seq_along(object)){
-    # CONTINUE HERE
+    coef <- stats::coef(object[[i]])
+    alpha[i] <- coef$beta0
+    beta <- cbind(beta,coef$betas)
   }
+  list <- list(alpha=alpha,beta=beta)
+  return(list)
 }
 
+#object <- glm.xrnet(x=data$X_train,y=data$y_train)
+#y_hat <- predict(object,newx=data$X_test)
 
 glm.empty <- function(x,y,family,alpha=1){
   object <- glm.separate(x=x,y=y,family=family,alpha=alpha,lambda=c(99e99,99e98))

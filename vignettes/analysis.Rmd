@@ -232,7 +232,7 @@ grDevices::dev.off()
 ```{r sim_devel,eval=FALSE}
 #<<setup>>
 
-alpha.init <- 0.95; type <- "exp";  repetitions <- 10
+alpha.init <- 0.95; type <- "exp";  repetitions <- 10 # increase to 10
 
 grid <- expand.grid(prob.separate=0.025,prob.common=0.025,family="gaussian",n0=c(25,50,100,150,200)) # effect of sample size
 cand <- c(0.01,0.025,0.05,0.10,0.20,0.25)
@@ -250,7 +250,7 @@ for(mode in c("transfer","multiple")){
     cat("i=",i,"\n")
     if(mode=="transfer"){
       data <- sim.data.transfer(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i],n0=grid$n0[i])
-      method <- c("glm.separate","glm.transfer","sparselink") # add xrnet
+      method <- c("glm.separate","glm.transfer","sparselink","glm.xrnet") # add xrnet
     } else if(mode=="multiple"){
       #--- multi-task learning ---
       data <- sim.data.multiple(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i],n0=grid$n0[i])
