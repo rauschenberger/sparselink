@@ -233,28 +233,29 @@ grDevices::dev.off()
 # Effect of sample size in source or target dataset (TL), effect of sample size (MTL).
 #<<setup>>
 
-alpha.init <- 0.95; type <- "exp";  repetitions <- 10 # increase to 10
+alpha.init <- 0.95; type <- "exp";  repetitions <- 2 # increase to 10
 grid <- metric <- list()
 
 for(mode in c("TL-source","TL-target","MTL-size","TL-prop","MTL-prop")){
   metric[[mode]] <- list()
   cand <- c(25,50,100,150,200)
   if(mode=="TL-source"){
-    grid[[mode]] <- expand.grid(prob.separate=0.025,prob.common=0.025,family="gaussian",n_source=cand,n_target=100)
+    grid[[mode]] <- expand.grid(prob.common=0.05,prob.separate=0.025,family="gaussian",n_source=cand,n_target=100)
   } else if(mode=="TL-target"){
-    grid[[mode]] <- expand.grid(prob.separate=0.025,prob.common=0.025,family="gaussian",n_source=100,n_target=cand) 
+    grid[[mode]] <- expand.grid(prob.common=0.05,prob.separate=0.025,family="gaussian",n_source=100,n_target=cand) 
   } else if(mode=="MTL-size"){
-    grid[[mode]] <- expand.grid(prob.separate=0.025,prob.common=0.025,family="gaussian",n0=cand) 
+    grid[[mode]] <- expand.grid(prob.common=0.05,prob.separate=0.025,family="gaussian",n0=cand) 
   } else if(mode %in% c("TL-prop","MTL-prop")){
     cand <- c(0.01,0.025,0.05,0.10,0.20,0.25)
-    grid[[mode]] <- expand.grid(prob.separate=cand,prob.common=NA,family="gaussian",n_source=100,n_target=100,n0=100)
+    grid[[mode]] <- expand.grid(prob.common=cand,prob.separate=NA,family="gaussian",n_source=100,n_target=100,n0=100)
   } else {
     stop("Wrong mode.")
   }
   grid[[mode]] <- grid[[mode]][rep(seq_len(nrow(grid[[mode]])),each=repetitions),]
   grid[[mode]]$seed <- seq_len(nrow(grid[[mode]]))
   grid[[mode]]$family <- as.character(grid[[mode]]$family)
-  grid[[mode]]$prob.common[is.na(grid[[mode]]$prob.common)] <-   grid[[mode]]$prob.separate[is.na(grid[[mode]]$prob.common)]
+  cond <- is.na(grid[[mode]]$prob.separate)
+  grid[[mode]]$prob.separate[cond] <- 0.5*grid[[mode]]$prob.common[cond]
   
   for(i in seq(from=1,to=nrow(grid[[mode]]))){
       set.seed(seed=grid$seed[i])
