@@ -309,20 +309,11 @@ second</p></li>
 <div class="section level3">
 <h3 id="sample-size-and-sparsity-under-development">Sample size and sparsity (under development)<a class="anchor" aria-label="anchor" href="#sample-size-and-sparsity-under-development"></a>
 </h3>
-<p>Logarithmic transformation of mean squared error calculated on
-hold-out data
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>-axis)
-against sample size of source data sets or sample size of target data
-set (left) or proportion of features with common effects and proportion
-of features with separate effects (right). standard lasso regression
-(dotted black line), proposed method (solid blue line), competing
-methods (dashed orange and red lines, namely ).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Effect of sample size in source or target dataset (TL), effect of sample size (MTL).</span></span>
-<span></span>
 <span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span></span>
-<span><span class="va">alpha.init</span> <span class="op">&lt;-</span> <span class="fl">0.95</span>; <span class="va">type</span> <span class="op">&lt;-</span> <span class="st">"exp"</span>;  <span class="va">repetitions</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="co"># increase to 10</span></span>
+<span><span class="va">alpha.init</span> <span class="op">&lt;-</span> <span class="fl">0.95</span>; <span class="va">type</span> <span class="op">&lt;-</span> <span class="st">"exp"</span>;  <span class="va">repetitions</span> <span class="op">&lt;-</span> <span class="fl">10</span> <span class="co"># increase to 10</span></span>
 <span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="va">metric</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">mode</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TL-source"</span>,<span class="st">"TL-target"</span>,<span class="st">"MTL-size"</span>,<span class="st">"TL-prop"</span>,<span class="st">"MTL-prop"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
@@ -363,9 +354,19 @@ methods (dashed orange and red lines, namely ).</p>
 <span>    <span class="op">}</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">grid</span>,<span class="va">metric</span>,file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"results"</span>,<span class="st">"simulation_devel.RData"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"results"</span>,<span class="st">"simulation_devel.RData"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">grid</span>,<span class="va">metric</span>,file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"results"</span>,<span class="st">"simulation_devel.RData"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Logarithmic transformation of mean squared error calculated on
+hold-out data
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>-axis)
+against sample size of source data sets or sample size of target data
+set (left) or proportion of features with common effects and proportion
+of features with separate effects (right). standard lasso regression
+(dotted black line), proposed method (solid blue line), competing
+methods (dashed orange and red lines, namely ). Added competing methods
+(orange) tend to perform worse than previously included competing
+methods (red).</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"results"</span>,<span class="st">"simulation_devel.RData"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span><span class="op">)</span>,mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/layout.html" class="external-link">layout</a></span><span class="op">(</span>mat<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">0</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">0</span>,<span class="fl">5</span>,<span class="fl">5</span><span class="op">)</span>,ncol<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
@@ -426,7 +427,7 @@ second</p></li>
 <li><p>Ensures: list <code>project</code> in working
 environment</p></li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">project</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">project</span><span class="op">$</span><span class="va">IBD</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tew (2016)"</span><span class="op">=</span><span class="st">"SRP063496"</span>,</span>
 <span>                 <span class="st">"Haberman (2019)"</span><span class="op">=</span><span class="st">"SRP129004"</span>,</span>
@@ -447,7 +448,7 @@ files</p></li>
 <code>info_data.txt</code> (system information) in folder
 <code>results</code></p></li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span></span>
@@ -475,7 +476,7 @@ seconds</p></li>
 <li><p>Ensures: lists <code>y</code> (targets) and <code>x</code>
 (features) in working environment</p></li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span></span>
@@ -609,7 +610,7 @@ minutes</p></li>
 <code>info_explore.txt</code> (session information) in folder
 <code>results</code></p></li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;preprocess_data&gt;&gt;</span></span>
@@ -660,7 +661,7 @@ second</p></li>
 <li><p>Ensures: files <code>tab_cor.tex</code> and
 <code>tab_auc.tex</code> in folder <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#if(any(unlist(project)!=names(refs))){stop("not compatible")}</span></span>
 <span></span>
@@ -729,7 +730,7 @@ folder <code>results</code> (generated by chunk
 <code>info_app.txt</code> (session information) in folder
 <code>results</code></p></li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;define_projects&gt;&gt;</span></span>
 <span><span class="co">#&lt;&lt;preprocess_data&gt;&gt;</span></span>
@@ -761,7 +762,7 @@ second</p></li>
 <li><p>Ensures: file <code>fig_app.eps</code> in folder
 <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span></span>
 <span><span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/postscript.html" class="external-link">postscript</a></span><span class="op">(</span>file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"manuscript"</span>,<span class="st">"fig_app.eps"</span><span class="op">)</span>,width<span class="op">=</span><span class="fl">6.5</span>,height<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
@@ -822,7 +823,7 @@ second</p></li>
 <li><p>Ensures: file <code>fig_coef.eps</code> in folder
 <code>manuscript</code></p></li>
 </ul>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#&lt;&lt;setup&gt;&gt;</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>,<span class="st">"results"</span>,<span class="st">"application.RData"</span><span class="op">)</span><span class="op">)</span></span>
@@ -869,7 +870,7 @@ second</p></li>
 <div class="section level3">
 <h3 id="multi-task-learning-under-development">Multi-task learning (under development)<a class="anchor" aria-label="anchor" href="#multi-task-learning-under-development"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span>list<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">path</span> <span class="op">&lt;-</span> <span class="st">"C:/Users/arauschenberger/Desktop/sparselink"</span> <span class="co"># LIH (Windows)</span></span>
 <span><span class="co">#path &lt;- "/Users/armin.rauschenberger/Desktop/LIH/sparselink" # LCSB (Mac)</span></span>
