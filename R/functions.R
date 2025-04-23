@@ -1190,7 +1190,7 @@ coef.glm.mgaussian <- function(object){
   return(list)
 }
 
-glm.transfer <- function(x,y,family,alpha=1){
+glm.glmtrans <- function(x,y,family,alpha=1){
   family <- unique(family)
   if(length(family)>1){stop("glmtrans requires unique family")}
   q <- length(x)
@@ -1202,12 +1202,12 @@ glm.transfer <- function(x,y,family,alpha=1){
   for(i in seq_len(q)){
     invisible(utils::capture.output(object[[i]] <- glmtrans::glmtrans(target=list(y=y[[i]],x=x[[i]]),source=source[-i],family=family,alpha=alpha)))
   }
-  class(object) <- "glm.transfer"
+  class(object) <- "glm.glmtrans"
   return(object)
 }
 
 #' @export
-predict.glm.transfer <- function(object,newx){
+predict.glm.glmtrans <- function(object,newx){
   q <- length(newx)
   y_hat <- list()
   for(i in seq_len(q)){
@@ -1217,7 +1217,7 @@ predict.glm.transfer <- function(object,newx){
 }
 
 #' @export
-coef.glm.transfer <- function(object){
+coef.glm.glmtrans <- function(object){
   coef <- sapply(object,function(x) x$beta)
   alpha <- coef[1,]
   beta <- coef[-1,]
@@ -1225,7 +1225,7 @@ coef.glm.transfer <- function(object){
   return(list)
 }
 
-#object <- glm.transfer(x=X_train,y=y_train,family=family)
+#object <- glm.glmtrans(x=X_train,y=y_train,family=family)
 #y_hat <- predict(object,newx=X_train)
 #coef(object)
 
@@ -1246,7 +1246,7 @@ coef.glm.transfer <- function(object){
 #' @param method character vector
 #' @param type character
 #'
-traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.separate","glm.transfer","sparselink","glm.common"),alpha.init,type,trial=FALSE){
+traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type,trial=FALSE){
   if(is.list(y_train)){
     q <- length(y_train)
   } else {
@@ -1303,7 +1303,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
 
 
 # This cross-validation function only works for transfer learning (not for multi-task learning).
-crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.transfer","sparselink","glm.common"),alpha.init,type){
+crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type){
   #if(is.matrix(y) & is.matrix(X)){
   #  mode <- "multiple"
   #  foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
