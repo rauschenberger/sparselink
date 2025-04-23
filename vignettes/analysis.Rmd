@@ -229,6 +229,8 @@ grDevices::dev.off()
 
 ## Sample size and sparsity (under development)
 
+Logarithmic transformation of mean squared error calculated on hold-out data ($y$-axis) against sample size of source data sets or sample size of target data set (left) or proportion of features with common effects and proportion of features with separate effects (right). standard lasso regression (dotted black line), proposed method (solid blue line), competing methods (dashed orange and red lines, namely ).
+
 ```{r sim_devel,eval=FALSE}
 # Effect of sample size in source or target dataset (TL), effect of sample size (MTL).
 
