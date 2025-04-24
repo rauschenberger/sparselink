@@ -409,7 +409,9 @@ methods (red).</p>
 <span>    <span class="va">val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span>X<span class="op">=</span><span class="va">mse</span><span class="op">[</span><span class="va">i</span>,<span class="op">]</span>,INDEX<span class="op">=</span><span class="va">params</span>,FUN<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="fu">graphics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">unique</span>,y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">val</span><span class="op">)</span>,col<span class="op">=</span><span class="va">col</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,type<span class="op">=</span><span class="st">"o"</span>,pch<span class="op">=</span><span class="fl">16</span>,lty<span class="op">=</span><span class="va">lty</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Change settings so that competing methods are useful.</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -1072,7 +1074,13 @@ second</p></li>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">auc_mtl</span>,<span class="va">colMeans</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">auc_tl</span>,<span class="va">colMeans</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">auc_tl</span>,<span class="va">colMeans</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#glm.separate   sparselink </span></span>
+<span><span class="co">#   0.7054149    0.7067895 </span></span>
+<span><span class="co">#glm.separate glm.glmtrans   sparselink   glm.common </span></span>
+<span><span class="co">#   0.6155303    0.7424242    0.7113636    0.7856061 </span></span>
+<span><span class="co"># Increase or decrease prop=0.1 to make MTL useful?</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="multi-task-learning-under-development">Multi-task learning (under development)<a class="anchor" aria-label="anchor" href="#multi-task-learning-under-development"></a>
