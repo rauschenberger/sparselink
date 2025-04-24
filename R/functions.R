@@ -1392,7 +1392,7 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
   # refit model on all folds
   #cat("refit on all folds","\n")
   #refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha)
-  list <- list(deviance=deviance)
+  list <- list(deviance=deviance,auc=auc)
   return(list)
 }
 
