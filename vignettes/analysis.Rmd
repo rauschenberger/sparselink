@@ -768,6 +768,53 @@ graphics::abline(v=seq(from=0.5,to=5.5,by=1))
 grDevices::dev.off()
 ```
 
+## Data-based simulation (under development)
+
+```{r,eval=FALSE}
+rm(list=ls())
+<<setup>>
+<<define_projects>>
+<<preprocess_data>>
+source(file.path(path,"package/R/development.R"))
+
+x <- x$SRP100787
+y <- y$SRP100787
+
+#--- MTL ---
+
+q <- 2
+n <- nrow(x)
+auc_mtl <- list()
+iter <- 3
+for(i in seq_len(iter)){
+  Y <- matrix(data=NA,nrow=n,ncol=q)
+  for(j in seq_len(q)){
+    Y[,j] <- abs(y - stats::rbinom(n=n,size=1,prob=0.1))
+  }
+  auc_mtl[[i]] <- cv.multiple(y=Y,X=x,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp")$auc
+}
+
+#--- TL ---
+
+auc_tl <- list()
+iter <- 3
+cond <- rep(x=NA,times=n)
+Y <- X <- list()
+for(i in seq_len(iter)){
+  cond[y==0] <- sample(rep(x=c(0,1),length.out=sum(y==0)))
+  cond[y==1] <- sample(rep(x=c(0,1),length.out=sum(y==1)))
+  Y <- list(y1=y[cond==0],y2=y[cond==1])
+  X <- list(x1=x[cond==0,],x2=x[cond==1,])
+  auc_tl[[i]] <- crossval(y=Y,X=X,family="binomial",alpha.init=0.95,alpha=1,type="exp")$auc
+}
+
+rowMeans(sapply(auc_mtl,colMeans))
+rowMeans(sapply(auc_tl,colMeans))
+
+
+```
+
+
 ## Multi-task learning (under development)
 
 ```{r multi-task,eval=FALSE}
