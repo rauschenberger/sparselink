@@ -233,12 +233,11 @@ grDevices::dev.off()
 # Effect of sample size in source or target dataset (TL), effect of sample size (MTL).
 #<<setup>>
 
-alpha.init <- 0.95; type <- "exp";  repetitions <- 2 # increase to 10
+alpha.init <- 0.95; type <- "exp";  repetitions <- 10 # increase to 10
 grid <- metric <- list()
 
 for(mode in c("TL-source","TL-target","MTL-size","TL-prop","MTL-prop")){
   metric[[mode]] <- list()
-  #cand <- c(25,50,100,150,200)
   cand <- c(20,40,60,80,100)
   if(mode=="TL-source"){
     grid[[mode]] <- expand.grid(prob.common=0.05,prob.separate=0.025,family="gaussian",n_source=cand,n_target=50)
@@ -247,9 +246,8 @@ for(mode in c("TL-source","TL-target","MTL-size","TL-prop","MTL-prop")){
   } else if(mode=="MTL-size"){
     grid[[mode]] <- expand.grid(prob.common=0.05,prob.separate=0.025,family="gaussian",n0=cand) 
   } else if(mode %in% c("TL-prop","MTL-prop")){
-    #cand <- c(0.01,0.025,0.05,0.10,0.20,0.25)
     cand <- c(0.025,0.05,0.10,0.15,0.20)
-    grid[[mode]] <- expand.grid(prob.common=cand,prob.separate=NA,family="gaussian",n_source=50,n_target=50,n0=100)
+    grid[[mode]] <- expand.grid(prob.common=cand,prob.separate=NA,family="gaussian",n_source=50,n_target=50,n0=50)
   } else {
     stop("Wrong mode.")
   }
@@ -263,7 +261,7 @@ for(mode in c("TL-source","TL-target","MTL-size","TL-prop","MTL-prop")){
       set.seed(seed=grid$seed[i])
       cat("i=",i,"\n")
       if(mode %in% c("TL-source","TL-target","TL-prop")){
-        n0 <- c(grid[[mode]]$n_source[i],grid[[mode]]$n_source[i],grid[[mode]]$n_target[i])
+        n0 <- rep(c(grid[[mode]]$n_source[i],grid[[mode]]$n_target[i]),times=c(2,1))
         data <- sim.data.transfer(prob.common=grid[[mode]]$prob.common[i],prob.separate=grid[[mode]]$prob.separate[i],family=grid[[mode]]$family[i],n0=n0)
         method <- c("glm.separate","glm.glmtrans","sparselink","glm.xrnet")
       } else if(mode %in% c("MTL-size","MTL-prop")){
@@ -272,7 +270,7 @@ for(mode in c("TL-source","TL-target","MTL-size","TL-prop","MTL-prop")){
       } else {
         stop("Wrong mode.")
       }
-      result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid[[mode]]$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1)
+      result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid[[mode]]$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1,trial=TRUE)
       metric[[mode]][[i]] <- result$deviance
     }
 }
@@ -280,14 +278,14 @@ for(mode in c("TL-source","TL-target","MTL-size","TL-prop","MTL-prop")){
 save(grid,metric,file=file.path(path,"results","simulation_devel.RData"))
 ```
 
-Logarithmic transformation of mean squared error calculated on hold-out data ($y$-axis) against sample size of source data sets or sample size of target data set (left) or proportion of features with common effects and proportion of features with separate effects (right). standard lasso regression (dotted black line), proposed method (solid blue line), competing methods (dashed orange and red lines, namely ). Added competing methods (orange) tend to perform worse than previously included competing methods (red).
+Logarithmic transformation of mean squared error calculated on hold-out data ($y$-axis), averaged across all three problems (TL-prop, MTL-size, MTL-prop) Left: Sample size of source data sets or sample size of target data set (left) or proportion of features with common effects and proportion of features with separate effects (right). standard lasso regression (dotted black line), proposed method (solid blue line), competing methods (dashed orange and red lines, namely ). Added competing methods (orange) tend to perform worse than previously included competing methods (red).
 
 ```{r sim_extra_figure,eval=fig.tab}
 load(file.path(path,"results","simulation_devel.RData"))
 
-graphics::par(mfrow=c(1,3),mar=c(3,3,1,1))
-graphics::layout(mat=matrix(data=c(1,1,2,2,3,3,0,4,4,0,5,5),ncol=2))
-for(mode in c("TL-source","TL-target","MTL-size","TL-prop","MTL-prop")){
+graphics::par(mfrow=c(1,3),mar=c(4.5,4.5,1.5,1),oma=c(0,0,0,0))
+#graphics::layout(mat=matrix(data=c(1,1,2,2,3,3,0,4,4,0,5,5),ncol=2))
+for(mode in c("MTL-size","TL-source","TL-target")){
   if(mode %in% c("TL-source","TL-target")){
     mse <- sapply(metric[[mode]],function(x) x[,3])
   } else {
@@ -314,13 +312,26 @@ for(mode in c("TL-source","TL-target","MTL-size","TL-prop","MTL-prop")){
   graphics::plot.new()
   graphics::plot.window(xlim=range(params),ylim=range(log(mse)))
   graphics::box()
+  #graphics::title(main=mode)
+  if(mode=="MTL-size"){
+    graphics::title(main="MTL - varying sample size")
+  } else if(mode=="TL-source"){
+    graphics::title(main="TL - varying source sample size")
+    xlab <- paste0("source sample size (n1=n2)")
+    graphics::legend(x="topleft",legend="n3=xxx (target sample size)",bty="n")
+  } else if(mode=="TL-target"){
+    graphics::title(main="TL - varying target sample size")
+    xlab <- paste0("target sample size (n3)")
+    graphics::legend(x="topleft",legend="n1=n2=xxx (source sample size)",bty="n")
+  }
+  graphics::title(ylab="log MSE",line=2.5,xlab=xlab)
   if(mode %in% c("TL-prop","MTL-prop")){
     graphics::axis(side=1,at=unique,labels=paste0(100*unique,"%"))
   } else {
     graphics::axis(side=1,at=unique)
   }
   graphics::axis(side=2)
-  graphics::title(main=mode)
+  
   for(i in names(col)){
     val <- tapply(X=mse[i,],INDEX=params,FUN=function(x) mean(x))
     graphics::lines(x=unique,y=log(val),col=col[i],type="o",pch=16,lty=lty[i])
@@ -784,29 +795,41 @@ source(file.path(path,"package/R/development.R"))
 x <- x$SRP100787
 y <- y$SRP100787
 
+#-----------
 #--- MTL ---
+#-----------
+
+prob <- c(0.00,0.05,0.10,0.15,0.20)
 
 q <- 2
 n <- nrow(x)
 auc_mtl <- list()
-iter <- 3
-for(i in seq_len(iter)){
-  Y <- matrix(data=NA,nrow=n,ncol=q)
-  for(j in seq_len(q)){
-    Y[,j] <- abs(y - stats::rbinom(n=n,size=1,prob=0.1))
+for(i in seq_along(prob)){
+  auc_mtl[[i]] <- list()
+  iter <- 1
+  for(j in seq_len(iter)){
+    Y <- matrix(data=NA,nrow=n,ncol=q)
+    for(k in seq_len(q)){
+      Y[,k] <- abs(y - stats::rbinom(n=n,size=1,prob=prob[i]))
+    }
+    auc_mtl[[i]][[j]] <- cv.multiple(y=Y,X=x,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp")$auc
   }
-  auc_mtl[[i]] <- cv.multiple(y=Y,X=x,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp")$auc
 }
+# MTL is beneficial under prob=0.15
 
+#----------
 #--- TL ---
+#----------
 
 auc_tl <- list()
 iter <- 3
 cond <- rep(x=NA,times=n)
 Y <- X <- list()
 for(i in seq_len(iter)){
-  cond[y==0] <- sample(rep(x=c(0,1),length.out=sum(y==0)))
-  cond[y==1] <- sample(rep(x=c(0,1),length.out=sum(y==1)))
+  n0 <- round(0.3*sum(y==0))
+  n1 <- round(0.3*sum(y==1))
+  cond[y==0] <- sample(rep=c(0,1),times=c(n0,n-n0)) #sample(rep(x=c(0,1),length.out=sum(y==0)))
+  cond[y==1] <- sample(rep=c(0,1),times=c(n1,n-n1)) #sample(rep(x=c(0,1),length.out=sum(y==1)))
   Y <- list(y1=y[cond==0],y2=y[cond==1])
   X <- list(x1=x[cond==0,],x2=x[cond==1,])
   auc_tl[[i]] <- crossval(y=Y,X=X,family="binomial",alpha.init=0.95,alpha=1,type="exp")$auc
@@ -885,6 +908,7 @@ if(project=="SRP155483"){
   #problem$proms <- c("VAS","HAQ")
   #problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
   problem$trial <- c("CRP","ESR","SWOLLEN")
+  problem$trial <- c("DAS28","SWOLLEN")
   #problem$all <- colnames(y)
 }
 
@@ -893,7 +917,8 @@ for(i in seq_len(ncol(Y))){
 }
 
 cond <- apply(X=Y,MARGIN=1,FUN=function(x) all(!is.na(x))) #& pathotype=="lymphoid" # subtypes seem to be defined based on clinical scores
-y <- scale(as.matrix(Y)[cond,]) # temporary scaling
+#Y <- as.matrix(Y)[cond,] # temporary: binarisation
+y <- scale(as.matrix(Y)[cond,])
 x <- X[cond,]
 
 #- - - - - - - - - - - - - 
@@ -979,12 +1004,13 @@ colMeans(cm)
 
 size <- unique(c(seq(from=50,to=nrow(x),by=25),nrow(x)))
 iter <- 10 # increase to 10
+size <- nrow(x) # suppress learning curve
 
 metric <- list()
 setting <- expand.grid(problem=names(problem),size=size,iter=seq_len(iter))
 for(i in seq_len(nrow(setting))){
   cat(progress=paste0(100*i/nrow(setting),"%"),"\n")
-  cond <- sample(rep(x=c(FALSE,TRUE),times=c(nrow(x)-setting$size[i],setting$size[i])))
+  cond <- sample(x=rep(x=c(FALSE,TRUE),times=c(nrow(x)-setting$size[i],setting$size[i])))
   vars <- problem[[setting$problem[i]]]
   metric[[i]] <- joinet:::cv.joinet(Y=y[cond,vars],X=x[cond,],family="gaussian",compare="mnorm")
   #method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink")
@@ -1012,6 +1038,21 @@ for(i in seq_along(problem)){
     graphics::lines(x=size,y=val,col=col[j],type="o",pch=16)
   }
 }
+
+#  JOINET is better than standard lasso when n>=100, performance is similar to spls and better than glmnet-mgaussian 
+
+#--- --- --- --- --- ---
+# binarisation ---
+#--- --- --- --- --- ---
+
+
+yy <- 1*cbind(y[,"CCP"]>20,y[,"CRP"]>10,y[,"DAS28"]>5)
+metric <- list()
+for(i in 1:10){
+  metric[[i]] <- joinet:::cv.joinet(Y=yy,X=x,family="binomial")
+}
+
+#rowMeans(sapply(metric,function(x) rowMeans(x)))
 
 #--- --- --- --- --- --- ---
 #--- explore other datasets ---
