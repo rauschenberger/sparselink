@@ -233,21 +233,23 @@ grDevices::dev.off()
 # Effect of sample size in source or target dataset (TL), effect of sample size (MTL).
 #<<setup>>
 
-alpha.init <- 0.95; type <- "exp";  repetitions <- 10 # increase to 10
+alpha.init <- 0.95; type <- "exp";  repetitions <- 2 # increase to 10
 grid <- metric <- list()
 
 for(mode in c("TL-source","TL-target","MTL-size","TL-prop","MTL-prop")){
   metric[[mode]] <- list()
-  cand <- c(25,50,100,150,200)
+  #cand <- c(25,50,100,150,200)
+  cand <- c(20,40,60,80,100)
   if(mode=="TL-source"){
-    grid[[mode]] <- expand.grid(prob.common=0.05,prob.separate=0.025,family="gaussian",n_source=cand,n_target=100)
+    grid[[mode]] <- expand.grid(prob.common=0.05,prob.separate=0.025,family="gaussian",n_source=cand,n_target=50)
   } else if(mode=="TL-target"){
-    grid[[mode]] <- expand.grid(prob.common=0.05,prob.separate=0.025,family="gaussian",n_source=100,n_target=cand) 
+    grid[[mode]] <- expand.grid(prob.common=0.05,prob.separate=0.025,family="gaussian",n_source=50,n_target=cand) 
   } else if(mode=="MTL-size"){
     grid[[mode]] <- expand.grid(prob.common=0.05,prob.separate=0.025,family="gaussian",n0=cand) 
   } else if(mode %in% c("TL-prop","MTL-prop")){
-    cand <- c(0.01,0.025,0.05,0.10,0.20,0.25)
-    grid[[mode]] <- expand.grid(prob.common=cand,prob.separate=NA,family="gaussian",n_source=100,n_target=100,n0=100)
+    #cand <- c(0.01,0.025,0.05,0.10,0.20,0.25)
+    cand <- c(0.025,0.05,0.10,0.15,0.20)
+    grid[[mode]] <- expand.grid(prob.common=cand,prob.separate=NA,family="gaussian",n_source=50,n_target=50,n0=100)
   } else {
     stop("Wrong mode.")
   }
@@ -305,7 +307,7 @@ for(mode in c("TL-source","TL-target","MTL-size","TL-prop","MTL-prop")){
   } else if(mode=="MTL-size"){
     params <- grid[[mode]]$n0
   } else if(mode %in% c("TL-prop","MTL-prop")){
-    params <- grid[[mode]]$prob.separate
+    params <- grid[[mode]]$prob.common
   }
   unique <- unique(params)
   #params <- grid[[mode]]$prob.separate
