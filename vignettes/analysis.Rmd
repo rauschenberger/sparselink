@@ -794,46 +794,64 @@ source(file.path(path,"package/R/development.R"))
 
 x <- x$SRP100787
 y <- y$SRP100787
-
-#-----------
-#--- MTL ---
-#-----------
-
-prob <- c(0.00,0.05,0.10,0.15,0.20)
-
+sd <- apply(x,2,sd) # temporary # REMOVE THIS!
+x <- x[,sd>=sort(sd,decreasing=TRUE)[100]] # REMOVE THIS!
+iter <- 1
 q <- 2
 n <- nrow(x)
+
+#-- -- --- ---
+#--- MTL ---
+#-- -- --- ---
+
+prob_mtl <- c(0.00,0.05,0.10,0.15,0.20)
 auc_mtl <- list()
-for(i in seq_along(prob)){
+for(i in seq_along(prob_mtl)){
   auc_mtl[[i]] <- list()
-  iter <- 1
   for(j in seq_len(iter)){
     Y <- matrix(data=NA,nrow=n,ncol=q)
     for(k in seq_len(q)){
-      Y[,k] <- abs(y - stats::rbinom(n=n,size=1,prob=prob[i]))
+      Y[,k] <- abs(y - stats::rbinom(n=n,size=1,prob=prob_mtl[i]))
     }
     auc_mtl[[i]][[j]] <- cv.multiple(y=Y,X=x,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp")$auc
   }
 }
 # MTL is beneficial under prob=0.15
 
-#----------
+#--- --- --- ---
 #--- TL ---
-#----------
+#--- --- --- ---
 
+prob_tl <- c(0.3,0.4,0.5,0.6,0.7)
 auc_tl <- list()
-iter <- 3
-cond <- rep(x=NA,times=n)
-Y <- X <- list()
-for(i in seq_len(iter)){
-  n0 <- round(0.3*sum(y==0))
-  n1 <- round(0.3*sum(y==1))
-  cond[y==0] <- sample(rep=c(0,1),times=c(n0,n-n0)) #sample(rep(x=c(0,1),length.out=sum(y==0)))
-  cond[y==1] <- sample(rep=c(0,1),times=c(n1,n-n1)) #sample(rep(x=c(0,1),length.out=sum(y==1)))
-  Y <- list(y1=y[cond==0],y2=y[cond==1])
-  X <- list(x1=x[cond==0,],x2=x[cond==1,])
-  auc_tl[[i]] <- crossval(y=Y,X=X,family="binomial",alpha.init=0.95,alpha=1,type="exp")$auc
+for(i in seq_along(prob_tl)){
+  auc_tl[[i]] <- list()
+  cond <- rep(x=NA,times=n)
+  Y <- X <- list()
+  for(j in seq_len(iter)){
+    n0 <- round(prob_tl[i]*sum(y==0))
+    n1 <- round(prob_tl[i]*sum(y==1))
+    cond[y==0] <- sample(rep(x=c(0,1),times=c(n0,sum(y==0)-n0))) #sample(rep(x=c(0,1),length.out=sum(y==0)))
+    cond[y==1] <- sample(rep(x=c(0,1),times=c(n1,sum(y==1)-n1))) #sample(rep(x=c(0,1),length.out=sum(y==1)))
+    Y <- list(y1=y[cond==0],y2=y[cond==1])
+    X <- list(x1=x[cond==0,],x2=x[cond==1,])
+    auc_tl[[i]][[j]] <- crossval(y=Y,X=X,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp")$auc
+  }
 }
+
+save(prob_mtl,auc_mtl,prob_tl,auc_tl,file=file.path(path,"results","sim-devel.RData"))
+
+# MTL: AUC vs contamination
+auc <- sapply(auc_mtl,function(x) colMeans(x[[1]]))
+graphics::plot(x=prob_mtl,auc["sparselink",],type="o",ylim=c(0.4,0.8),col="blue")
+graphics::lines(x=prob_mtl,auc["glm.separate",],type="o",col="red")
+graphics::abline(h=0.5,lty=2,col="grey")
+
+# TL: source/target sample size
+auc <- sapply(auc_tl,function(x) x[[1]][2,])
+graphics::plot(x=prob_tl,auc["sparselink",],type="o",ylim=c(0.4,0.8),col="blue")
+graphics::lines(x=prob_tl,auc["glm.separate",],type="o",col="red")
+graphics::abline(h=0.5,lty=2,col="grey")
 
 rowMeans(sapply(auc_mtl,colMeans))
 rowMeans(sapply(auc_tl,colMeans))
