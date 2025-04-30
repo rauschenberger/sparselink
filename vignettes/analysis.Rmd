@@ -796,7 +796,7 @@ x <- x$SRP100787
 y <- y$SRP100787
 sd <- apply(x,2,sd) # temporary # REMOVE THIS!
 x <- x[,sd>=sort(sd,decreasing=TRUE)[100]] # REMOVE THIS!
-iter <- 1
+iter <- 10
 q <- 2
 n <- nrow(x)
 
@@ -813,10 +813,19 @@ for(i in seq_along(prob_mtl)){
     for(k in seq_len(q)){
       Y[,k] <- abs(y - stats::rbinom(n=n,size=1,prob=prob_mtl[i]))
     }
-    auc_mtl[[i]][[j]] <- cv.multiple(y=Y,X=x,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp")$auc
+    #auc_mtl[[i]][[j]] <- cv.multiple(y=Y,X=x,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp",trial=TRUE)$auc
+    auc_mtl[[i]][[j]] <- joinet::cv.joinet(Y=Y,X=x,family="binomial")
   }
 }
 # MTL is beneficial under prob=0.15
+
+# for joinet (deviance: lower=better)
+a <- sapply(auc_mtl,function(x) rowMeans(sapply(x,function(x) rowMeans(x))))
+plot(prob_mtl,y=a["base",],type="o")
+lines(prob_mtl,y=a["meta",],type="o",lty=2)
+
+
+#lapply(auc_mtl,function(x) rowMeans(sapply(x,function(x) colMeans(x))))
 
 #--- --- --- ---
 #--- TL ---
@@ -835,32 +844,30 @@ for(i in seq_along(prob_tl)){
     cond[y==1] <- sample(rep(x=c(0,1),times=c(n1,sum(y==1)-n1))) #sample(rep(x=c(0,1),length.out=sum(y==1)))
     Y <- list(y1=y[cond==0],y2=y[cond==1])
     X <- list(x1=x[cond==0,],x2=x[cond==1,])
-    auc_tl[[i]][[j]] <- crossval(y=Y,X=X,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp")$auc
+    auc_tl[[i]][[j]] <- crossval(y=Y,X=X,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp",trial=TRUE)$auc
   }
 }
 
 save(prob_mtl,auc_mtl,prob_tl,auc_tl,file=file.path(path,"results","sim-devel.RData"))
 
+graphics::par(mfrow=c(1,2))
+
 # MTL: AUC vs contamination
-auc <- sapply(auc_mtl,function(x) colMeans(x[[1]]))
+aucs <- lapply(auc_mtl,function(x) sapply(x,function(x) colMeans(x)))
+auc <- sapply(aucs,function(x) rowMeans(x))
 graphics::plot(x=prob_mtl,auc["sparselink",],type="o",ylim=c(0.4,0.8),col="blue")
 graphics::lines(x=prob_mtl,auc["glm.separate",],type="o",col="red")
 graphics::abline(h=0.5,lty=2,col="grey")
 
 # TL: source/target sample size
-auc <- sapply(auc_tl,function(x) x[[1]][2,])
+aucs <- lapply(auc_tl,function(x) sapply(x,function(x) x[2,]))
+auc <- sapply(aucs,function(x) rowMeans(x))
 graphics::plot(x=prob_tl,auc["sparselink",],type="o",ylim=c(0.4,0.8),col="blue")
 graphics::lines(x=prob_tl,auc["glm.separate",],type="o",col="red")
 graphics::abline(h=0.5,lty=2,col="grey")
 
-rowMeans(sapply(auc_mtl,colMeans))
-rowMeans(sapply(auc_tl,colMeans))
+# statistical testing
 
-#glm.separate   sparselink 
-#   0.7054149    0.7067895 
-#glm.separate glm.glmtrans   sparselink   glm.common 
-#   0.6155303    0.7424242    0.7113636    0.7856061 
-# Increase or decrease prop=0.1 to make MTL useful?
 
 
 ```
