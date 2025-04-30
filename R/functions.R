@@ -1303,7 +1303,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
 
 
 # This cross-validation function only works for transfer learning (not for multi-task learning).
-crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type){
+crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type,trial=FALSE){
   #if(is.matrix(y) & is.matrix(X)){
   #  mode <- "multiple"
   #  foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
@@ -1331,7 +1331,7 @@ crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.g
       X_train[[j]] <- X[[j]][foldid[[j]]!=i,,drop=FALSE]
       X_test[[j]] <- X[[j]][foldid[[j]]==i,,drop=FALSE]
     }
-    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type)
+    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
     for(j in seq_len(q)){
       for(k in method){
         y_hat[[j]][foldid[[j]]==i,k] <- test$y_hat[[k]][[j]]
@@ -1349,7 +1349,7 @@ crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.g
   }
   # refit model on all folds
   cat("refit on all folds","\n")
-  refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha)
+  refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha,trial=trial)
   list <- list(deviance=deviance,auc=auc,refit=refit)
   return(list)
 }
