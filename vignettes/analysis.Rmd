@@ -9,7 +9,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-**We obtained our results on 2025-01-03 using R version 4.4.0 (2024-04-24, "Puppy Cup") running on a Dell Latitude 5440 laptop with a 13th Gen Intel(R) Core(TM) i7-1365U processor (1800 Mhz) and the operating system Microsoft Windows 10 Enterprise. The total computation time was around 2 hours (excluding data download, without parallel computing).**
+**We obtained our results on 2025-05-XX using R version 4.5.0 (2025-04-11, "How About a Twenty-Six") running on a Dell Latitude 5440 laptop with a 13th Gen Intel(R) Core(TM) i7-1365U processor (1800 Mhz) and the operating system Microsoft Windows 10 Enterprise. The total computation time was around 2 hours (excluding data download, without parallel computing).**
 
 # Working environment
 
@@ -36,7 +36,7 @@ for(i in seq_along(dir)){
 source(file.path(path,"package/R/functions.R")) # Or load 'sparselink' package.
 
 inst <- rownames(utils::installed.packages())
-pkgs <- c("knitr","rmarkdown","glmnet","BiocManager")
+pkgs <- c("knitr","rmarkdown","glmnet","BiocManager","spls","xrnet")
 for(i in seq_along(pkgs)){
   if(!pkgs[i]%in%inst){
     utils::install.packages(pkgs[i])
@@ -143,7 +143,7 @@ for(mode in c("transfer","multiple")){
       method <- c("glm.separate","glm.mgaussian","sparselink","glm.spls") # add glmnet "mgaussian" (only for linear case) or "MTPS" (not sparse)?
     }
     
-    result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1,trial=TRUE)
+    result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1,trial=FALSE)
     hyperpar[[i]] <- result$hyperpar
     time[[i]] <- result$time
     auc[[i]] <- result$auc
@@ -281,15 +281,17 @@ save(grid,metric,file=file.path(path,"results","simulation_devel.RData"))
 Logarithmic transformation of mean squared error calculated on hold-out data ($y$-axis), averaged across all three problems (TL-prop, MTL-size, MTL-prop) Left: Sample size of source data sets or sample size of target data set (left) or proportion of features with common effects and proportion of features with separate effects (right). standard lasso regression (dotted black line), proposed method (solid blue line), competing methods (dashed orange and red lines, namely ). Added competing methods (orange) tend to perform worse than previously included competing methods (red).
 
 ```{r sim_extra_figure,eval=fig.tab}
+#<<setup>>
 load(file.path(path,"results","simulation_devel.RData"))
 
 graphics::par(mfrow=c(1,3),mar=c(4.5,4.5,1.5,1),oma=c(0,0,0,0))
 #graphics::layout(mat=matrix(data=c(1,1,2,2,3,3,0,4,4,0,5,5),ncol=2))
 for(mode in c("MTL-size","TL-source","TL-target")){
-  if(mode %in% c("TL-source","TL-target")){
-    mse <- sapply(metric[[mode]],function(x) x[,3])
-  } else if(mode %in% "MTL-size"){
+#for(mode in c("MTL-prop","TL-prop")){
+  if(mode %in% c("MTL-size","MTL-prop","TL-prop")){
     mse <- sapply(metric[[mode]],function(x) rowMeans(x))
+  } else if(mode %in% c("TL-source","TL-target")){
+    mse <- sapply(metric[[mode]],function(x) x[,3])
   }
   if(mode %in% c("TL-source","TL-target","TL-prop")){
     col <- c("glm.separate"="black","glm.glmtrans"="red","glm.xrnet"="orange","sparselink"="blue")
@@ -323,6 +325,14 @@ for(mode in c("MTL-size","TL-source","TL-target")){
     main <- "TL - varying target sample size"
     xlab <- bquote("target sample size ("~n[3]~")")
     legend <- bquote("source sample size:"~n[1]~"="~n[2]==.(unique(grid[[mode]]$n_source)))
+  } else if(mode=="MTL-prop"){
+    xlab <- "blabla"
+    main <- "MTL - effect proportion"
+    legend <- ""
+  } else if(mode=="TL-prop"){
+    xlab <- "blabla"
+    main <- "TL - effect proportion"
+    legend <- ""
   }
   graphics::title(main=main)
   graphics::title(ylab="log MSE",line=2.5,xlab=xlab)
@@ -663,7 +673,7 @@ for(i in names(project)){
   for(j in seq_len(5)){ # 5 repetitions of 10-fold CV
     set.seed(j)
     codes <- project[[i]]
-    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.common","glm.xrnet"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type,trial=TRUE)
+    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.common","glm.xrnet"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type,trial=FALSE)
   }
 }
 save(result,project,file=file.path(path,"results","application.RData"))
