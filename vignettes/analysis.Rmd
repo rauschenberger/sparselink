@@ -288,7 +288,7 @@ graphics::par(mfrow=c(1,3),mar=c(4.5,4.5,1.5,1),oma=c(0,0,0,0))
 for(mode in c("MTL-size","TL-source","TL-target")){
   if(mode %in% c("TL-source","TL-target")){
     mse <- sapply(metric[[mode]],function(x) x[,3])
-  } else {
+  } else if(mode %in% "MTL-size"){
     mse <- sapply(metric[[mode]],function(x) rowMeans(x))
   }
   if(mode %in% c("TL-source","TL-target","TL-prop")){
@@ -308,11 +308,9 @@ for(mode in c("MTL-size","TL-source","TL-target")){
     params <- grid[[mode]]$prob.common
   }
   unique <- unique(params)
-  #params <- grid[[mode]]$prob.separate
   graphics::plot.new()
   graphics::plot.window(xlim=range(params),ylim=range(log(mse)))
   graphics::box()
-  #graphics::title(main=mode)
   if(mode=="MTL-size"){
     main <- "MTL - varying sample size"
     xlab <- bquote("sample size ("~n[1]~"="~n[2]~"="~n[3]~")")
