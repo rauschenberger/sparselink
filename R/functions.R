@@ -2,6 +2,7 @@
 if(FALSE){
   setwd("C:/Users/arauschenberger/Desktop/sparselink/package")
   roxygen2::roxygenise()
+  #usethis::use_mit_license()
   rcmdcheck::rcmdcheck()
   pkgdown::check_pkgdown()
   pkgdown::build_site()
