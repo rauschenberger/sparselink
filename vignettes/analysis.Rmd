@@ -314,17 +314,21 @@ for(mode in c("MTL-size","TL-source","TL-target")){
   graphics::box()
   #graphics::title(main=mode)
   if(mode=="MTL-size"){
-    graphics::title(main="MTL - varying sample size")
+    main <- "MTL - varying sample size"
+    xlab <- bquote("sample size ("~n[1]~"="~n[2]~"="~n[3]~")")
+    legend <- ""
   } else if(mode=="TL-source"){
-    graphics::title(main="TL - varying source sample size")
-    xlab <- paste0("source sample size (n1=n2)")
-    graphics::legend(x="topleft",legend="n3=xxx (target sample size)",bty="n")
+    main <- "TL - varying source sample size"
+    xlab <- bquote("source sample size ("~n[1]~"="~n[2]~")")
+    legend <- bquote("target sample size:"~n[3]==.(unique(grid[[mode]]$n_target)))
   } else if(mode=="TL-target"){
-    graphics::title(main="TL - varying target sample size")
-    xlab <- paste0("target sample size (n3)")
-    graphics::legend(x="topleft",legend="n1=n2=xxx (source sample size)",bty="n")
+    main <- "TL - varying target sample size"
+    xlab <- bquote("target sample size ("~n[3]~")")
+    legend <- bquote("source sample size:"~n[1]~"="~n[2]==.(unique(grid[[mode]]$n_source)))
   }
+  graphics::title(main=main)
   graphics::title(ylab="log MSE",line=2.5,xlab=xlab)
+  graphics::legend(x="topleft",legend=legend,bty="n")
   if(mode %in% c("TL-prop","MTL-prop")){
     graphics::axis(side=1,at=unique,labels=paste0(100*unique,"%"))
   } else {
