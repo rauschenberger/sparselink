@@ -6,7 +6,7 @@ if(FALSE){
   #usethis::use_mit_license()
   rcmdcheck::rcmdcheck()
   pkgdown::check_pkgdown()
-  pkgdown::build_site()
+  #pkgdown::build_site()
 }
 
 #' @title logit function

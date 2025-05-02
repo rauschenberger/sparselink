@@ -11,7 +11,8 @@ sparselink(
   alpha.init = 0.95,
   alpha = 1,
   type = "exp",
-  nfolds = 10
+  nfolds = 10,
+  trial = FALSE
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ default: 1 (lasso)}
 \item{type}{character}
 
 \item{nfolds}{number of cross-validation folds}
+
+\item{trial}{Should exponents above 1 be used? Default: FALSE}
 }
 \description{
 Sparse regression for related problems

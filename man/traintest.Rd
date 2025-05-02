@@ -11,9 +11,10 @@ traintest(
   X_test = NULL,
   family,
   alpha,
-  method = c("glm.separate", "glm.transfer", "sparselink", "glm.common"),
+  method = c("glm.separate", "glm.glmtrans", "sparselink", "glm.common"),
   alpha.init,
-  type
+  type,
+  trial = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ traintest(
 \item{alpha.init}{elastic net mixing parameter for initial regressions}
 
 \item{type}{character}
+
+\item{trial}{see sparselink}
 }
 \description{
 Trains and test prediction models
