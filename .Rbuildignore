@@ -2,6 +2,7 @@
 ^docs$
 ^pkgdown$
 license.md
+LICENSE
 CONTRIBUTING.md
 \.Rhistory
 \.git
@@ -10,3 +11,4 @@ appveyor.yml
 ^\.github$
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
+^LICENSE\.md$
