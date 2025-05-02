@@ -143,7 +143,7 @@ for(mode in c("transfer","multiple")){
       method <- c("glm.separate","glm.mgaussian","sparselink","glm.spls") # add glmnet "mgaussian" (only for linear case) or "MTPS" (not sparse)?
     }
     
-    result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1)
+    result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1,trial=TRUE)
     hyperpar[[i]] <- result$hyperpar
     time[[i]] <- result$time
     auc[[i]] <- result$auc
@@ -663,7 +663,7 @@ for(i in names(project)){
   for(j in seq_len(5)){ # 5 repetitions of 10-fold CV
     set.seed(j)
     codes <- project[[i]]
-    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.common","glm.xrnet"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type)
+    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.common","glm.xrnet"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type,trial=TRUE)
   }
 }
 save(result,project,file=file.path(path,"results","application.RData"))
