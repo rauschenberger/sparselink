@@ -1022,12 +1022,14 @@ glm.spls <- function(x,y,family="gaussian",alpha=1,nfolds=10){
   return(object)
 }
 
+#' @export
 predict.glm.spls <- function(object,newx){
   temp <- spls::predict.spls(object=object,newx=newx,type="fit")
   y_hat <- apply(X=temp,MARGIN=2,FUN=function(x) x,simplify=FALSE)
   return(y_hat)
 }
 
+#' @export
 coef.glm.spls <- function(object){
   coef <- spls::coef.spls(object=object)
   list <- list(alpha=NA,beta=coef)
@@ -1068,6 +1070,7 @@ glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   return(object)
 }
 
+#' @export
 predict.glm.xrnet <- function(object,newx){
   y_hat <- list()
   for(i in seq_along(object)){
@@ -1076,6 +1079,7 @@ predict.glm.xrnet <- function(object,newx){
   return(y_hat)
 }
 
+#' @export
 coef.glm.xrnet <- function(object){
   alpha <- beta <- numeric()
   for(i in seq_along(object)){
