@@ -136,11 +136,11 @@ for(mode in c("transfer","multiple")){
     cat("i=",i,"\n")
     if(mode=="transfer"){
       data <- sim.data.transfer(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i])
-      method <- c("glm.separate","glm.glmtrans","sparselink")
+      method <- c("glm.separate","glm.glmtrans","sparselink","glm.xrnet")
     } else if(mode=="multiple"){
       #--- multi-task learning ---
       data <- sim.data.multiple(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i])
-      method <- c("glm.separate","glm.mgaussian","sparselink") # add glmnet "mgaussian" (only for linear case) or "MTPS" (not sparse)?
+      method <- c("glm.separate","glm.mgaussian","sparselink","glm.spls") # add glmnet "mgaussian" (only for linear case) or "MTPS" (not sparse)?
     }
     
     result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1)
