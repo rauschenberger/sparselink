@@ -1050,7 +1050,7 @@ glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   prior <- matrix(data=NA,nrow=p,ncol=q)
   for(i in seq_len(q)){
     object <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],alpha=alpha.init,family=family)
-    prior[,i] <- coef(object=object,s="lambda.min")[-1]
+    prior[,i] <- stats::coef(object=object,s="lambda.min")[-1]
   }
   #--- stage 2 ---
   object <- list()
@@ -1249,6 +1249,7 @@ coef.glm.glmtrans <- function(object){
 #' @param alpha elastic net mixing paramter
 #' @param method character vector
 #' @param type character
+#' @param trial see sparselink
 #'
 traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type,trial=FALSE){
   if(is.list(y_train)){
@@ -1970,6 +1971,7 @@ plotWeight <- function(x,y){
 #' default: 1 (lasso)
 #' @param nfolds number of cross-validation folds
 #' @param type character
+#' @param trial Should exponents above 1 be used? Default: FALSE
 #' 
 #' @examples
 #' # multi-task learning
