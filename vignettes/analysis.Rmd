@@ -36,7 +36,7 @@ for(i in seq_along(dir)){
 source(file.path(path,"package/R/functions.R")) # Or load 'sparselink' package.
 
 inst <- rownames(utils::installed.packages())
-pkgs <- c("knitr","rmarkdown","glmnet","BiocManager","spls","xrnet")
+pkgs <- c("knitr","rmarkdown","glmnet","BiocManager","mvtnorm","glmtrans","spls","xrnet")
 for(i in seq_along(pkgs)){
   if(!pkgs[i]%in%inst){
     utils::install.packages(pkgs[i])
