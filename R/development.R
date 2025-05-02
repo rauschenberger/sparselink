@@ -1,4 +1,6 @@
 
+if(FALSE){
+
 fuse <- function(x,y,mode){
   slot <- list(sep=list(),com=numeric())
   list <- list(y=slot,x=slot)
@@ -792,4 +794,6 @@ if(FALSE){
 
 #object <- devel(x=x,y=y,family="gaussian")
 #y_hat <- predict(object=object,newx=x)
+
+}
 
