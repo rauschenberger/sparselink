@@ -177,7 +177,7 @@ The following chunk generate the figures for the simulation study.
 
 caption <- paste(c("\\textbf{Multi-task learning.}","\\textbf{Transfer learning.}"),"Comparison of different measures (rows) between an available method (red) and the proposed method (blue) in different simulation settings (columns), based on the average of three problems",c("(tasks)","(datasets)"),"for each repetition out of ten. Measures: performance metric (mean squared error on hold-out data, as a fraction of the one from standard lasso regression; a point below the dashed line means that",c("multi-task","transfer"),"learning improves predictions), sparsity (number of non-zero coefficients), precision (number of coefficients with correct signs divided by number of non-zero coefficients). The arrows point in the direction of improvement. Settings: percentage of features with a common effect for all problems ($\\pi_\\theta$), percentage of features with a specific effect for each problem ($\\pi_\\delta$).",c("\\label{fig_sim_multiple}","\\label{fig_sim_transfer}"))
 
-figure_change <- function(){
+figure_change <- function(model0,model1="sparselink",model2){
   
   mode <- paste0(100*grid$prob.common,"%\n",100*grid$prob.separate,"%")
   
@@ -193,20 +193,32 @@ figure_change <- function(){
   #--- predictive performance ---
   means <- t(sapply(X=deviance,FUN=rowMeans))
   means <- means/means[,"glm.separate"]
-  change(x=mode,y0=means[,model.ref],y1=means[,model.own],main="metric",increase=FALSE)
+  if(is.null(model2)){
+    change(x=mode,y0=means[,model0],y1=means[,model1],main="metric",increase=FALSE)
+  } else {
+    change2(x=mode,y0=means[,model0],y1=means[,model1],y2=means[,model2],main="metric",increase=FALSE)
+  }
   graphics::abline(h=1,lty=2,col="grey")
   label()
   
   #--- sparsity ---
   nzero <- sapply(X=sel.num,FUN=rowMeans)
-  change(x=mode,y0=nzero[model.ref,],y1=nzero[model.own,],main="sparsity",increase=FALSE)
+  if(is.null(model2)){
+    change(x=mode,y0=nzero[model0,],y1=nzero[model1,],main="sparsity",increase=FALSE)
+  } else {
+    change2(x=mode,y0=nzero[model0,],y1=nzero[model1,],y2=nzero[model2,],main="sparsity",increase=FALSE)
+  }
   graphics::abline(h=0,lty=2,col="grey")
   label()
   
   #--- precision ---
   precision <- sapply(X=sel.count,FUN=function(x) x[,"precision"])
   precision[is.na(precision)] <- 0
-  change(x=mode,y0=precision[model.ref,],y1=precision[model.own,],main="precision",increase=TRUE)
+  if(is.null(model2)){
+    change(x=mode,y0=precision[model0,],y1=precision[model1,],main="precision",increase=TRUE)
+  } else {
+    change2(x=mode,y0=precision[model0,],y1=precision[model1,],y2=precision[model2,],main="precision",increase=TRUE)
+  }
   graphics::abline(h=0,lty=2,col="grey")
   label()
   
@@ -214,16 +226,20 @@ figure_change <- function(){
 
 grDevices::postscript(file=file.path(path,"manuscript","fig_sim_multiple.eps"),width=6.5,height=6)
 load(file.path(path,paste0("results/simulation_multiple.RData")))
-model.ref <- "glm.mgaussian"
-model.own <- "sparselink"
-figure_change()
+#model.ref <- "glm.mgaussian"
+#model.own <- "sparselink"
+figure_change(model0="glm.mgaussian",model1="sparselink",model2="glm.spls")
+rowMeans(sapply(deviance,function(x) rank(rowMeans(x))))
+rowMeans(sapply(deviance,function(x) colMeans(t(x)/x["glm.separate",])))
 grDevices::dev.off()
 
 grDevices::postscript(file=file.path(path,"manuscript","fig_sim_transfer.eps"),width=6.5,height=6)
 load(file.path(path,paste0("results/simulation_transfer.RData")))
-model.ref <- "glm.glmtrans"
-model.own <- "sparselink"
-figure_change()
+#model.ref <- "glm.glmtrans"
+#model.own <- "sparselink"
+figure_change(model0="glm.glmtrans",model1="sparselink",model2="glm.xrnet")
+rowMeans(sapply(deviance,function(x) rank(rowMeans(x))))
+rowMeans(sapply(deviance,function(x) colMeans(t(x)/x["glm.separate",])))
 grDevices::dev.off()
 ```
 
@@ -695,7 +711,7 @@ This chunk generates the figure on the predictive performance.
 
 grDevices::postscript(file=file.path(path,"manuscript","fig_app.eps"),width=6.5,height=4)
 graphics::par(mfrow=c(2,1),mar=c(4,2,1,1),oma=c(0,0,0,0))
-load(file.path(path,paste0("results/application.RData")))
+load(file.path(path,paste0("results/application.RData")),verbose=TRUE)
 
 reference <- "glm.glmtrans"
 experimental <- "sparselink"
