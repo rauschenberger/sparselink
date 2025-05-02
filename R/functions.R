@@ -1520,6 +1520,47 @@ change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
   graphics::par(xpd=FALSE)
 }
 
+
+change2 <- function(x,y0,y1,y2,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
+  unique <- unique(x)
+  graphics::plot.new()
+  xlim <- c(1-0.2,length(unique)+0.2)
+  ylim <- range(c(y0,y1,y2),na.rm=TRUE)
+  graphics::plot.window(xlim=xlim,ylim=ylim)
+  graphics::mtext(text=unique,side=1,at=seq_along(unique),line=1,cex=cex.axis)  
+  graphics::axis(side=2,cex.axis=cex.axis)
+  for(i in seq_along(unique)){
+    cond <- x==unique[i]
+    graphics::segments(x0=i,y0=y1[cond],x1=i+0.1,y1=y2[cond],col="grey")
+    graphics::segments(x0=i-0.1,y0=y0[cond],x1=i,y1=y1[cond],col="grey")
+    graphics::points(x=rep(i-0.1,times=sum(cond)),y=y0[cond],col="red",pch=16,cex=0.8)
+    graphics::points(x=rep(i,times=sum(cond)),y=y1[cond],col="blue",pch=16,cex=0.8)
+    graphics::points(x=rep(i+0.1,times=sum(cond)),y=y2[cond],col="red",pch=16,cex=0.8)
+  }
+  graphics::title(main=main,line=0,cex.main=cex.main)
+  graphics::par(xpd=TRUE)
+  usr <- graphics::par("usr")
+  margin <- 0.1*diff(usr[3:4])
+  if(increase){
+    inferior <- usr[3]
+    superior <- usr[4]
+    margin.inferior <- +margin
+    margin.superior <- -margin
+  } else {
+    inferior <- usr[4]
+    superior <- usr[3]
+    margin.inferior <- -margin
+    margin.superior <- +margin
+  }
+  pos <- xlim[1]-0.13*diff(xlim)
+  pos <- usr[2] # trial
+  graphics::arrows(x0=pos,y0=inferior+2*margin.inferior,
+                   y1=superior+2*margin.superior,lwd=2,length=0.08,col="grey")
+  graphics::text(x=pos,y=inferior+1*margin.inferior,labels="-",col="red",font=2,cex=1.2)
+  graphics::text(x=pos,y=superior+1*margin.superior,labels="+",col="blue",font=2,cex=1.2)
+  graphics::par(xpd=FALSE)
+}
+
 ### --- development ---
 # 
 # glm.tidy <- function(x,y,family,alpha.one=0.95,alpha.two=1){
