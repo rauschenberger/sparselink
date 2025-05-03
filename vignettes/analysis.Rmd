@@ -475,7 +475,8 @@ for(i in unlist(project)){
 #mean <- apply(X=x[[extra]],MARGIN=2,FUN=mean) # original
 var <- apply(X=x[[extra]],MARGIN=2,FUN=var) # trial
 #warning("change number in next line")
-temp <- cond & mean >= sort(mean[cond],decreasing=TRUE)[5000] # trial: top 5000
+#temp <- cond & mean >= sort(mean[cond],decreasing=TRUE)[5000] # trial: top 5000
+temp <- cond & var >= sort(var[cond],decreasing=TRUE)[5000] # trial: top 5000
 select[[extra]] <- temp
 
 # pre-processing
