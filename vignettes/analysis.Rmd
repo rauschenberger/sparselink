@@ -232,7 +232,7 @@ figure_change(model0="glm.mgaussian",model1="sparselink",model2="glm.spls")
 rowMeans(sapply(deviance,function(x) rank(rowMeans(x))))
 rowMeans(sapply(deviance,function(x) colMeans(t(x)/x["glm.separate",])))
 runtime <- rowSums(sapply(time,function(x) x))
-runtime/runtime["glm.separate"]
+round(runtime/runtime["glm.separate"],digits=2)
 grDevices::dev.off()
 
 grDevices::postscript(file=file.path(path,"manuscript","fig_sim_transfer.eps"),width=6.5,height=6)
@@ -243,7 +243,7 @@ figure_change(model0="glm.glmtrans",model1="sparselink",model2="glm.xrnet")
 rowMeans(sapply(deviance,function(x) rank(rowMeans(x))))
 rowMeans(sapply(deviance,function(x) colMeans(t(x)/x["glm.separate",])))
 runtime <- rowSums(sapply(time,function(x) x))
-runtime/runtime["glm.separate"]
+round(runtime/runtime["glm.separate"],digits=2)
 grDevices::dev.off()
 ```
 
@@ -971,7 +971,7 @@ if(project=="SRP155483"){
   #problem$proms <- c("VAS","HAQ")
   #problem$labor <- c("CRP","ESR") # CCP might be too different (check cor)
   problem$trial <- c("CRP","ESR","SWOLLEN")
-  problem$trial <- c("DAS28","SWOLLEN")
+  #problem$trial <- c("DAS28","SWOLLEN","TENDER")
   #problem$all <- colnames(y)
 }
 
@@ -1028,12 +1028,15 @@ alpha.init <- 0.95; alpha <- 1; type <- "exp"; trial <- FALSE
 results <- list()
 for(k in seq_along(problem)){
   results[[k]] <- list()
-  for(i in seq_len(1)){ # 5 repetitions of 10-fold CV
+  for(i in seq_len(3)){ # 5 repetitions of 10-fold CV
     set.seed(i)
     method <- c("glm.empty","glm.separate","glm.mgaussian","glm.spls") #"sparselink" "group.devel"
     results[[k]][[i]] <-  cv.multiple(y=y[,problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
+
+save(results,file=file.path(path,"results","app_mtl_devel.RData"))
+
 
 colMeans(results[[1]][[1]]$deviance/results[[1]][[1]]$deviance[,"glm.empty"])
 names(results) <- names(problem)
