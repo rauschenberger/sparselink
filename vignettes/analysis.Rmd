@@ -456,23 +456,26 @@ for(i in c(unlist(project),extra)){
 select <- list()
 total <- numeric()
 for(i in unlist(project)){
-  total <- rbind(total,Matrix::colSums(x[[i]])) # original: mean filtering
-  #total <- rbind(total,apply(X=x[[i]],MARGIN=2,FUN=stats::var)) # alternative: variance filtering
+  #total <- rbind(total,Matrix::colSums(x[[i]])) # original: mean filtering
+  total <- rbind(total,apply(X=x[[i]],MARGIN=2,FUN=stats::var)) # trial: variance filtering
 }
 type <- SummarizedExperiment::rowData(data[[i]])$gene_type
 cond <- type=="protein_coding"
 total[,!cond] <- 0
 rank <- apply(X=total,MARGIN=1,FUN=rank)
 mean_rank <- rowMeans(rank)
-temp <- cond & apply(total,2,function(x) all(x>0)) & (mean_rank >= sort(mean_rank[cond],decreasing=TRUE)[2000]) # double-check (remove?) second condition
+#temp <- cond & apply(total,2,function(x) all(x>0)) & (mean_rank >= sort(mean_rank[cond],decreasing=TRUE)[2000]) # original: top 2000
+temp <- cond & mean_rank >= sort(mean_rank[cond],decreasing=TRUE)[5000] # trial: top 5000
+
 for(i in unlist(project)){
   select[[i]] <- temp
 }
 
 # select most expressed protein-coding genes (for MTL project)
-mean <- apply(X=x[[extra]],MARGIN=2,FUN=mean)
+#mean <- apply(X=x[[extra]],MARGIN=2,FUN=mean) # original
+var <- apply(X=x[[extra]],MARGIN=2,FUN=var) # trial
 #warning("change number in next line")
-temp <- cond & mean >= sort(mean[cond],decreasing=TRUE)[2000] # increase to 2000!
+temp <- cond & mean >= sort(mean[cond],decreasing=TRUE)[5000] # trial: top 5000
 select[[extra]] <- temp
 
 # pre-processing
@@ -693,7 +696,7 @@ for(i in names(project)){
   for(j in seq_len(5)){ # 5 repetitions of 10-fold CV
     set.seed(j)
     codes <- project[[i]]
-    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.common","glm.xrnet"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type,trial=FALSE)
+    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type,trial=FALSE)
   }
 }
 save(result,project,file=file.path(path,"results","application.RData"))
