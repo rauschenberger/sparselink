@@ -1034,7 +1034,7 @@ for(k in seq_along(problem)){
   results[[k]] <- list()
   for(i in seq_len(3)){ # 5 repetitions of 10-fold CV
     set.seed(i)
-    method <- c("glm.empty","glm.separate","glm.mgaussian","glm.spls") #"sparselink" "group.devel"
+    method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink","glm.spls") #"sparselink" "group.devel"
     results[[k]][[i]] <-  cv.multiple(y=y[,problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
