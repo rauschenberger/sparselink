@@ -769,7 +769,7 @@ colMeans(nzero[disease=="RA",])
 
 #--- revision: report AUC ---
 Reduce(f="+",x=lapply(result$IBD,function(x) x$auc))/length(result$IBD)
-lapply(result,function(x) round(colMeans(Reduce(f="+",x=lapply(x,function(x) x$auc))/length(result$IBD)),digits=3))
+lapply(result,function(x) round(colMeans(Reduce(f="+",x=lapply(x,function(x) x$auc))/length(result$IBD)),digits=2))
 ```
 
 This chunk generates the figure on feature selection.
@@ -1040,6 +1040,8 @@ for(k in seq_along(problem)){
 }
 
 save(results,file=file.path(path,"results","app_mtl_devel.RData"))
+
+lapply(results,function(x) lapply(x,function(x) colMeans(x$deviance)))
 
 
 colMeans(results[[1]][[1]]$deviance/results[[1]][[1]]$deviance[,"glm.empty"])
