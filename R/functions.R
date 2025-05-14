@@ -1456,12 +1456,13 @@ count_vector <- function(truth,estim){
 #' @param x setting: character vector
 #' @param y0 old value: numeric vector
 #' @param y1 new value: numeric vector
+#' @param dist horizontal distance between points
 #' @param main title
 #' @param increase change to arrow NULL, up, down
 #' @param cex.axis numeric
 #' @param cex.main numeric
 #' 
-change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
+change <- function(x,y0,y1,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
   unique <- unique(x)
   #graphics::par(mfrow=c(1,1),mar=c(3,3,1,1))
   graphics::plot.new()
@@ -1486,9 +1487,9 @@ change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
     #} else {
       cond <- x==unique[i]
     #}
-    graphics::segments(x0=i-0.1,y0=y0[cond],x1=i+0.1,y1=y1[cond],col="grey")
-    graphics::points(x=rep(i-0.1,times=sum(cond)),y=y0[cond],col="red",pch=16,cex=0.8)
-    graphics::points(x=rep(i+0.1,times=sum(cond)),y=y1[cond],col="blue",pch=16,cex=0.8)
+    graphics::segments(x0=i-dist,y0=y0[cond],x1=i+dist,y1=y1[cond],col="grey")
+    graphics::points(x=rep(i-dist,times=sum(cond)),y=y0[cond],col="red",pch=16,cex=0.8)
+    graphics::points(x=rep(i+dist,times=sum(cond)),y=y1[cond],col="blue",pch=16,cex=0.8)
     #pvalue <- stats::wilcox.test(x=y0,y=y1,paired=TRUE)$p.value
   }
   graphics::title(main=main,line=0,cex.main=cex.main)
@@ -1520,8 +1521,10 @@ change <- function(x,y0,y1,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
   graphics::par(xpd=FALSE)
 }
 
-
-change2 <- function(x,y0,y1,y2,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
+#' @title Plot differences
+#' @inheritParams change
+#' 
+change2 <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
   unique <- unique(x)
   graphics::plot.new()
   xlim <- c(1-0.2,length(unique)+0.2)
@@ -1531,11 +1534,11 @@ change2 <- function(x,y0,y1,y2,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
   graphics::axis(side=2,cex.axis=cex.axis)
   for(i in seq_along(unique)){
     cond <- x==unique[i]
-    graphics::segments(x0=i,y0=y1[cond],x1=i+0.1,y1=y2[cond],col="grey")
-    graphics::segments(x0=i-0.1,y0=y0[cond],x1=i,y1=y1[cond],col="grey")
-    graphics::points(x=rep(i-0.1,times=sum(cond)),y=y0[cond],col="red",pch=16,cex=0.8)
+    graphics::segments(x0=i,y0=y1[cond],x1=i+dist,y1=y2[cond],col="grey")
+    graphics::segments(x0=i-dist,y0=y0[cond],x1=i,y1=y1[cond],col="grey")
+    graphics::points(x=rep(i-dist,times=sum(cond)),y=y0[cond],col="red",pch=16,cex=0.8)
     graphics::points(x=rep(i,times=sum(cond)),y=y1[cond],col="blue",pch=16,cex=0.8)
-    graphics::points(x=rep(i+0.1,times=sum(cond)),y=y2[cond],col="red",pch=16,cex=0.8)
+    graphics::points(x=rep(i+dist,times=sum(cond)),y=y2[cond],col="red",pch=16,cex=0.8)
   }
   graphics::title(main=main,line=0,cex.main=cex.main)
   graphics::par(xpd=TRUE)
