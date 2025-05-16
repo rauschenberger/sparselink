@@ -60,8 +60,10 @@ from an object of class [sparselink].</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Returns estimated coefficients.
 The output is a list with two slots:
-slot `alpha` with the estimated intercept (scalar),
-and slot `beta` with the estimated slopes (vector).</p>
+slot `alpha` with the estimated intercept
+(vector or length \(q\)),
+and slot `beta` with the estimated slopes
+(matrix with \(p\) rows and \(q\) columns).</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -75,8 +77,13 @@ and slot `beta` with the estimated slopes (vector).</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fl">1</span><span class="op">+</span><span class="fl">1</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">family</span> <span class="op">&lt;-</span> <span class="st">"gaussian"</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim.data.transfer.html">sim.data.transfer</a></span><span class="op">(</span>family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">#data &lt;- sim.data.multiple(family=family)</span></span></span>
+<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu"><a href="sparselink.html">sparselink</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">X_train</span>,y<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">y_train</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha.init=0.95, alpha=1, trial=FALSE, type=exp</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning</span>
+<span class="r-in"><span><span class="va">coef</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span>object<span class="op">=</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
