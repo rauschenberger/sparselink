@@ -193,32 +193,22 @@ figure_change <- function(model0,model1="sparselink",model2){
   #--- predictive performance ---
   means <- t(sapply(X=deviance,FUN=rowMeans))
   means <- means/means[,"glm.separate"]
-  if(is.null(model2)){
-    change(x=mode,y0=means[,model0],y1=means[,model1],main="metric",increase=FALSE)
-  } else {
-    change2(x=mode,y0=means[,model0],y1=means[,model1],y2=means[,model2],main="metric",increase=FALSE)
-  }
+  change(x=mode,y0=means[,model0],y1=means[,model1],y2=means[,model2],main="metric",increase=FALSE)
   graphics::abline(h=1,lty=2,col="grey")
   label()
   
   #--- sparsity ---
   nzero <- sapply(X=sel.num,FUN=rowMeans)
-  if(is.null(model2)){
-    change(x=mode,y0=nzero[model0,],y1=nzero[model1,],main="sparsity",increase=FALSE)
-  } else {
-    change2(x=mode,y0=nzero[model0,],y1=nzero[model1,],y2=nzero[model2,],main="sparsity",increase=FALSE)
-  }
+  change(x=mode,y0=nzero[model0,],y1=nzero[model1,],y2=nzero[model2,],main="sparsity",increase=FALSE)
+  
   graphics::abline(h=0,lty=2,col="grey")
   label()
   
   #--- precision ---
   precision <- sapply(X=sel.count,FUN=function(x) x[,"precision"])
   precision[is.na(precision)] <- 0
-  if(is.null(model2)){
-    change(x=mode,y0=precision[model0,],y1=precision[model1,],main="precision",increase=TRUE)
-  } else {
-    change2(x=mode,y0=precision[model0,],y1=precision[model1,],y2=precision[model2,],main="precision",increase=TRUE)
-  }
+  change(x=mode,y0=precision[model0,],y1=precision[model1,],y2=precision[model2,],main="precision",increase=TRUE)
+  
   graphics::abline(h=0,lty=2,col="grey")
   label()
   
@@ -741,8 +731,7 @@ label <- gsub(pattern="IBD.|RA.",replacement="",x=gsub(pattern=" ",replacement="
 index <- match(x=rownames(metric),table=unlist(project))
 
 xlab <- label[index]
-#change(x=xlab,y0=metric[,reference],y1=metric[,experimental],main="metric",increase=TRUE,cex.main=0.8)
-change2(x=xlab,y0=metric[,model0],y1=metric[,model1],y2=metric[,model2],main="metric",increase=TRUE,cex.main=0.8)
+change(x=xlab,y0=metric[,model0],y1=metric[,model1],y2=metric[,model2],main="metric",increase=TRUE,cex.main=0.8)
 graphics::axis(side=1,at=length(project$IBD)+0.5,labels="|",tick=FALSE,line=-0.25,font=2)
 graphics::abline(h=0.5,lty=2,col="grey")
 graphics::abline(h=1,lty=2,col="grey")
@@ -750,8 +739,7 @@ graphics::abline(h=1,lty=2,col="grey")
 # sparsity
 nzero <- lapply(result,function(x) lapply(x,function(x) sapply(x$refit$coef,function(x) colSums(x!=0))))
 nzero <- do.call(what="rbind",args=do.call(what="c",args=nzero))
-#change(x=xlab,y0=nzero[,reference],y1=nzero[,experimental],main="sparsity",increase=FALSE,cex.main=0.8)
-change2(x=xlab,y0=nzero[,model0],y1=nzero[,model1],y2=nzero[,model2],main="sparsity",increase=FALSE,cex.main=0.8)
+change(x=xlab,y0=nzero[,model0],y1=nzero[,model1],y2=nzero[,model2],main="sparsity",increase=FALSE,cex.main=0.8)
 graphics::axis(side=1,at=length(project$IBD)+0.5,labels="|",tick=FALSE,line=-0.25,font=2)
 graphics::abline(h=0,lty=2,col="grey")
 grDevices::dev.off()

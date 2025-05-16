@@ -1454,77 +1454,16 @@ count_vector <- function(truth,estim){
 #' @title Plot pairwise differences
 #' 
 #' @param x setting: character vector
-#' @param y0 old value: numeric vector
-#' @param y1 new value: numeric vector
+#' @param y0 values on the left: numeric vector
+#' @param y1 values in the centre: numeric vector
+#' @param y2 values on the right: numeric vector
 #' @param dist horizontal distance between points
 #' @param main title
 #' @param increase change to arrow NULL, up, down
 #' @param cex.axis numeric
 #' @param cex.main numeric
 #' 
-change <- function(x,y0,y1,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
-  unique <- unique(x)
-  #graphics::par(mfrow=c(1,1),mar=c(3,3,1,1))
-  graphics::plot.new()
-  xlim <- c(1-0.2,length(unique)+0.2)
-  ylim <- range(c(y0,y1),na.rm=TRUE)
-  graphics::plot.window(xlim=xlim,ylim=ylim)
-  #if(is.list(unique)){
-  #  for(i in seq_along(unique)){
-  #    #graphics::axis(side=1,at=i,labels=unique[[i]],tick=FALSE,line=0.5,cex.axis=cex.axis)
-  #    graphics::mtext(text=unique[[i]][[1]],side=1,line=0.2,at=i,cex=cex.axis)
-  #    graphics::mtext(text=unique[[i]][[2]],side=1,line=1.2,at=i,cex=cex.axis)
-  #  }
-  #} else {
-    #graphics::axis(side=1,at=seq_along(unique),labels=unique,tick=FALSE,line=0,cex.axis=cex.axis)
-    graphics::mtext(text=unique,side=1,at=seq_along(unique),line=1,cex=cex.axis)  
-  #}
-  #graphics::mtext(text="common",at=0.5,side=2,padj=1)
-  graphics::axis(side=2,cex.axis=cex.axis)
-  for(i in seq_along(unique)){
-    #if(is.list(unique)){
-    #  cond <- sapply(X=x,FUN=function(x) x[[1]]==unique[[i]][[1]] & x[[2]]==unique[[i]][[2]])
-    #} else {
-      cond <- x==unique[i]
-    #}
-    graphics::segments(x0=i-dist,y0=y0[cond],x1=i+dist,y1=y1[cond],col="grey")
-    graphics::points(x=rep(i-dist,times=sum(cond)),y=y0[cond],col="red",pch=16,cex=0.8)
-    graphics::points(x=rep(i+dist,times=sum(cond)),y=y1[cond],col="blue",pch=16,cex=0.8)
-    #pvalue <- stats::wilcox.test(x=y0,y=y1,paired=TRUE)$p.value
-  }
-  graphics::title(main=main,line=0,cex.main=cex.main)
-  #graphics::title(ylab=main,line=3,font=2)
-  graphics::par(xpd=TRUE)
-  usr <- graphics::par("usr")
-  margin <- 0.1*diff(usr[3:4])
-  if(increase){
-    inferior <- usr[3]
-    superior <- usr[4]
-    margin.inferior <- +margin
-    margin.superior <- -margin
-  } else {
-    inferior <- usr[4]
-    superior <- usr[3]
-    margin.inferior <- -margin
-    margin.superior <- +margin
-  }
-  pos <- xlim[1]-0.13*diff(xlim)
-  pos <- usr[2] # trial
-  #graphics::arrows(x0=pos,y0=inferior+margin.inferior,
-  #                 y1=superior+margin.superior,lwd=2,length=0.08,col="grey")
-  #graphics::text(x=pos,y=inferior,labels="-",col="red",font=2,cex=1.2)
-  #graphics::text(x=pos,y=superior,labels="+",col="blue",font=2,cex=1.2)
-  graphics::arrows(x0=pos,y0=inferior+2*margin.inferior,
-                   y1=superior+2*margin.superior,lwd=2,length=0.08,col="grey")
-  graphics::text(x=pos,y=inferior+1*margin.inferior,labels="-",col="red",font=2,cex=1.2)
-  graphics::text(x=pos,y=superior+1*margin.superior,labels="+",col="blue",font=2,cex=1.2)
-  graphics::par(xpd=FALSE)
-}
-
-#' @title Plot differences
-#' @inheritParams change
-#' 
-change2 <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
+change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
   unique <- unique(x)
   graphics::plot.new()
   xlim <- c(1-0.2,length(unique)+0.2)
