@@ -1,6 +1,7 @@
 url: https://rauschenberger.github.io/sparselink/
 template:
   bootstrap: 5
+  math-rendering: mathjax
   bootswatch: cerulean
 
 home:
