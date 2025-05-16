@@ -641,7 +641,7 @@ get.info <- function(x,y){
 #'and with \eqn{p} columns
 #'@param y list of \eqn{q} vectors, of length \eqn{n_1,\ldots,n_q},
 #'or NULL (default)
-#'@param foldid list of \eqn{q} vectors, of length \eqn{n_1,\ldotsn_q},
+#'@param foldid list of \eqn{q} vectors, of length \eqn{n_1,\ldots,n_q},
 #'or NULL (default)
 #'
 #'@examples
