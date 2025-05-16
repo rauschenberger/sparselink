@@ -6,7 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Sparse regression for related problems • sparselink</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -65,20 +71,17 @@
 <h2 id="estimating-sparse-regression-models-in-multi-task-learning-and-transfer-learning-through-adaptive-penalisation">Estimating sparse regression models in multi-task learning and
 transfer learning through adaptive penalisation<a class="anchor" aria-label="anchor" href="#estimating-sparse-regression-models-in-multi-task-learning-and-transfer-learning-through-adaptive-penalisation"></a>
 </h2>
-<p><strong>Armin
-Rauschenberger</strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mspace width="0.222em"></mspace><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mo>*</mo></mrow></msup><annotation encoding="application/x-tex">~^{1,2,*}</annotation></semantics></math><a href="https://orcid.org/0000-0001-6498-4801" class="external-link"><img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" alt="AR"></a>, <strong>Petr V.
-Nazarov</strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mspace width="0.222em"></mspace><mrow><mn>1</mn><mo>,</mo><mo>†</mo></mrow></msup><annotation encoding="application/x-tex">~^{1,\dagger}</annotation></semantics></math><a href="https://orcid.org/0000-0003-3443-0298" class="external-link"><img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" alt="MvdW"></a>, and <strong>Enrico
-Glaab</strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mspace width="0.222em"></mspace><mrow><mn>2</mn><mo>,</mo><mo>†</mo></mrow></msup><annotation encoding="application/x-tex">~^{2,\dagger}</annotation></semantics></math><a href="https://orcid.org/0000-0003-3977-7469" class="external-link"><img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" alt="EG"></a></p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mn>1</mn></msup><annotation encoding="application/x-tex">^1</annotation></semantics></math>Bioinformatics
-and Artificial Intelligence, Department of Medical Informatics,
-Luxembourg Institute of Health (LIH), Strassen, Luxembourg.</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mn>2</mn></msup><annotation encoding="application/x-tex">^2</annotation></semantics></math>Biomedical
-Data Science, Luxembourg Centre for Systems Biomedicine (LCSB),
-University of Luxembourg, Esch-sur-Alzette, Luxembourg.</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mo>*</mo></msup><annotation encoding="application/x-tex">^{*}</annotation></semantics></math>To
-whom correspondence should be addressed.</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mo>†</mo></msup><annotation encoding="application/x-tex">^{\dagger}</annotation></semantics></math>Petr
-V. Nazarov and Enrico Glaab share senior authorship.</p>
+<p><strong>Armin Rauschenberger</strong><span class="math inline">\(~^{1,2,*}\)</span> <a href="https://orcid.org/0000-0001-6498-4801" class="external-link"><img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" alt="AR"></a>, <strong>Petr V. Nazarov</strong><span class="math inline">\(~^{1,\dagger}\)</span> <a href="https://orcid.org/0000-0003-3443-0298" class="external-link"><img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" alt="MvdW"></a>, and <strong>Enrico Glaab</strong><span class="math inline">\(~^{2,\dagger}\)</span> <a href="https://orcid.org/0000-0003-3977-7469" class="external-link"><img src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" alt="EG"></a></p>
+<p><span class="math inline">\(^1\)</span>Bioinformatics and Artificial
+Intelligence, Department of Medical Informatics, Luxembourg Institute of
+Health (LIH), Strassen, Luxembourg.</p>
+<p><span class="math inline">\(^2\)</span>Biomedical Data Science,
+Luxembourg Centre for Systems Biomedicine (LCSB), University of
+Luxembourg, Esch-sur-Alzette, Luxembourg.</p>
+<p><span class="math inline">\(^{*}\)</span>To whom correspondence
+should be addressed.</p>
+<p><span class="math inline">\(^{\dagger}\)</span>Petr V. Nazarov and
+Enrico Glaab share senior authorship.</p>
 </div>
 <div class="section level2">
 <h2 id="abstract">Abstract<a class="anchor" aria-label="anchor" href="#abstract"></a>
