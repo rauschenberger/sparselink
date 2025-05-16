@@ -49,4 +49,12 @@ x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
 object <- sparselink(x=x,y=y,family=family)
 
+# transfer learning
+n <- c(100,50)
+p <- 50
+x <- lapply(X=n,function(x) matrix(data=stats::rnorm(n*p),nrow=x,ncol=p))
+y <- lapply(X=n,function(x) stats::rnorm(x))
+family <- "gaussian"
+object <- sparselink(x=x,y=y,family=family)
+
 }

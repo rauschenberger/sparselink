@@ -28,6 +28,6 @@ from an object of class [sparselink].
 \href{https://orcid.org/0000-0003-3443-0298}{Petr N. Nazarov},
 \href{https://orcid.org/0000-0003-3977-7469}{Enrico Glaab}
 (2025).
-"Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation"
-\emph{In preparation}.
+"Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation".
+\emph{Under revision}. \url{https://hdl.handle.net/10993/63425}
 }

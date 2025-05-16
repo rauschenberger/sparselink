@@ -350,18 +350,24 @@ make.folds.trans <- function(y,family,nfolds=10){
   return(foldid)
 }
 
-#' @inheritParams sparselink
+#' @title 
+#' Extract dimensionality.
+#' 
+#' @param x list of \eqn{q} matrices,
+#' with \eqn{n_k} (samples) rows and \eqn{p} columns (features),
+#' for \eqn{k} in \eqn{1,...,q}
+#' @param y list of \eqn{q} vectors,
+#' with \eqn{n_k} entries,
+#' for \eqn{k} in \eqn{1,...,q}
+#' 
 #' @return
 #' Returns a list with the slots
-#' q (scalar, number of problems),
-#' n (vector, number of samples)
-#' and p (scalar, number of features)
+#' \eqn{q} (scalar, number of problems),
+#' \eqn{n} (vector of length \eqn{q}, number of samples)
+#' and \eqn{p} (scalar, number of features)
 #' 
-#' @example
+#' @examples
 #' data <- sim.data.transfer()
-#' get.info(x=data$X_train,y=data$y_train,family=data$family)
-#' 
-#' data <- sim.data.multiple()
 #' get.info(x=data$X_train,y=data$y_train,family=data$family)
 #' 
 get.info <- function(x,y,family){
@@ -1082,8 +1088,6 @@ change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase
   graphics::text(x=pos,y=superior+1*margin.superior,labels="+",col="blue",font=2,cex=1.2)
   graphics::par(xpd=FALSE)
 }
-
-
 
 #' @title Construct penalty factors
 #' 
