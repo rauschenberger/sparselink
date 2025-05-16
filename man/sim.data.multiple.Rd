@@ -34,11 +34,11 @@ sim.data.multiple(
 }
 \value{
 Returns list with slots
-y_train (n0 x q matrix),
-X_train (n0 x p matrix),
-y_test (n1 x q matrix),
-X_test (n1 x p matrix),
-and beta (p x q matrix).
+y_train (\eqn{n_0} x \eqn{q} matrix),
+X_train (\eqn{n_0} x \eqn{p} matrix),
+y_test (\eqn{n_1} x \eqn{q} matrix),
+X_test (\eqn{n_1} x \eqn{p} matrix),
+and beta (\eqn{p} x \eqn{q} matrix).
 }
 \description{
 Simulates data for multi-task learning.
@@ -48,3 +48,4 @@ data <- sim.data.multiple()
 sapply(X=data,FUN=dim)
  
 }
+\keyword{internal}

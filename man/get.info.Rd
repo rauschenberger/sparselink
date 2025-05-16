@@ -4,7 +4,7 @@
 \alias{get.info}
 \title{Extract dimensionality.}
 \usage{
-get.info(x, y, family)
+get.info(x, y)
 }
 \arguments{
 \item{x}{list of \eqn{q} matrices,
@@ -26,6 +26,7 @@ Extract dimensionality.
 }
 \examples{
 data <- sim.data.transfer()
-get.info(x=data$X_train,y=data$y_train,family=data$family)
+get.info(x=data$X_train,y=data$y_train)
 
 }
+\keyword{internal}

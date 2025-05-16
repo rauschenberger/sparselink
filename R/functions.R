@@ -111,6 +111,7 @@ mean_function <- function(eta,family){
 #' Simulates data for transfer learning.
 #' 
 #' @export
+#' @keywords internal
 #' 
 #' @param prob.common probability of common effect
 #' @param prob.separate probability of separate effect
@@ -182,16 +183,17 @@ sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,10
 #' Simulates data for multi-task learning.
 #' 
 #' @export
+#' @keywords internal
 #' 
 #' @inheritParams sim.data.transfer
 #' 
 #' @returns
 #' Returns list with slots
-#' y_train (n0 x q matrix),
-#' X_train (n0 x p matrix),
-#' y_test (n1 x q matrix),
-#' X_test (n1 x p matrix),
-#' and beta (p x q matrix).
+#' y_train (\eqn{n_0} x \eqn{q} matrix),
+#' X_train (\eqn{n_0} x \eqn{p} matrix),
+#' y_test (\eqn{n_1} x \eqn{q} matrix),
+#' X_test (\eqn{n_1} x \eqn{p} matrix),
+#' and beta (\eqn{p} x \eqn{q} matrix).
 #' 
 #' @examples
 #' data <- sim.data.multiple()
@@ -233,13 +235,13 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #' Calculates Gaussian deviance (mean-squared error) and binomial deviance.
 #' 
 #' @export
+#' @keywords internal
 #' 
 #' @param y response
 #' @param y_hat predictor
 #' @param family character "gaussian" or "binomial"
 #' 
 #' @examples
-#' 
 #' n <- 100
 #' family <- "gaussian"
 #' y <- stats::rnorm(n=n)
@@ -271,13 +273,13 @@ calc.metric <- function(y,y_hat,family){
 #' @title  Folds for multi-task learning
 #' 
 #' @export
+#' @keywords internal
 #' 
 #' @param y matrix with n rows (samples) and q columns (outcomes)
 #' @param family character "gaussian" or "binomial"
 #' @param nfolds integer between 2 and n
 #' 
 #' @examples
-#' 
 #' family <- "binomial"
 #' y <- sim.data.multiple(family=family)$y_train
 #' fold <- make.folds.multi(y=y,family=family)
@@ -305,7 +307,6 @@ make.folds.multi <- function(y,family,nfolds=10){
       } else {
         cands <- seq_len(length.out=nfolds)
       }
-      #warning("Improve this function!")
       if(sum(cond)==1){ # Should this be sum(cond)<=nfolds?
         foldid[cond] <- cands
       } else {
@@ -319,8 +320,9 @@ make.folds.multi <- function(y,family,nfolds=10){
 #' @title Folds for transfer learning
 #' 
 #' @export
+#' @keywords internal
 #' 
-#' @param y list of q numeric vectors
+#' @param y list of \eqn{q} numeric vectors
 #' @inheritParams make.folds.multi
 #' 
 #' @examples
@@ -352,6 +354,9 @@ make.folds.trans <- function(y,family,nfolds=10){
 
 #' @title 
 #' Extract dimensionality.
+#'
+#' @export
+#' @keywords internal
 #' 
 #' @param x list of \eqn{q} matrices,
 #' with \eqn{n_k} (samples) rows and \eqn{p} columns (features),
@@ -368,9 +373,9 @@ make.folds.trans <- function(y,family,nfolds=10){
 #' 
 #' @examples
 #' data <- sim.data.transfer()
-#' get.info(x=data$X_train,y=data$y_train,family=data$family)
+#' get.info(x=data$X_train,y=data$y_train)
 #' 
-get.info <- function(x,y,family){
+get.info <- function(x,y){
   if(length(x)!=length(y)){stop("different q")}
   if(any(sapply(X=x,FUN=base::nrow)!=sapply(X=y,FUN=base::length))){stop("different n")}
   if(any(diff(sapply(X=x,FUN=base::ncol))!=0)){stop("different p")}
@@ -384,6 +389,7 @@ get.info <- function(x,y,family){
 #' @title Data fusion
 #' 
 #' @export
+#' @keywords internal
 #'
 #' @param x list of q matrices, with n_1,...,n_q rows and with p columns
 #' @param y list of q vectors, of length n_1,...,n_q, or NULL (default)
@@ -473,13 +479,13 @@ comb_split_trial <- function(coef,id){
   list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight.source=weight.ext,weight.target=weight.int)
 }
 
-#' @export
-#' 
 #' @title
 #' Make Predictions
 #' 
 #' @description
 #' Predicts outcome
+#' 
+#' @export
 #' 
 #' @param object
 #' object of class `sparselink`
@@ -526,14 +532,14 @@ predict.sparselink <- function(object,newx,weight=NULL,...){
   return(y_hat)
 }
 
-#' @export
-#'
 #' @title
 #' Extract Coefficients
 #'
 #' @description
 #' Extracts coefficients
 #' from an object of class [sparselink].
+#' 
+#' @export
 #'
 #' @inheritParams predict.sparselink
 #'
@@ -572,7 +578,7 @@ glm.common <- function(x,y,family,alpha=1){
   family <- unique(family)
   if(length(family)>1){stop("requires unique family")}
   object <- list()
-  object$info <- get.info(x=x,y=y,family=family)
+  object$info <- get.info(x=x,y=y)
   fuse <- fuse.data(x=x,y=y,foldid=NULL)
   object$cv.glmnet <- glmnet::cv.glmnet(x=fuse$x,y=fuse$y,family=family,alpha=alpha)
   class(object) <- "glm.common"
@@ -697,7 +703,7 @@ glm.separate <- function(x,y,family,alpha=1,lambda=NULL){
     family <- rep(x=family,times=length(y))
   }
   object <- list()
-  object$info <- get.info(x=x,y=y,family=family)
+  object$info <- get.info(x=x,y=y)
   object$cv.glmnet <- list()
   for(i in seq_len(object$info$q)){
     object$cv.glmnet[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family[i],alpha=alpha,lambda=lambda)
@@ -1163,9 +1169,15 @@ plotWeight <- function(x,y){
   }
 }
 
-#' @title Sparse regression for related problems
+#' @title
+#' Sparse regression for related problems
+#' 
+#' @description
+#' Estimates sparse regression models (i.e., selecting few variables)
+#' in multi-task learning or transfer learning
 #' 
 #' @export
+#' 
 #' @param x n x p matrix (multi-task learning) 
 #' or list of n_k x p matrices (transfer learning)
 #' @param y n x q matrix (multi-task learning)

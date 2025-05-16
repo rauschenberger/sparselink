@@ -26,3 +26,4 @@ dim(fuse$x)
 table(fuse$index)
 
 }
+\keyword{internal}

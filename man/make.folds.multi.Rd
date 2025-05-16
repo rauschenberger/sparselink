@@ -17,7 +17,6 @@ make.folds.multi(y, family, nfolds = 10)
 Folds for multi-task learning
 }
 \examples{
-
 family <- "binomial"
 y <- sim.data.multiple(family=family)$y_train
 fold <- make.folds.multi(y=y,family=family)
@@ -25,3 +24,4 @@ table(fold)
 table(y[,3],fold)
 
 }
+\keyword{internal}

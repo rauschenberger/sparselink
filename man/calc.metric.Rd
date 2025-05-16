@@ -17,7 +17,6 @@ calc.metric(y, y_hat, family)
 Calculates Gaussian deviance (mean-squared error) and binomial deviance.
 }
 \examples{
-
 n <- 100
 family <- "gaussian"
 y <- stats::rnorm(n=n)
@@ -30,3 +29,4 @@ y_hat <- stats::runif(n=n)
 calc.metric(y=y,y_hat=y_hat,family=family)
 
 }
+\keyword{internal}

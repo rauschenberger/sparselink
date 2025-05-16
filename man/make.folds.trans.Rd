@@ -7,7 +7,7 @@
 make.folds.trans(y, family, nfolds = 10)
 }
 \arguments{
-\item{y}{list of q numeric vectors}
+\item{y}{list of \eqn{q} numeric vectors}
 
 \item{family}{character "gaussian" or "binomial"}
 
@@ -22,3 +22,4 @@ y <- sim.data.transfer(family=family)$y_train
 fold <- make.folds.trans(y,family=family)
 
 }
+\keyword{internal}

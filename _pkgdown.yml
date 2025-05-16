@@ -30,6 +30,7 @@ reference:
   - predict.sparselink
 - title: "Other functions"
   contents:
+  - get.info
   - sim.data.multiple
   - sim.data.transfer
   - calc.metric

@@ -37,7 +37,8 @@ default: 1 (lasso)}
 \item{trial}{Should exponents above 1 be used? Default: FALSE}
 }
 \description{
-Sparse regression for related problems
+Estimates sparse regression models (i.e., selecting few variables)
+in multi-task learning or transfer learning
 }
 \examples{
 # multi-task learning
