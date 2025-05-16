@@ -8,62 +8,62 @@ if(FALSE){
   #pkgdown::build_site()
 }
 
-#' @title logit function
-#' @export
-#' @keywords internal
-#' 
-#' @param x numeric vector with values in unit interval
-#' 
-#' @examples
-#' x <- seq(from=0,to=1,length.out=100)
-#' y <- logit(x=x)
-#' graphics::plot(x=x,y=y,type="l")
-#' graphics::abline(v=0.5,lty=2)
-#' graphics::abline(h=0,lty=2)
-#' 
+#'@title logit function
+#'@export
+#'@keywords internal
+#'
+#'@param x numeric vector with values in unit interval
+#'
+#'@examples
+#'x <- seq(from=0,to=1,length.out=100)
+#'y <- logit(x=x)
+#'graphics::plot(x=x,y=y,type="l")
+#'graphics::abline(v=0.5,lty=2)
+#'graphics::abline(h=0,lty=2)
+#'
 logit <- function(x){
   if(any(x<0|x>1)){stop("x must be in unit interval")}
   log(x/(1-x))
 }
 
-#' @title Sigmoid function
-#' @export
-#' @keywords internal
-#' 
-#' @param x numeric vector
+#'@title Sigmoid function
+#'@export
+#'@keywords internal
 #'
-#' @examples
-#' x <- seq(from=-3,to=3,length.out=100)
-#' y <- sigmoid(x)
-#' graphics::plot(x=x,y=y,type="l")
-#' graphics::abline(v=0,lty=2)
-#' graphics::abline(h=0.5,lty=2)
-#' 
+#'@param x numeric vector
+#'
+#'@examples
+#'x <- seq(from=-3,to=3,length.out=100)
+#'y <- sigmoid(x)
+#'graphics::plot(x=x,y=y,type="l")
+#'graphics::abline(v=0,lty=2)
+#'graphics::abline(h=0.5,lty=2)
+#'
 sigmoid <- function(x){
   1/(1+exp(-x))
 }
 
-#' @title Link function
-#' @export
-#' @keywords internal
-#' 
-#' @description
-#' Applies the link function.
+#'@title Link function
+#'@export
+#'@keywords internal
 #'
-#' @param mu numeric vector (with values in unit interval if family="binomial")
-#' @param family character "gaussian" or "binomial"
+#'@description
+#'Applies the link function.
 #'
-#' @examples
-#' family <- "binomial"
-#' from <- ifelse(family=="binomial",0,-3)
-#' to <- ifelse(family=="binomial",1,3)
-#' mu <- seq(from=from,to=to,length.out=100)
-#' eta <- link_function(mu=mu,family=family)
-#' graphics::plot(x=mu,y=eta,type="l",main=family)
-#' v <- ifelse(family=="binomial",0.5,0)
-#' graphics::abline(v=v,lty=2)
-#' graphics::abline(h=0,lty=2)
-#' 
+#'@param mu numeric vector (with values in unit interval if family="binomial")
+#'@param family character "gaussian" or "binomial"
+#'
+#'@examples
+#'family <- "binomial"
+#'from <- ifelse(family=="binomial",0,-3)
+#'to <- ifelse(family=="binomial",1,3)
+#'mu <- seq(from=from,to=to,length.out=100)
+#'eta <- link_function(mu=mu,family=family)
+#'graphics::plot(x=mu,y=eta,type="l",main=family)
+#'v <- ifelse(family=="binomial",0.5,0)
+#'graphics::abline(v=v,lty=2)
+#'graphics::abline(h=0,lty=2)
+#'
 link_function <- function(mu,family){
   if(family=="gaussian"){
     eta <- mu
@@ -75,25 +75,25 @@ link_function <- function(mu,family){
   return(eta)
 }
 
-#' @title Mean function
-#' @export
-#' @keywords internal
-#' 
-#' @description
-#' Applies the mean function (inverse link function).
-#' 
-#' @param eta numeric vector
-#' @param family character "gaussian" or "binomial"
-#' 
-#' @examples
-#' family <- "binomial"
-#' eta <- seq(from=-3,to=3,length.out=100)
-#' mu <- mean_function(eta=eta,family=family)
-#' graphics::plot(x=eta,y=mu,type="l",main=family)
-#' graphics::abline(v=0,lty=2)
-#' h <- ifelse(family=="binomial",0.5,0)
-#' graphics::abline(h=h,lty=2)
-#' 
+#'@title Mean function
+#'@export
+#'@keywords internal
+#'
+#'@description
+#'Applies the mean function (inverse link function).
+#'
+#'@param eta numeric vector
+#'@param family character "gaussian" or "binomial"
+#'
+#'@examples
+#'family <- "binomial"
+#'eta <- seq(from=-3,to=3,length.out=100)
+#'mu <- mean_function(eta=eta,family=family)
+#'graphics::plot(x=eta,y=mu,type="l",main=family)
+#'graphics::abline(v=0,lty=2)
+#'h <- ifelse(family=="binomial",0.5,0)
+#'graphics::abline(h=h,lty=2)
+#'
 mean_function <- function(eta,family){
   if(family=="gaussian"){
     mu <- eta
@@ -105,38 +105,38 @@ mean_function <- function(eta,family){
   return(mu)
 }
 
-#' @title Data simulation for transfer learning
-#' 
-#' @description
-#' Simulates data for transfer learning.
-#' 
-#' @export
-#' @keywords internal
-#' 
-#' @param prob.common probability of common effect
-#' @param prob.separate probability of separate effect
-#' @param q number of datasets: integer
-#' @param n0 number of training samples: integer vector of length q
-#' @param n1 number of testing samples for all datasets: integer
-#' @param p number of features: integer
-#' @param family character "gaussian" or "binomial"
-#' @param rho correlation (for decreasing structure)
-#' 
-#' @returns
-#' Returns a list with slots y_train and X_train for training data,
-#' y_test and X_test for testing data,
-#' and beta for effects.
-#' The training data contains vectors of different lengths (y_train)
-#' and matrices with different number of rows (X_train).
-#' 
-#' @examples
-#' data <- sim.data.transfer()
-#' sapply(X=data$y_train,FUN=length)
-#' sapply(X=data$X_train,FUN=dim)
-#' sapply(X=data$y_test,FUN=length)
-#' sapply(X=data$X_test,FUN=dim)
-#' dim(data$beta)
-#' 
+#'@title Data simulation for transfer learning
+#'
+#'@description
+#'Simulates data for transfer learning.
+#'
+#'@export
+#'@keywords internal
+#'
+#'@param prob.common probability of common effect
+#'@param prob.separate probability of separate effect
+#'@param q number of datasets: integer
+#'@param n0 number of training samples: integer vector of length q
+#'@param n1 number of testing samples for all datasets: integer
+#'@param p number of features: integer
+#'@param family character "gaussian" or "binomial"
+#'@param rho correlation (for decreasing structure)
+#'
+#'@returns
+#'Returns a list with slots y_train and X_train for training data,
+#'y_test and X_test for testing data,
+#'and beta for effects.
+#'The training data contains vectors of different lengths (y_train)
+#'and matrices with different number of rows (X_train).
+#'
+#'@examples
+#'data <- sim.data.transfer()
+#'sapply(X=data$y_train,FUN=length)
+#'sapply(X=data$X_train,FUN=dim)
+#'sapply(X=data$y_test,FUN=length)
+#'sapply(X=data$X_test,FUN=dim)
+#'dim(data$beta)
+#'
 sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,200),n1=10000,p=200,rho=0.5,family="gaussian"){
   if(length(n0)==1){
     n0 <- rep(x=n0,times=q)
@@ -177,28 +177,28 @@ sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,10
   return(list)
 }
 
-#' @title Data simulation for multi-task learning
+#'@title Data simulation for multi-task learning
+#'
+#'@description
+#'Simulates data for multi-task learning.
+#'
+#'@export
+#'@keywords internal
+#'
+#'@inheritParams sim.data.transfer
+#'
+#'@returns
+#'Returns list with slots
+#'y_train (\eqn{n_0} x \eqn{q} matrix),
+#'X_train (\eqn{n_0} x \eqn{p} matrix),
+#'y_test (\eqn{n_1} x \eqn{q} matrix),
+#'X_test (\eqn{n_1} x \eqn{p} matrix),
+#'and beta (\eqn{p} x \eqn{q} matrix).
+#'
+#'@examples
+#'data <- sim.data.multiple()
+#'sapply(X=data,FUN=dim)
 #' 
-#' @description
-#' Simulates data for multi-task learning.
-#' 
-#' @export
-#' @keywords internal
-#' 
-#' @inheritParams sim.data.transfer
-#' 
-#' @returns
-#' Returns list with slots
-#' y_train (\eqn{n_0} x \eqn{q} matrix),
-#' X_train (\eqn{n_0} x \eqn{p} matrix),
-#' y_test (\eqn{n_1} x \eqn{q} matrix),
-#' X_test (\eqn{n_1} x \eqn{p} matrix),
-#' and beta (\eqn{p} x \eqn{q} matrix).
-#' 
-#' @examples
-#' data <- sim.data.multiple()
-#' sapply(X=data,FUN=dim)
-#'  
 sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=10000,p=200,rho=0.5,family="gaussian"){
   n <- n0 + n1
   theta <- stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.common)
@@ -229,30 +229,30 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
   return(list)
 }
 
-#' @title Calculate deviance
-#' 
-#' @description
-#' Calculates Gaussian deviance (mean-squared error) and binomial deviance.
-#' 
-#' @export
-#' @keywords internal
-#' 
-#' @param y response
-#' @param y_hat predictor
-#' @param family character "gaussian" or "binomial"
-#' 
-#' @examples
-#' n <- 100
-#' family <- "gaussian"
-#' y <- stats::rnorm(n=n)
-#' y_hat <- stats::rnorm(n=n)
-#' calc.metric(y=y,y_hat=y_hat,family=family)
-#' 
-#' family <- "binomial"
-#' y <- stats::rbinom(n=n,size=1,prob=0.5)
-#' y_hat <- stats::runif(n=n)
-#' calc.metric(y=y,y_hat=y_hat,family=family)
-#' 
+#'@title Calculate deviance
+#'
+#'@description
+#'Calculates Gaussian deviance (mean-squared error) and binomial deviance.
+#'
+#'@export
+#'@keywords internal
+#'
+#'@param y response
+#'@param y_hat predictor
+#'@param family character "gaussian" or "binomial"
+#'
+#'@examples
+#'n <- 100
+#'family <- "gaussian"
+#'y <- stats::rnorm(n=n)
+#'y_hat <- stats::rnorm(n=n)
+#'calc.metric(y=y,y_hat=y_hat,family=family)
+#'
+#'family <- "binomial"
+#'y <- stats::rbinom(n=n,size=1,prob=0.5)
+#'y_hat <- stats::runif(n=n)
+#'calc.metric(y=y,y_hat=y_hat,family=family)
+#'
 calc.metric <- function(y,y_hat,family){
   if(length(y)!=length(y_hat)){
     stop("incompatible lengths")  
@@ -270,22 +270,22 @@ calc.metric <- function(y,y_hat,family){
   return(metric)
 }
 
-#' @title  Folds for multi-task learning
-#' 
-#' @export
-#' @keywords internal
-#' 
-#' @param y matrix with n rows (samples) and q columns (outcomes)
-#' @param family character "gaussian" or "binomial"
-#' @param nfolds integer between 2 and n
-#' 
-#' @examples
-#' family <- "binomial"
-#' y <- sim.data.multiple(family=family)$y_train
-#' fold <- make.folds.multi(y=y,family=family)
-#' table(fold)
-#' table(y[,3],fold)
-#' 
+#'@title  Folds for multi-task learning
+#'
+#'@export
+#'@keywords internal
+#'
+#'@param y matrix with n rows (samples) and q columns (outcomes)
+#'@param family character "gaussian" or "binomial"
+#'@param nfolds integer between 2 and n
+#'
+#'@examples
+#'family <- "binomial"
+#'y <- sim.data.multiple(family=family)$y_train
+#'fold <- make.folds.multi(y=y,family=family)
+#'table(fold)
+#'table(y[,3],fold)
+#'
 make.folds.multi <- function(y,family,nfolds=10){
   n <- nrow(y)
   q <- ncol(y)
@@ -317,19 +317,19 @@ make.folds.multi <- function(y,family,nfolds=10){
   return(foldid)
 }
 
-#' @title Folds for transfer learning
-#' 
-#' @export
-#' @keywords internal
-#' 
-#' @param y list of \eqn{q} numeric vectors
-#' @inheritParams make.folds.multi
-#' 
-#' @examples
-#' family <- "binomial"
-#' y <- sim.data.transfer(family=family)$y_train
-#' fold <- make.folds.trans(y,family=family)
-#' 
+#'@title Folds for transfer learning
+#'
+#'@export
+#'@keywords internal
+#'
+#'@param y list of \eqn{q} numeric vectors
+#'@inheritParams make.folds.multi
+#'
+#'@examples
+#'family <- "binomial"
+#'y <- sim.data.transfer(family=family)$y_train
+#'fold <- make.folds.trans(y,family=family)
+#'
 make.folds.trans <- function(y,family,nfolds=10){
   q <- length(y)
   if(length(family)==1){
@@ -352,29 +352,29 @@ make.folds.trans <- function(y,family,nfolds=10){
   return(foldid)
 }
 
-#' @title 
-#' Extract dimensionality.
+#'@title 
+#'Extract dimensionality.
 #'
-#' @export
-#' @keywords internal
-#' 
-#' @param x list of \eqn{q} matrices,
-#' with \eqn{n_k} (samples) rows and \eqn{p} columns (features),
-#' for \eqn{k} in \eqn{1,...,q}
-#' @param y list of \eqn{q} vectors,
-#' with \eqn{n_k} entries,
-#' for \eqn{k} in \eqn{1,...,q}
-#' 
-#' @return
-#' Returns a list with the slots
-#' \eqn{q} (scalar, number of problems),
-#' \eqn{n} (vector of length \eqn{q}, number of samples)
-#' and \eqn{p} (scalar, number of features)
-#' 
-#' @examples
-#' data <- sim.data.transfer()
-#' get.info(x=data$X_train,y=data$y_train)
-#' 
+#'@export
+#'@keywords internal
+#'
+#'@param x list of \eqn{q} matrices,
+#'with \eqn{n_k} (samples) rows and \eqn{p} columns (features),
+#'for \eqn{k} in \eqn{1,...,q}
+#'@param y list of \eqn{q} vectors,
+#'with \eqn{n_k} entries,
+#'for \eqn{k} in \eqn{1,...,q}
+#'
+#'@return
+#'Returns a list with the slots
+#'\eqn{q} (scalar, number of problems),
+#'\eqn{n} (vector of length \eqn{q}, number of samples)
+#'and \eqn{p} (scalar, number of features)
+#'
+#'@examples
+#'data <- sim.data.transfer()
+#'get.info(x=data$X_train,y=data$y_train)
+#'
 get.info <- function(x,y){
   if(length(x)!=length(y)){stop("different q")}
   if(any(sapply(X=x,FUN=base::nrow)!=sapply(X=y,FUN=base::length))){stop("different n")}
@@ -387,23 +387,23 @@ get.info <- function(x,y){
 }
 
 #'@title Data fusion
-#' 
-#' @export
-#' @keywords internal
 #'
-#' @param x list of q matrices, with n_1,...,n_q rows and with p columns
-#' @param y list of q vectors, of length n_1,...,n_q, or NULL (default)
-#' @param foldid list of q vectors, of length n_1,...n_q, or NULL (default)
-#' 
-#' @examples
-#' data <- sim.data.transfer()
-#' sapply(X=data$y_train,FUN=length)
-#' sapply(X=data$X_train,FUN=dim)
-#' fuse <- fuse.data(x=data$X_train,y=data$y_train)
-#' length(fuse$y)
-#' dim(fuse$x)
-#' table(fuse$index)
-#' 
+#'@export
+#'@keywords internal
+#'
+#'@param x list of q matrices, with n_1,...,n_q rows and with p columns
+#'@param y list of q vectors, of length n_1,...,n_q, or NULL (default)
+#'@param foldid list of q vectors, of length n_1,...n_q, or NULL (default)
+#'
+#'@examples
+#'data <- sim.data.transfer()
+#'sapply(X=data$y_train,FUN=length)
+#'sapply(X=data$X_train,FUN=dim)
+#'fuse <- fuse.data(x=data$X_train,y=data$y_train)
+#'length(fuse$y)
+#'dim(fuse$x)
+#'table(fuse$index)
+#'
 fuse.data <- function(x,y=NULL,foldid=NULL){
   list <- list()
   if(!is.null(x)){
@@ -445,7 +445,7 @@ fuse.data <- function(x,y=NULL,foldid=NULL){
 #'data <- stats::rbinom(p*q,size=1,prob=0.2)*stats::rnorm(p*q)
 #'coef <- matrix(data=data,nrow=p,ncol=q)
 #'comb_split(coef=coef,id=1)
-#' 
+#'
 comb_split <- function(coef,id){
 
   # #--- prediction ---
@@ -505,38 +505,38 @@ comb_split <- function(coef,id){
   return(list)
 }
 
-#' @title
-#' Make Predictions
-#' 
-#' @description
-#' Predicts outcome
-#' 
-#' @export
-#' 
-#' @param object
-#' object of class `sparselink`
-#' 
-#' @param newx
-#' features:
-#' matrix with \eqn{n} rows (samples) and \eqn{p} columns (variables)
-#' 
-#' @param weight experimental argument:
-#' numeric vector of length 2,
-#' with the first entry for the internal weight,
-#' and the second entry for the external weight,
-#' overwrites the cross-validated weights
-#' 
-#' @param ... (not applicable)
-#' 
-#' @return
-#' Returns predicted values or predicted probabilities.
-#' The output is a column vector with one entry for each sample. 
-#' 
-#' @inherit sparselink-package references
-#' 
-#' @examples
-#' 1+1
-#' 
+#'@title
+#'Make Predictions
+#'
+#'@description
+#'Predicts outcome
+#'
+#'@export
+#'
+#'@param object
+#'object of class `sparselink`
+#'
+#'@param newx
+#'features:
+#'matrix with \eqn{n} rows (samples) and \eqn{p} columns (variables)
+#'
+#'@param weight experimental argument:
+#'numeric vector of length 2,
+#'with the first entry for the internal weight,
+#'and the second entry for the external weight,
+#'overwrites the cross-validated weights
+#'
+#'@param ... (not applicable)
+#'
+#'@return
+#'Returns predicted values or predicted probabilities.
+#'The output is a column vector with one entry for each sample. 
+#'
+#'@inherit sparselink-package references
+#'
+#'@examples
+#'1+1
+#'
 predict.sparselink <- function(object,newx,weight=NULL,...){
   if(is.null(weight)){
     id <- object$weight.ind
@@ -558,27 +558,27 @@ predict.sparselink <- function(object,newx,weight=NULL,...){
   return(y_hat)
 }
 
-#' @title
-#' Extract Coefficients
+#'@title
+#'Extract Coefficients
 #'
-#' @description
-#' Extracts coefficients
-#' from an object of class [sparselink].
-#' 
-#' @export
+#'@description
+#'Extracts coefficients
+#'from an object of class [sparselink].
 #'
-#' @inheritParams predict.sparselink
+#'@export
 #'
-#' @return
-#' Returns estimated coefficients.
-#' The output is a list with two slots:
-#' slot `alpha` with the estimated intercept (scalar),
-#' and slot `beta` with the estimated slopes (vector).
+#'@inheritParams predict.sparselink
 #'
-#' @inherit sparselink-package references
-#' 
-#' @examples
-#' 1+1
+#'@return
+#'Returns estimated coefficients.
+#'The output is a list with two slots:
+#'slot `alpha` with the estimated intercept (scalar),
+#'and slot `beta` with the estimated slopes (vector).
+#'
+#'@inherit sparselink-package references
+#'
+#'@examples
+#'1+1
 #'
 coef.sparselink <- function(object){
   id <- object$weight.ind
@@ -611,7 +611,7 @@ glm.common <- function(x,y,family,alpha=1){
   return(object)
 }
 
-#' @export
+#'@export
 predict.glm.common <- function(object,newx){
   fuse <- fuse.data(x=newx,y=NULL,foldid=NULL)
   temp <- stats::predict(object=object$cv.glmnet,newx=fuse$x,s=object$cv.glmnet$lambda.min,type="response")
@@ -619,7 +619,7 @@ predict.glm.common <- function(object,newx){
   return(y_hat)
 }
 
-#' @export
+#'@export
 coef.glm.common <- function(object){
   coef <- stats::coef(object=object$cv.glmnet,s="lambda.min")
   alpha <- rep(x=coef[1],times=object$info$q)
@@ -642,14 +642,14 @@ glm.spls <- function(x,y,family="gaussian",alpha=1,nfolds=10){
   return(object)
 }
 
-#' @export
+#'@export
 predict.glm.spls <- function(object,newx){
   temp <- spls::predict.spls(object=object,newx=newx,type="fit")
   y_hat <- apply(X=temp,MARGIN=2,FUN=function(x) x,simplify=FALSE)
   return(y_hat)
 }
 
-#' @export
+#'@export
 coef.glm.spls <- function(object){
   coef <- spls::coef.spls(object=object)
   list <- list(alpha=NA,beta=coef)
@@ -690,7 +690,7 @@ glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   return(object)
 }
 
-#' @export
+#'@export
 predict.glm.xrnet <- function(object,newx){
   y_hat <- list()
   for(i in seq_along(object)){
@@ -699,7 +699,7 @@ predict.glm.xrnet <- function(object,newx){
   return(y_hat)
 }
 
-#' @export
+#'@export
 coef.glm.xrnet <- function(object){
   alpha <- beta <- numeric()
   for(i in seq_along(object)){
@@ -738,7 +738,7 @@ glm.separate <- function(x,y,family,alpha=1,lambda=NULL){
   return(object)
 }
 
-#' @export
+#'@export
 predict.glm.separate <- function(object,newx){
   if(is.matrix(newx)){
     newx <- replicate(n=object$info$q,expr=newx,simplify=FALSE) 
@@ -751,7 +751,7 @@ predict.glm.separate <- function(object,newx){
   return(y_hat)
 }
 
-#' @export
+#'@export
 coef.glm.separate <- function(object){
   p <- object$info$p
   q <- object$info$q
@@ -799,13 +799,13 @@ glm.mgaussian <- function(x,y,family,alpha){
   return(object)
 }
 
-#' @export
+#'@export
 predict.glm.mgaussian <- function(object,newx){
   y_hat <- stats::predict(object$cv.glmnet,newx=newx,s="lambda.min")
   apply(y_hat,2,function(x) x,simplify=FALSE)
 }
 
-#' @export
+#'@export
 coef.glm.mgaussian <- function(object){
   coef <- stats::coef(object$cv.glmnet,s="lambda.min")
   alpha <- sapply(coef,function(x) x[1])
@@ -830,7 +830,7 @@ glm.glmtrans <- function(x,y,family,alpha=1){
   return(object)
 }
 
-#' @export
+#'@export
 predict.glm.glmtrans <- function(object,newx){
   q <- length(newx)
   y_hat <- list()
@@ -840,7 +840,7 @@ predict.glm.glmtrans <- function(object,newx){
   return(y_hat)
 }
 
-#' @export
+#'@export
 coef.glm.glmtrans <- function(object){
   coef <- sapply(object,function(x) x$beta)
   alpha <- coef[1,]
@@ -855,21 +855,21 @@ coef.glm.glmtrans <- function(object){
 
 #cor(y_train[[3]],y_hat[[3]])
 
-#' @title Train and test model
+#'@title Train and test model
 #'
-#' @description
-#' Trains and test prediction models
-#' 
-#' @param y_train target of training samples: vector of length n
-#' @param X_train features of training samples: n x p matrix
-#' @param y_test target of testing samples: vector of length m
-#' @param X_test features of testing samples m x p matrix
-#' @param family character "gaussian" or "binomial"
-#' @param alpha.init elastic net mixing parameter for initial regressions
-#' @param alpha elastic net mixing paramter
-#' @param method character vector
-#' @param type character
-#' @param trial see sparselink
+#'@description
+#'Trains and test prediction models
+#'
+#'@param y_train target of training samples: vector of length n
+#'@param X_train features of training samples: n x p matrix
+#'@param y_test target of testing samples: vector of length m
+#'@param X_test features of testing samples m x p matrix
+#'@param family character "gaussian" or "binomial"
+#'@param alpha.init elastic net mixing parameter for initial regressions
+#'@param alpha elastic net mixing paramter
+#'@param method character vector
+#'@param type character
+#'@param trial see sparselink
 #'
 traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type,trial=FALSE){
   if(is.list(y_train)){
@@ -1030,10 +1030,10 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
 #estim <- sample(x=c(-1,0,1),size=20,replace=TRUE)
 #table(truth,estim)
 
-#' @title Metrics for sign detection
-#' 
-#' @param truth n times p matrix with entries in -1, 0, 1
-#' @param estim n times p matrix with entries in -1, 0, 1
+#'@title Metrics for sign detection
+#'
+#'@param truth n times p matrix with entries in -1, 0, 1
+#'@param estim n times p matrix with entries in -1, 0, 1
 #'
 count_matrix <- function(truth,estim){
   if(!is.matrix(truth)){stop()}
@@ -1045,11 +1045,11 @@ count_matrix <- function(truth,estim){
   return(rate)
 }
 
-#' @title Metrics for sign detection
-#' 
-#' @param truth vector of length p with entries in -1, 0, 1
-#' @param estim vector of length p with entries -1, 0, 1
-#' 
+#'@title Metrics for sign detection
+#'
+#'@param truth vector of length p with entries in -1, 0, 1
+#'@param estim vector of length p with entries -1, 0, 1
+#'
 count_vector <- function(truth,estim){
   if(!is.vector(truth)){stop()}
   if(length(truth)!=length(estim)){stop()}
@@ -1069,18 +1069,18 @@ count_vector <- function(truth,estim){
   return(c(sensitivity=sensitivity,specificity=specificity,precision=precision))
 }
 
-#' @title Plot pairwise differences
-#' 
-#' @param x setting: character vector
-#' @param y0 values on the left: numeric vector
-#' @param y1 values in the centre: numeric vector
-#' @param y2 values on the right: numeric vector
-#' @param dist horizontal distance between points
-#' @param main title
-#' @param increase change to arrow NULL, up, down
-#' @param cex.axis numeric
-#' @param cex.main numeric
-#' 
+#'@title Plot pairwise differences
+#'
+#'@param x setting: character vector
+#'@param y0 values on the left: numeric vector
+#'@param y1 values in the centre: numeric vector
+#'@param y2 values on the right: numeric vector
+#'@param dist horizontal distance between points
+#'@param main title
+#'@param increase change to arrow NULL, up, down
+#'@param cex.axis numeric
+#'@param cex.main numeric
+#'
 change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
   unique <- unique(x)
   graphics::plot.new()
@@ -1121,24 +1121,24 @@ change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase
   graphics::par(xpd=FALSE)
 }
 
-#' @title Construct penalty factors
-#' 
-#' @description
-#' Uses internal and external weights (for negative and positive effects)
-#' as well as internal and external exponents/factors for these weights
-#' to construct penalty factors.
-#' 
-#' @param w_int internal weights:
-#' numeric vector of length p with non-negative entries
-#' @param w_ext external weights:
-#' numeric vector of length p with non-negative entries
-#' @param v_int exponent or factor for internal weights:
-#' non-negative scalar
-#' @param v_ext exponent or factor for external weights:
-#' non-negative scalar
-#' @param type character "geo", "exp", "rem" or "ari"
-#' (with or without addition of ".con")
-#' 
+#'@title Construct penalty factors
+#'
+#'@description
+#'Uses internal and external weights (for negative and positive effects)
+#'as well as internal and external exponents/factors for these weights
+#'to construct penalty factors.
+#'
+#'@param w_int internal weights:
+#'numeric vector of length p with non-negative entries
+#'@param w_ext external weights:
+#'numeric vector of length p with non-negative entries
+#'@param v_int exponent or factor for internal weights:
+#'non-negative scalar
+#'@param v_ext exponent or factor for external weights:
+#'non-negative scalar
+#'@param type character "geo", "exp", "rem" or "ari"
+#'(with or without addition of ".con")
+#'
 construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
   if(type %in% c("geo","geo.con")){
     pf <- 1/((w_int^v_int)*(w_ext^v_ext))
@@ -1153,25 +1153,25 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
   return(pf)
 }
 
-#' @title Visualise metric that depends on two parameters
-#' @export
-#' @keywords internal
-#' 
-#' @description 
-#' Displays values in y in a grey scale (white=lowest, black=highest),
-#' for different combinations of the two variables in x.
-#' The lowest value is indicated by a red cross,
-#' and the lowest value on the diagonal is indicated by a red circle.
+#'@title Visualise metric that depends on two parameters
+#'@export
+#'@keywords internal
 #'
-#' @param x list with slots source and target
-#' @param y numeric vector
-#' 
-#' @examples
-#' values <- seq(from=0,to=1,by=0.2)
-#' x <- expand.grid(source=values,target=values)
-#' y <- stats::rexp(n=length(values)*length(values))
-#' plotWeight(x=x,y=y)
-#' 
+#'@description 
+#'Displays values in y in a grey scale (white=lowest, black=highest),
+#'for different combinations of the two variables in x.
+#'The lowest value is indicated by a red cross,
+#'and the lowest value on the diagonal is indicated by a red circle.
+#'
+#'@param x list with slots source and target
+#'@param y numeric vector
+#'
+#'@examples
+#'values <- seq(from=0,to=1,by=0.2)
+#'x <- expand.grid(source=values,target=values)
+#'y <- stats::rexp(n=length(values)*length(values))
+#'plotWeight(x=x,y=y)
+#'
 plotWeight <- function(x,y){
   if(stats::cor(x$source,x$target)==-1){
     graphics::plot(x=x$source,y=y,type="o",xlab="weight source = 1 - weight target")
@@ -1195,46 +1195,46 @@ plotWeight <- function(x,y){
   }
 }
 
-#' @title
-#' Sparse regression for related problems
-#' 
-#' @description
-#' Estimates sparse regression models (i.e., selecting few variables)
-#' in multi-task learning or transfer learning
-#' 
-#' @export
-#' 
-#' @param x n x p matrix (multi-task learning) 
-#' or list of n_k x p matrices (transfer learning)
-#' @param y n x q matrix (multi-task learning)
-#' or list of n_k-dimensional vectors (transfer learning)
-#' @param family character "gaussian" or "binomial"
-#' @param alpha.init elastic net mixing parameter for initial regressions,
-#' default: 0.95 (lasso-like elastic net)
-#' @param alpha elastic net mixing parameter of final regressions,
-#' default: 1 (lasso)
-#' @param nfolds number of cross-validation folds
-#' @param type character
-#' @param trial Should exponents above 1 be used? Default: FALSE
-#' 
-#' @examples
-#' # multi-task learning
-#' n <- 100
-#' p <- 50
-#' q <- 3
-#' family <- "gaussian"
-#' x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
-#' y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
-#' object <- sparselink(x=x,y=y,family=family)
-#' 
-#' # transfer learning
-#' n <- c(100,50)
-#' p <- 50
-#' x <- lapply(X=n,function(x) matrix(data=stats::rnorm(n*p),nrow=x,ncol=p))
-#' y <- lapply(X=n,function(x) stats::rnorm(x))
-#' family <- "gaussian"
-#' object <- sparselink(x=x,y=y,family=family)
-#' 
+#'@title
+#'Sparse regression for related problems
+#'
+#'@description
+#'Estimates sparse regression models (i.e., selecting few variables)
+#'in multi-task learning or transfer learning
+#'
+#'@export
+#'
+#'@param x n x p matrix (multi-task learning) 
+#'or list of n_k x p matrices (transfer learning)
+#'@param y n x q matrix (multi-task learning)
+#'or list of n_k-dimensional vectors (transfer learning)
+#'@param family character "gaussian" or "binomial"
+#'@param alpha.init elastic net mixing parameter for initial regressions,
+#'default: 0.95 (lasso-like elastic net)
+#'@param alpha elastic net mixing parameter of final regressions,
+#'default: 1 (lasso)
+#'@param nfolds number of cross-validation folds
+#'@param type character
+#'@param trial Should exponents above 1 be used? Default: FALSE
+#'
+#'@examples
+#'# multi-task learning
+#'n <- 100
+#'p <- 50
+#'q <- 3
+#'family <- "gaussian"
+#'x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
+#'y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
+#'object <- sparselink(x=x,y=y,family=family)
+#'
+#'# transfer learning
+#'n <- c(100,50)
+#'p <- 50
+#'x <- lapply(X=n,function(x) matrix(data=stats::rnorm(n*p),nrow=x,ncol=p))
+#'y <- lapply(X=n,function(x) stats::rnorm(x))
+#'family <- "gaussian"
+#'object <- sparselink(x=x,y=y,family=family)
+#'
 sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,trial=FALSE){ # was alpha.init=0.95, alpha=1 and trial=FALSE
   
   alpha.one <- alpha.init
