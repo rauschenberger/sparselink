@@ -386,7 +386,7 @@ get.info <- function(x,y){
   return(list)
 }
 
-#' @title Data fusion
+#'@title Data fusion
 #' 
 #' @export
 #' @keywords internal
@@ -421,7 +421,32 @@ fuse.data <- function(x,y=NULL,foldid=NULL){
   return(list)
 }
 
-comb_split_trial <- function(coef,id){
+
+#'@title
+#'Extract internal and external weights
+#'
+#'@export
+#'@keywords internal
+#'@param coef matrix with \eqn{p} rows (features) and \eqn{q} columns (problems)
+#'@param id integer in \eqn{1,...,q}
+#'
+#'@value
+#'Returns a list with slots
+#'lower.limits, upper.limits,
+#'weight.source (external weights)
+#'and weight.target (internal weights).
+#'Each slot is a vector of length \eqn{2*p},
+#'with the first \eqn{p} entries for positive effects
+#'and the last \eqn{p} entries for negative effects.
+#'
+#'@examples
+#'p <- 10
+#'q <- 3
+#'data <- stats::rbinom(p*q,size=1,prob=0.2)*stats::rnorm(p*q)
+#'coef <- matrix(data=data,nrow=p,ncol=q)
+#'comb_split(coef=coef,id=1)
+#' 
+comb_split <- function(coef,id){
 
   # #--- prediction ---
   # metric <- numeric()
@@ -477,6 +502,7 @@ comb_split_trial <- function(coef,id){
   #warning("end temporary")
 
   list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight.source=weight.ext,weight.target=weight.int)
+  return(list)
 }
 
 #' @title
@@ -1297,8 +1323,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
   }
   
   for(i in seq_len(q)){
-    #rest.ext <- comb_split(coef=beta.ext,weight=n,id=i)
-    rest.ext <- comb_split_trial(coef=beta.ext,id=i)
+    rest.ext <- comb_split(coef=beta.ext,id=i)
     glm.two.ext[[i]] <- list()
     for(l in seq_len(nrow(weight))){
       
@@ -1363,8 +1388,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
         
       }
       
-      #rest.int <- comb_split(coef=beta.int,weight=n,id=i)
-      rest.int <- comb_split_trial(coef=beta.int,id=i)
+      rest.int <- comb_split(coef=beta.int,id=i)
       
       for(l in seq_len(nrow(weight))){
         
