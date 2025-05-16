@@ -474,6 +474,10 @@ comb_split <- function(coef,id){
 #'@param newx
 #'features:
 #'matrix with \eqn{n} rows (samples) and \eqn{p} columns (variables)
+#'for multi-task learning;
+#'list of \eqn{q} matrices
+#'with \eqn{n_k} rows (samples) and \eqn{p} columns (variables)
+#'for transfer learning, for each \eqn{k} in \eqn{1,...,q}
 #'
 #'@param weight experimental argument:
 #'numeric vector of length 2,
@@ -485,12 +489,17 @@ comb_split <- function(coef,id){
 #'
 #'@return
 #'Returns predicted values or predicted probabilities.
-#'The output is a column vector with one entry for each sample. 
+#'The output is a list of \eqn{q} column vectors of length \eqn{n_k}
+#'for \eqn{k} in \eqn{1,...,q}.
 #'
 #'@inherit sparselink-package references
 #'
 #'@examples
-#'1+1
+#'family <- "gaussian"
+#'data <- sim.data.transfer(family=family)
+#'#data <- sim.data.multiple(family=family)
+#'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
+#'y_hat <- predict(object=object,newx=data$X_test)
 #'
 predict.sparselink <- function(object,newx,weight=NULL,...){
   if(is.null(weight)){
@@ -527,13 +536,19 @@ predict.sparselink <- function(object,newx,weight=NULL,...){
 #'@return
 #'Returns estimated coefficients.
 #'The output is a list with two slots:
-#'slot `alpha` with the estimated intercept (scalar),
-#'and slot `beta` with the estimated slopes (vector).
+#'slot `alpha` with the estimated intercept
+#'(vector or length \eqn{q}),
+#'and slot `beta` with the estimated slopes
+#'(matrix with \eqn{p} rows and \eqn{q} columns).
 #'
 #'@inherit sparselink-package references
 #'
 #'@examples
-#'1+1
+#'family <- "gaussian"
+#'data <- sim.data.transfer(family=family)
+#'#data <- sim.data.multiple(family=family)
+#'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
+#'coef <- coef(object=object)
 #'
 coef.sparselink <- function(object){
   id <- object$weight.ind
@@ -549,11 +564,6 @@ coef.sparselink <- function(object){
   coef <- list(alpha=alpha,beta=beta)
   return(coef)
 }
-
-
-# #object <- sparselink(x=X_train,y=y_train,family=family)
-# #y_hat <- predict(object=object,newx=X_test)
-# #coef <- coef(object=object)
 
 glm.common <- function(x,y,family,alpha=1){
   family <- unique(family)
