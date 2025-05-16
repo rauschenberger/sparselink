@@ -16,11 +16,11 @@ sparselink(
 )
 }
 \arguments{
-\item{x}{n x p matrix (multi-task learning) 
-or list of n_k x p matrices (transfer learning)}
+\item{x}{\eqn{n \times p} matrix (multi-task learning) 
+or list of \eqn{n_k} x \eqn{p} matrices (transfer learning)}
 
-\item{y}{n x q matrix (multi-task learning)
-or list of n_k-dimensional vectors (transfer learning)}
+\item{y}{\eqn{n x q} matrix (multi-task learning)
+or list of \eqn{n_k}-dimensional vectors (transfer learning)}
 
 \item{family}{character "gaussian" or "binomial"}
 

@@ -19,10 +19,10 @@ if(FALSE){
 #'
 #'@export
 #'
-#'@param x n x p matrix (multi-task learning) 
-#'or list of n_k x p matrices (transfer learning)
-#'@param y n x q matrix (multi-task learning)
-#'or list of n_k-dimensional vectors (transfer learning)
+#'@param x \eqn{n \times p} matrix (multi-task learning) 
+#'or list of \eqn{n_k} x \eqn{p} matrices (transfer learning)
+#'@param y \eqn{n x q} matrix (multi-task learning)
+#'or list of \eqn{n_k}-dimensional vectors (transfer learning)
 #'@param family character "gaussian" or "binomial"
 #'@param alpha.init elastic net mixing parameter for initial regressions,
 #'default: 0.95 (lasso-like elastic net)
