@@ -940,7 +940,38 @@ comb_split_trial <- function(coef,id){
 # }
 
 #' @export
-predict.sparselink <- function(object,newx,weight=NULL){
+#' 
+#' @title
+#' Make Predictions
+#' 
+#' @description
+#' Predicts outcome
+#' 
+#' @param object
+#' object of class `sparselink`
+#' 
+#' @param newx
+#' features:
+#' matrix with \eqn{n} rows (samples) and \eqn{p} columns (variables)
+#' 
+#' @param weight experimental argument:
+#' numeric vector of length 2,
+#' with the first entry for the internal weight,
+#' and the second entry for the external weight,
+#' overwrites the cross-validated weights
+#' 
+#' @param ... (not applicable)
+#' 
+#' @return
+#' Returns predicted values or predicted probabilities.
+#' The output is a column vector with one entry for each sample. 
+#' 
+#' @inherit sparselink-package references
+#' 
+#' @examples
+#' 1+1
+#' 
+predict.sparselink <- function(object,newx,weight=NULL,...){
   if(is.null(weight)){
     id <- object$weight.ind
   } else {
@@ -962,6 +993,27 @@ predict.sparselink <- function(object,newx,weight=NULL){
 }
 
 #' @export
+#'
+#' @title
+#' Extract Coefficients
+#'
+#' @description
+#' Extracts coefficients
+#' from an object of class [sparselink].
+#'
+#' @inheritParams predict.sparselink
+#'
+#' @return
+#' Returns estimated coefficients.
+#' The output is a list with two slots:
+#' slot `alpha` with the estimated intercept (scalar),
+#' and slot `beta` with the estimated slopes (vector).
+#'
+#' @inherit sparselink-package references
+#' 
+#' @examples
+#' 1+1
+#'
 coef.sparselink <- function(object){
   id <- object$weight.ind
   p <- object$info$p

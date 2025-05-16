@@ -23,9 +23,11 @@ reference:
 - title: "R Package"
   contents:
   - sparselink-package
-- title: "Main function"
+- title: "Main functions"
   contents:
   - sparselink
+  - coef.sparselink
+  - predict.sparselink
 - title: "Other functions"
   contents:
   - sim.data.multiple
