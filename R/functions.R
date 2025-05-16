@@ -421,7 +421,6 @@ fuse.data <- function(x,y=NULL,foldid=NULL){
   return(list)
 }
 
-
 #'@title
 #'Extract internal and external weights
 #'
@@ -447,60 +446,16 @@ fuse.data <- function(x,y=NULL,foldid=NULL){
 #'comb_split(coef=coef,id=1)
 #'
 comb_split <- function(coef,id){
-
-  # #--- prediction ---
-  # metric <- numeric()
-  # for(i in seq_len(ncol(coef))){
-  #    eta <- x_sta[[id]] %*% coef[,i]
-  #    y_hat <- mean_function(eta=eta,family=family)
-  #    metric[i] <- calc.metric(y=y_sta[[id]],y_hat=y_hat,family=family)
-  # }
-  # mean <- rep(x=y_sta[[i]],times=length(y_sta[[i]]))
-  # metric.mean <- calc.metric(y=y_sta[[id]],y_hat=y_hat,family=family)
-  # cor <- 1*(metric[-id]<metric.mean)
-
-  # #--- correlation ---
-  #cor <- stats::cor(x=coef[,id],y=coef[,-id],method="spearman")
-  #cor[is.na(cor)] <- 0
-  ##cor[cor>0] <- 1
-  ##cor[cor<0] <- 0
-  #cor <- matrix(data=cor,nrow=nrow(coef),ncol=length(cor),byrow=TRUE)
-
-  #--- equality ---
-  #warning("Next line was active until revision.")
-  cor <- 1
-
-  #warning("remove binarisation!")
-  #coef <- sign(coef) # temporary trial
-
+  lower.limits <- rep(x=c(0,-Inf),each=nrow(coef))
+  upper.limits <- rep(x=c(Inf,0),each=nrow(coef))
   #--- external weights ---
-
-  #warning("put back max/min (instead of sum)")
-  #positive <- apply(X=cor*coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) max(c(0,x)))
-  #negative <- apply(X=cor*coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) abs(min(c(0,x))))
-
-  positive <- apply(X=cor*coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) sum(pmax(0,x)))
-  negative <- apply(X=cor*coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) sum(abs(pmin(0,x))))
-
-  lower.limits <- rep(c(0,-Inf),each=nrow(coef))
-  upper.limits <- rep(c(Inf,0),each=nrow(coef))
+  positive <- apply(X=coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) sum(pmax(0,x)))
+  negative <- apply(X=coef[,-id,drop=FALSE],MARGIN=1,FUN=function(x) sum(abs(pmin(0,x))))
   weight.ext <- c(positive,negative)
-
   #--- internal weights ---
   positive <- pmax(0,coef[,id])
   negative <- abs(pmin(0,coef[,id]))
   weight.int <- c(positive,negative)
-
-  #warning("removed weight standardisation")
-  #warning("reactivated weight standardisation")
-  #if(any(weight.ext!=0)){
-  #  weight.ext <- weight.ext/sum(weight.ext)
-  #}
-  #if(any(weight.int!=0)){
-  #  weight.int <- weight.int/sum(weight.int)
-  #}
-  #warning("end temporary")
-
   list <- list(lower.limits=lower.limits,upper.limits=upper.limits,weight.source=weight.ext,weight.target=weight.int)
   return(list)
 }
