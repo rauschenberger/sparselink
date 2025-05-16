@@ -20,8 +20,8 @@ if(FALSE){
 #'@export
 #'
 #'@param x \eqn{n \times p} matrix (multi-task learning) 
-#'or list of \eqn{n_k} x \eqn{p} matrices (transfer learning)
-#'@param y \eqn{n x q} matrix (multi-task learning)
+#'or list of \eqn{n_k \times p} matrices (transfer learning)
+#'@param y \eqn{n \times q} matrix (multi-task learning)
 #'or list of \eqn{n_k}-dimensional vectors (transfer learning)
 #'@param family character "gaussian" or "binomial"
 #'@param alpha.init elastic net mixing parameter for initial regressions,
@@ -30,7 +30,8 @@ if(FALSE){
 #'default: 1 (lasso)
 #'@param nfolds number of cross-validation folds
 #'@param type character
-#'@param trial Should exponents above 1 be used? Default: FALSE
+#'@param trial experimental argument (to be removed):
+#'Should exponents above 1 be used? Default: FALSE
 #'
 #'@examples
 #'# multi-task learning
@@ -286,7 +287,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
 #'for multi-task learning;
 #'list of \eqn{q} matrices
 #'with \eqn{n_k} rows (samples) and \eqn{p} columns (variables)
-#'for transfer learning, for each \eqn{k} in \eqn{1,...,q}
+#'for transfer learning, for each \eqn{k} in \eqn{1,\ldots,q}
 #'
 #'@param weight experimental argument:
 #'numeric vector of length 2,
@@ -299,7 +300,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
 #'@returns
 #'Returns predicted values or predicted probabilities.
 #'The output is a list of \eqn{q} column vectors of length \eqn{n_k}
-#'for \eqn{k} in \eqn{1,...,q}.
+#'for \eqn{k} in \eqn{1,\ldots,q}.
 #'
 #'@inherit sparselink-package references
 #'
@@ -605,10 +606,10 @@ make.folds.trans <- function(y,family,nfolds=10){
 #'
 #'@param x list of \eqn{q} matrices,
 #'with \eqn{n_k} (samples) rows and \eqn{p} columns (features),
-#'for \eqn{k} in \eqn{1,...,q}
+#'for \eqn{k} in \eqn{1,\ldots,q}
 #'@param y list of \eqn{q} vectors,
 #'with \eqn{n_k} entries,
-#'for \eqn{k} in \eqn{1,...,q}
+#'for \eqn{k} in \eqn{1,\ldots,q}
 #'
 #'@returns
 #'Returns a list with the slots
@@ -636,9 +637,12 @@ get.info <- function(x,y){
 #'@export
 #'@keywords internal
 #'
-#'@param x list of q matrices, with n_1,...,n_q rows and with p columns
-#'@param y list of q vectors, of length n_1,...,n_q, or NULL (default)
-#'@param foldid list of q vectors, of length n_1,...n_q, or NULL (default)
+#'@param x list of \eqn{q} matrices, with \eqn{n_1,\ldots,n_q} rows
+#'and with \eqn{p} columns
+#'@param y list of \eqn{q} vectors, of length \eqn{n_1,\ldots,n_q},
+#'or NULL (default)
+#'@param foldid list of \eqn{q} vectors, of length \eqn{n_1,\ldotsn_q},
+#'or NULL (default)
 #'
 #'@examples
 #'data <- sim.data.transfer()
@@ -672,7 +676,7 @@ fuse.data <- function(x,y=NULL,foldid=NULL){
 #'@export
 #'@keywords internal
 #'@param coef matrix with \eqn{p} rows (features) and \eqn{q} columns (problems)
-#'@param id integer in \eqn{1,...,q}
+#'@param id integer in \eqn{1,\ldots,q}
 #'
 #'@returns
 #'Returns a list with slots
@@ -1062,11 +1066,11 @@ sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,10
 #'
 #'@returns
 #'Returns list with slots
-#'y_train (\eqn{n_0} x \eqn{q} matrix),
-#'X_train (\eqn{n_0} x \eqn{p} matrix),
-#'y_test (\eqn{n_1} x \eqn{q} matrix),
-#'X_test (\eqn{n_1} x \eqn{p} matrix),
-#'and beta (\eqn{p} x \eqn{q} matrix).
+#'y_train (\eqn{n_0 \times q} matrix),
+#'X_train (\eqn{n_0 \times p} matrix),
+#'y_test (\eqn{n_1 \times q} matrix),
+#'X_test (\eqn{n_1 \times p} matrix),
+#'and beta (\eqn{p \times q} matrix).
 #'
 #'@examples
 #'data <- sim.data.multiple()
@@ -1108,12 +1112,12 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #'Trains and tests prediction models
 #'
 #'@param y_train target of training samples: vector of length n
-#'@param X_train features of training samples: n x p matrix
-#'@param y_test target of testing samples: vector of length m
-#'@param X_test features of testing samples m x p matrix
+#'@param X_train features of training samples: \eqn{n \times p} matrix
+#'@param y_test target of testing samples: vector of length \eqn{m}
+#'@param X_test features of testing samples \eqn{m \times p} matrix
 #'@param family character "gaussian" or "binomial"
 #'@param alpha.init elastic net mixing parameter for initial regressions
-#'@param alpha elastic net mixing paramter
+#'@param alpha elastic net mixing parameter
 #'@param method character vector
 #'@param type character
 #'@param trial see sparselink
