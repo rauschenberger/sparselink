@@ -17,9 +17,9 @@ sparselink(
 }
 \arguments{
 \item{x}{\eqn{n \times p} matrix (multi-task learning) 
-or list of \eqn{n_k} x \eqn{p} matrices (transfer learning)}
+or list of \eqn{n_k \times p} matrices (transfer learning)}
 
-\item{y}{\eqn{n x q} matrix (multi-task learning)
+\item{y}{\eqn{n \times q} matrix (multi-task learning)
 or list of \eqn{n_k}-dimensional vectors (transfer learning)}
 
 \item{family}{character "gaussian" or "binomial"}
@@ -34,7 +34,8 @@ default: 1 (lasso)}
 
 \item{nfolds}{number of cross-validation folds}
 
-\item{trial}{Should exponents above 1 be used? Default: FALSE}
+\item{trial}{experimental argument (to be removed):
+Should exponents above 1 be used? Default: FALSE}
 }
 \description{
 Estimates sparse regression models (i.e., selecting few variables)

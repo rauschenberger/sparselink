@@ -9,11 +9,11 @@ get.info(x, y)
 \arguments{
 \item{x}{list of \eqn{q} matrices,
 with \eqn{n_k} (samples) rows and \eqn{p} columns (features),
-for \eqn{k} in \eqn{1,...,q}}
+for \eqn{k} in \eqn{1,\ldots,q}}
 
 \item{y}{list of \eqn{q} vectors,
 with \eqn{n_k} entries,
-for \eqn{k} in \eqn{1,...,q}}
+for \eqn{k} in \eqn{1,\ldots,q}}
 }
 \value{
 Returns a list with the slots

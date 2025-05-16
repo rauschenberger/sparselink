@@ -9,7 +9,7 @@ comb_split(coef, id)
 \arguments{
 \item{coef}{matrix with \eqn{p} rows (features) and \eqn{q} columns (problems)}
 
-\item{id}{integer in \eqn{1,...,q}}
+\item{id}{integer in \eqn{1,\ldots,q}}
 }
 \value{
 Returns a list with slots

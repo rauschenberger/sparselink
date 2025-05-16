@@ -34,11 +34,11 @@ sim.data.multiple(
 }
 \value{
 Returns list with slots
-y_train (\eqn{n_0} x \eqn{q} matrix),
-X_train (\eqn{n_0} x \eqn{p} matrix),
-y_test (\eqn{n_1} x \eqn{q} matrix),
-X_test (\eqn{n_1} x \eqn{p} matrix),
-and beta (\eqn{p} x \eqn{q} matrix).
+y_train (\eqn{n_0 \times q} matrix),
+X_train (\eqn{n_0 \times p} matrix),
+y_test (\eqn{n_1 \times q} matrix),
+X_test (\eqn{n_1 \times p} matrix),
+and beta (\eqn{p \times q} matrix).
 }
 \description{
 Simulates data for multi-task learning.

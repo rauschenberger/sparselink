@@ -7,11 +7,14 @@
 fuse.data(x, y = NULL, foldid = NULL)
 }
 \arguments{
-\item{x}{list of q matrices, with n_1,...,n_q rows and with p columns}
+\item{x}{list of \eqn{q} matrices, with \eqn{n_1,\ldots,n_q} rows
+and with \eqn{p} columns}
 
-\item{y}{list of q vectors, of length n_1,...,n_q, or NULL (default)}
+\item{y}{list of \eqn{q} vectors, of length \eqn{n_1,\ldots,n_q},
+or NULL (default)}
 
-\item{foldid}{list of q vectors, of length n_1,...n_q, or NULL (default)}
+\item{foldid}{list of \eqn{q} vectors, of length \eqn{n_1,\ldotsn_q},
+or NULL (default)}
 }
 \description{
 Data fusion

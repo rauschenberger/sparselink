@@ -20,15 +20,15 @@ traintest(
 \arguments{
 \item{y_train}{target of training samples: vector of length n}
 
-\item{X_train}{features of training samples: n x p matrix}
+\item{X_train}{features of training samples: \eqn{n \times p} matrix}
 
-\item{y_test}{target of testing samples: vector of length m}
+\item{y_test}{target of testing samples: vector of length \eqn{m}}
 
-\item{X_test}{features of testing samples m x p matrix}
+\item{X_test}{features of testing samples \eqn{m \times p} matrix}
 
 \item{family}{character "gaussian" or "binomial"}
 
-\item{alpha}{elastic net mixing paramter}
+\item{alpha}{elastic net mixing parameter}
 
 \item{method}{character vector}
 

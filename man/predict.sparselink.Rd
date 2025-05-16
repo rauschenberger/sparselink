@@ -14,7 +14,7 @@ matrix with \eqn{n} rows (samples) and \eqn{p} columns (variables)
 for multi-task learning;
 list of \eqn{q} matrices
 with \eqn{n_k} rows (samples) and \eqn{p} columns (variables)
-for transfer learning, for each \eqn{k} in \eqn{1,...,q}}
+for transfer learning, for each \eqn{k} in \eqn{1,\ldots,q}}
 
 \item{weight}{experimental argument:
 numeric vector of length 2,
@@ -27,7 +27,7 @@ overwrites the cross-validated weights}
 \value{
 Returns predicted values or predicted probabilities.
 The output is a list of \eqn{q} column vectors of length \eqn{n_k}
-for \eqn{k} in \eqn{1,...,q}.
+for \eqn{k} in \eqn{1,\ldots,q}.
 }
 \description{
 Predicts outcome
