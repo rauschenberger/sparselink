@@ -735,25 +735,6 @@ coef.glm.separate <- function(object){
 #y_hat <- predict(object,newx=X_test)
 #coef <- coef(object)
 
-if(FALSE){
-  # family="mgaussian"
-  n <- 100
-  p <- 200
-  q <- 3
-  x <- matrix(data=stats::rnorm(n=n*p),nrow=n,ncol=p)
-  theta <- stats::rbinom(n=p,size=1,prob=0.05)*stats::rnorm(n=p)
-  beta <- matrix(data=NA,nrow=p,ncol=q)
-  for(i in seq_len(q)){
-    beta[,i] <- theta + stats::rbinom(n=p,size=1,prob=0.05)*stats::rnorm(n=p)
-  }
-  y <- x %*% beta + stats::rnorm(n*q)
-  object <- glmnet::cv.glmnet(x=x,y=y,family="mgaussian")
-  sapply(coef(object,s="lambda.min"),function(x) as.numeric(x))
-  
-  object <- glm.mgaussian(x=x,y=y,family="gaussian")
-  predict(object,newx=x)
-}
-
 glm.mgaussian <- function(x,y,family,alpha){
   object <- list()
   family <- unique(family)
@@ -1416,39 +1397,4 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
   list <- list(glm.one=glm.one.ext,glm.two=glm.two.ext,weight=weight,weight.ind=weight.ind,weight.min=weight.min,lambda.min=lambda.min,info=data.frame(p=p,q=q,mode=mode,family=paste0(family,collapse=", ")))
   class(list) <- "sparselink"
   return(list)
-}
-
-# 
-# if(FALSE){
-#   p <- 50
-#   x <- stats::rbinom(n=p,size=1,prob=0.4)*stats::runif(n=p)  
-#   y <- stats::rbinom(n=p,size=1,prob=0.4)*stats::runif(n=p)
-#   #wx <- 0.0
-#   #wy <- 0.0
-#   #z <- wx*x + wy * y
-#   #z <- x^wx + y^wy - (wx==0) - (wy==0) + (wx==0 & wy==0)
-#   #z <- z/sum(z)
-#   #graphics::par(mfrow=c(1,2))
-#   w <- 0.0
-#   #z <- w*x + (1-w)*y
-#   z <- x^w + y^(1-w) - (w==0|w==1)
-#   ymax <- max(z)
-#   graphics::plot(x=x,y=z,ylim=c(0,ymax))
-#   graphics::plot(x=y,y=z,ylim=c(0,ymax))
-#   
-# }
-
-
-if(FALSE){
-  # Search for global variables!
-  fun <- objects(all.names=TRUE,pattern="\\.")
-  fun <- objects()
-  for(i in seq_along(fun)){
-    if(fun[i] %in% c("fun","path","i")){next}
-    if(fun[i]==".Random.seed"){next}
-    var <- codetools::findGlobals(fun=fun[i],merge=FALSE)$variables
-    if(length(var)>0){
-      warning(paste0("Global variable(s) in function ",fun[i],": ",paste0(var,collapse=", ")))
-    }
-  }
 }
