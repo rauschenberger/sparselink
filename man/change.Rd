@@ -4,14 +4,28 @@
 \alias{change}
 \title{Plot pairwise differences}
 \usage{
-change(x, y0, y1, main = "", cex.axis = 0.5, cex.main = 1, increase = TRUE)
+change(
+  x,
+  y0,
+  y1,
+  y2,
+  dist = 0.15,
+  main = "",
+  cex.axis = 0.5,
+  cex.main = 1,
+  increase = TRUE
+)
 }
 \arguments{
 \item{x}{setting: character vector}
 
-\item{y0}{old value: numeric vector}
+\item{y0}{values on the left: numeric vector}
 
-\item{y1}{new value: numeric vector}
+\item{y1}{values in the centre: numeric vector}
+
+\item{y2}{values on the right: numeric vector}
+
+\item{dist}{horizontal distance between points}
 
 \item{main}{title}
 
