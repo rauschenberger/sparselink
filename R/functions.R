@@ -3,7 +3,6 @@ if(FALSE){
   #install.packages(c("roxygen2","pkgdown","rcmdcheck","usethis","remotes","testthat"))
   setwd("C:/Users/arauschenberger/Desktop/sparselink/package")
   roxygen2::roxygenise()
-  #usethis::use_mit_license()
   rcmdcheck::rcmdcheck()
   pkgdown::check_pkgdown()
   #pkgdown::build_site()
@@ -351,6 +350,20 @@ make.folds.trans <- function(y,family,nfolds=10){
   return(foldid)
 }
 
+#' @inheritParams sparselink
+#' @return
+#' Returns a list with the slots
+#' q (scalar, number of problems),
+#' n (vector, number of samples)
+#' and p (scalar, number of features)
+#' 
+#' @example
+#' data <- sim.data.transfer()
+#' get.info(x=data$X_train,y=data$y_train,family=data$family)
+#' 
+#' data <- sim.data.multiple()
+#' get.info(x=data$X_train,y=data$y_train,family=data$family)
+#' 
 get.info <- function(x,y,family){
   if(length(x)!=length(y)){stop("different q")}
   if(any(sapply(X=x,FUN=base::nrow)!=sapply(X=y,FUN=base::length))){stop("different n")}
@@ -1170,6 +1183,14 @@ plotWeight <- function(x,y){
 #' family <- "gaussian"
 #' x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 #' y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
+#' object <- sparselink(x=x,y=y,family=family)
+#' 
+#' # transfer learning
+#' n <- c(100,50)
+#' p <- 50
+#' x <- lapply(X=n,function(x) matrix(data=stats::rnorm(n*p),nrow=x,ncol=p))
+#' y <- lapply(X=n,function(x) stats::rnorm(x))
+#' family <- "gaussian"
 #' object <- sparselink(x=x,y=y,family=family)
 #' 
 sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,trial=FALSE){ # was alpha.init=0.95, alpha=1 and trial=FALSE
