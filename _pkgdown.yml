@@ -20,6 +20,9 @@ navbar:
       href: news/index.html
 
 reference:
+- title: "R Package"
+  contents:
+  - sparselink-package
 - title: "Main function"
   contents:
   - sparselink
