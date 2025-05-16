@@ -10,7 +10,11 @@
 \item{object}{object of class `sparselink`}
 
 \item{newx}{features:
-matrix with \eqn{n} rows (samples) and \eqn{p} columns (variables)}
+matrix with \eqn{n} rows (samples) and \eqn{p} columns (variables)
+for multi-task learning;
+list of \eqn{q} matrices
+with \eqn{n_k} rows (samples) and \eqn{p} columns (variables)
+for transfer learning, for each \eqn{k} in \eqn{1,...,q}}
 
 \item{weight}{experimental argument:
 numeric vector of length 2,
@@ -22,13 +26,18 @@ overwrites the cross-validated weights}
 }
 \value{
 Returns predicted values or predicted probabilities.
-The output is a column vector with one entry for each sample.
+The output is a list of \eqn{q} column vectors of length \eqn{n_k}
+for \eqn{k} in \eqn{1,...,q}.
 }
 \description{
 Predicts outcome
 }
 \examples{
-1+1
+family <- "gaussian"
+data <- sim.data.transfer(family=family)
+#data <- sim.data.multiple(family=family)
+object <- sparselink(x=data$X_train,y=data$y_train,family=family)
+y_hat <- predict(object=object,newx=data$X_test)
 
 }
 \references{

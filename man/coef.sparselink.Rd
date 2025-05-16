@@ -12,15 +12,21 @@
 \value{
 Returns estimated coefficients.
 The output is a list with two slots:
-slot `alpha` with the estimated intercept (scalar),
-and slot `beta` with the estimated slopes (vector).
+slot `alpha` with the estimated intercept
+(vector or length \eqn{q}),
+and slot `beta` with the estimated slopes
+(matrix with \eqn{p} rows and \eqn{q} columns).
 }
 \description{
 Extracts coefficients
 from an object of class [sparselink].
 }
 \examples{
-1+1
+family <- "gaussian"
+data <- sim.data.transfer(family=family)
+#data <- sim.data.multiple(family=family)
+object <- sparselink(x=data$X_train,y=data$y_train,family=family)
+coef <- coef(object=object)
 
 }
 \references{

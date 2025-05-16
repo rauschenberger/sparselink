@@ -46,6 +46,6 @@ Simulates data for multi-task learning.
 \examples{
 data <- sim.data.multiple()
 sapply(X=data,FUN=dim)
- 
+
 }
 \keyword{internal}

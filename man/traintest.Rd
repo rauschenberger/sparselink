@@ -39,5 +39,5 @@ traintest(
 \item{trial}{see sparselink}
 }
 \description{
-Trains and test prediction models
+Trains and tests prediction models
 }
