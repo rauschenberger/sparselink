@@ -1179,7 +1179,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
 
 
 # This cross-validation function only works for transfer learning (not for multi-task learning).
-crossval <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type,trial=FALSE){
+cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type,trial=FALSE){
   #if(is.matrix(y) & is.matrix(X)){
   #  mode <- "multiple"
   #  foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)

@@ -689,7 +689,7 @@ for(i in names(project)){
   for(j in seq_len(5)){ # 5 repetitions of 10-fold CV
     set.seed(j)
     codes <- project[[i]]
-    result[[i]][[j]] <- crossval(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type,trial=FALSE)
+    result[[i]][[j]] <- cv.transfer(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type,trial=FALSE)
   }
 }
 save(result,project,file=file.path(path,"results","application.RData"))
@@ -876,7 +876,7 @@ for(i in seq_along(prob_tl)){
     cond[y==1] <- sample(rep(x=c(0,1),times=c(n1,sum(y==1)-n1))) #sample(rep(x=c(0,1),length.out=sum(y==1)))
     Y <- list(y1=y[cond==0],y2=y[cond==1])
     X <- list(x1=x[cond==0,],x2=x[cond==1,])
-    auc_tl[[i]][[j]] <- crossval(y=Y,X=X,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp",trial=FALSE)$auc
+    auc_tl[[i]][[j]] <- cv.transfer(y=Y,X=X,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp",trial=FALSE)$auc
   }
 }
 
