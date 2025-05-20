@@ -55,15 +55,15 @@
 
 
 <dl><dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
-<dd><p>matrix with n rows (samples) and q columns (outcomes)</p></dd>
+<dd><p>matrix with \(n\) rows (samples) and \(q\) columns (outcomes)</p></dd>
 
 
 <dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
-<dd><p>character "gaussian" or "binomial"</p></dd>
+<dd><p>character <code>"gaussian"</code> or <code>"binomial"</code></p></dd>
 
 
 <dt id="arg-nfolds">nfolds<a class="anchor" aria-label="anchor" href="#arg-nfolds"></a></dt>
-<dd><p>integer between 2 and n</p></dd>
+<dd><p>integer between 2 and \(n\)</p></dd>
 
 </dl></div>
 
@@ -75,12 +75,12 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">fold</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fold</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1  2  3  4  5  6  7  8  9 10 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14 11 11 11 10  9  8  8  9  9 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 12 10 12  9 10  7  9  9 10 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span>,<span class="va">fold</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    fold</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     1 2 3 4 5 6 7 8 9 10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0 7 6 6 6 5 5 4 5 5  5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1 7 5 5 5 5 4 4 3 4  4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0 7 7 5 7 6 6 4 5 5  6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1 5 5 5 5 3 4 3 4 4  4</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
