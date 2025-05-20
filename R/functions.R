@@ -31,7 +31,27 @@ if(FALSE){
 #'@param nfolds number of cross-validation folds
 #'@param type character
 #'@param trial experimental argument (to be removed):
-#'Should exponents above 1 be used? Default: FALSE
+#'Should exponents above 1 be used? Default: \code{FALSE}
+#'
+#'@returns
+#'Returns an object of class \code{sparselink}, a list with multiple slots.
+#'- Stage 1 regressions (before sharing information):
+#'Slot \code{glm.one} contains \eqn{q} objects of type \code{cv.glmnet}
+#'(one for each problem).
+#'- Candidate scaling parameters (exponents):
+#'Slot \code{weight} contains a data frame
+#'with \eqn{n} combinations of exponents
+#'for the external (source) and internal (target) weights
+#'- Stage 2 regressions (after sharing information):
+#'Slot \code{glm.two} contains \eqn{q} lists (one for each problem)
+#'of \eqn{n} objects of type \code{cv.glmnet}
+#'(one for each combination of exponents).
+#'- Optimal regularisation parameters: 
+#'Slot \code{lambda.min} contains the cross-validated regularisation parameters
+#'for the stage 2 regressions.
+#'- Optimal scaling parameters:
+#'Slots \code{weight.ind}/\code{weight.min}
+#'indicate/contain the cross-validated scaling parameters.
 #'
 #'@examples
 #'# multi-task learning
@@ -476,12 +496,11 @@ mean_function <- function(eta,family){
 
 
 #'@title Calculate deviance
+#'@export
+#'@keywords internal
 #'
 #'@description
 #'Calculates Gaussian deviance (mean-squared error) and binomial deviance.
-#'
-#'@export
-#'@keywords internal
 #'
 #'@param y response
 #'@param y_hat predictor
