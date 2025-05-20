@@ -105,25 +105,24 @@ Should exponents above 1 be used? Default: <code>FALSE</code></p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Returns an object of class <code>sparselink</code>, a list with multiple slots.
-- Stage 1 regressions (before sharing information):
+    <p>Returns an object of class <code>sparselink</code>, a list with multiple slots.</p><ul><li><p>Stage 1 regressions (before sharing information):
 Slot <code>glm.one</code> contains \(q\) objects of type <code>cv.glmnet</code>
-(one for each problem).
-- Candidate scaling parameters (exponents):
+(one for each problem).</p></li>
+<li><p>Candidate scaling parameters (exponents):
 Slot <code>weight</code> contains a data frame
 with \(n\) combinations of exponents
-for the external (source) and internal (target) weights
-- Stage 2 regressions (after sharing information):
+for the external (source) and internal (target) weights</p></li>
+<li><p>Stage 2 regressions (after sharing information):
 Slot <code>glm.two</code> contains \(q\) lists (one for each problem)
 of \(n\) objects of type <code>cv.glmnet</code>
-(one for each combination of exponents).
-- Optimal regularisation parameters:
+(one for each combination of exponents).</p></li>
+<li><p>Optimal regularisation parameters:
 Slot <code>lambda.min</code> contains the cross-validated regularisation parameters
-for the stage 2 regressions.
-- Optimal scaling parameters:
+for the stage 2 regressions.</p></li>
+<li><p>Optimal scaling parameters:
 Slots <code>weight.ind</code>/<code>weight.min</code>
-indicate/contain the cross-validated scaling parameters.</p>
-    </div>
+indicate/contain the cross-validated scaling parameters.</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
