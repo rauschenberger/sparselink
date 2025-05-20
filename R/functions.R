@@ -700,6 +700,67 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
 
 #----- other methods -----
 
+#'@title
+#'Available methods
+#'
+#'@description
+#'Wrapper functions of available methods for related problems.
+#'
+#'@param x feature matrix (multi-task learning)
+#'or list of \eqn{q} feature matrices (transfer learning)
+#'@param y response matrix (multi-task learning)
+#'or list of \eqn{q} response vectors (transfer learning)
+#'@param family character vector with 1 or \eqn{q} entries,
+#'possible values are \code{"gaussian"} and sometimes \code{"binomial"} or other
+#'@param alpha elastic net mixing parameter:
+#'number between 0 and 1
+#'@param nfolds number of cross-validation folds: positive integer
+#'@param alpha.init elastic net mixing parameter for initial models:
+#'number between 0 and 1
+#'@param lambda sequence of regularisation parameters
+#'@param object output from multi-task learning or transfer learning method
+#'@param newx feature matrix (MTL) or list of feature matrices (TL)
+#'of testing samples
+#'
+#'@examples
+#'# multi-task learning
+#'n_train <- 100
+#'n_test <- 10
+#'p <- 50
+#'q <- 3
+#'family <- "gaussian"
+#'x <- matrix(data=rnorm(n=n_train*p),nrow=n_train,ncol=p)
+#'newx <- matrix(data=rnorm(n=n_test*p),nrow=n_test,ncol=p)
+#'y <- matrix(data=rnorm(n_train*q),nrow=n_train,ncol=q)
+#'object <- glm.empty(x=x,y=y,family=family)
+#'object <- glm.separate(x=x,y=y,family=family)
+#'object <- glm.mgaussian(x=x,y=y,family=family)
+#'object <- glm.spls(x=x,y=y,family=family)
+#'coef(object)
+#'predict(object,newx=newx)
+#'
+#'# transfer learning
+#'n_train <- c(100,50)
+#'n_test <- c(10,10)
+#'p <- 50
+#'x <- lapply(X=n_train,function(n) matrix(data=stats::rnorm(n*p),nrow=n,ncol=p))
+#'newx <- lapply(X=n_test,function(n) matrix(data=stats::rnorm(n*p),nrow=n,ncol=p))
+#'y <- lapply(X=n_train,function(n) stats::rnorm(n))
+#'family <- "gaussian"
+#'object <- glm.empty(x=x,y=y,family=family)
+#'object <- glm.separate(x=x,y=y,family=family)
+#'object <- glm.common(x=x,y=y,family=family)
+#'object <- glm.glmtrans(x=x,y=y,family=family)
+#'object <- glm.xrnet(x=x,y=y,family=family)
+#'coef(object)
+#'predict(object,newx=newx)
+#'
+#'@name methods
+NULL
+
+#'@rdname methods
+#'@export
+#'@keywords internal
 glm.common <- function(x,y,family,alpha=1){
   family <- unique(family)
   if(length(family)>1){stop("requires unique family")}
@@ -711,7 +772,9 @@ glm.common <- function(x,y,family,alpha=1){
   return(object)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 predict.glm.common <- function(object,newx){
   fuse <- fuse.data(x=newx,y=NULL,foldid=NULL)
   temp <- stats::predict(object=object$cv.glmnet,newx=fuse$x,s=object$cv.glmnet$lambda.min,type="response")
@@ -719,7 +782,9 @@ predict.glm.common <- function(object,newx){
   return(y_hat)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 coef.glm.common <- function(object){
   coef <- stats::coef(object=object$cv.glmnet,s="lambda.min")
   alpha <- rep(x=coef[1],times=object$info$q)
@@ -728,10 +793,9 @@ coef.glm.common <- function(object){
   return(list)
 }
 
-#object <- glm.common(x=data$X_train,y=data$y_train,family=family)
-#y_hat <- predict(object,newx=data$X_test)
-#coef <- coef(object)
-
+#'@rdname methods
+#'@export
+#'@keywords internal
 glm.spls <- function(x,y,family="gaussian",alpha=1,nfolds=10){
   if(any(family!="gaussian")){stop("SPLS requires Gaussian family.")}
   if(alpha!=1){stop("SPLS requires alpha=1")}
@@ -742,25 +806,27 @@ glm.spls <- function(x,y,family="gaussian",alpha=1,nfolds=10){
   return(object)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 predict.glm.spls <- function(object,newx){
   temp <- spls::predict.spls(object=object,newx=newx,type="fit")
   y_hat <- apply(X=temp,MARGIN=2,FUN=function(x) x,simplify=FALSE)
   return(y_hat)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 coef.glm.spls <- function(object){
   coef <- spls::coef.spls(object=object)
   list <- list(alpha=NA,beta=coef)
   return(list)
 }
 
-#object <- glm.spls(x=X_train,y=y_train,family=family)
-#y_hat <- predict(object,newx=X_test)
-#coef <- coef(object)
-
-
+#'@rdname methods
+#'@export
+#'@keywords internal
 glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   family <- unique(family)
   if(length(family)!=1){stop("XRNET requires single family")}
@@ -789,7 +855,9 @@ glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   return(object)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 predict.glm.xrnet <- function(object,newx){
   y_hat <- list()
   for(i in seq_along(object)){
@@ -798,7 +866,9 @@ predict.glm.xrnet <- function(object,newx){
   return(y_hat)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 coef.glm.xrnet <- function(object){
   alpha <- beta <- numeric()
   for(i in seq_along(object)){
@@ -810,14 +880,17 @@ coef.glm.xrnet <- function(object){
   return(list)
 }
 
-#object <- glm.xrnet(x=data$X_train,y=data$y_train)
-#y_hat <- predict(object,newx=data$X_test)
-
+#'@rdname methods
+#'@export
+#'@keywords internal
 glm.empty <- function(x,y,family,alpha=1){
   object <- glm.separate(x=x,y=y,family=family,alpha=alpha,lambda=c(99e99,99e98))
   return(object)
 }
 
+#'@rdname methods
+#'@export
+#'@keywords internal
 glm.separate <- function(x,y,family,alpha=1,lambda=NULL){
   if(is.matrix(x) & is.matrix(y)){
     q <- ncol(y)
@@ -837,7 +910,9 @@ glm.separate <- function(x,y,family,alpha=1,lambda=NULL){
   return(object)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 predict.glm.separate <- function(object,newx){
   if(is.matrix(newx)){
     newx <- replicate(n=object$info$q,expr=newx,simplify=FALSE) 
@@ -850,7 +925,9 @@ predict.glm.separate <- function(object,newx){
   return(y_hat)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 coef.glm.separate <- function(object){
   p <- object$info$p
   q <- object$info$q
@@ -865,11 +942,10 @@ coef.glm.separate <- function(object){
   return(list)
 }
 
-#object <- glm.separate(x=X_train,y=y_train,family=family)
-#y_hat <- predict(object,newx=X_test)
-#coef <- coef(object)
-
-glm.mgaussian <- function(x,y,family,alpha){
+#'@rdname methods
+#'@export
+#'@keywords internal
+glm.mgaussian <- function(x,y,family="gaussian",alpha=1){
   object <- list()
   family <- unique(family)
   if(length(family)>1){stop("requires unique family")}
@@ -879,13 +955,17 @@ glm.mgaussian <- function(x,y,family,alpha){
   return(object)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 predict.glm.mgaussian <- function(object,newx){
   y_hat <- stats::predict(object$cv.glmnet,newx=newx,s="lambda.min")
   apply(y_hat,2,function(x) x,simplify=FALSE)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 coef.glm.mgaussian <- function(object){
   coef <- stats::coef(object$cv.glmnet,s="lambda.min")
   alpha <- sapply(coef,function(x) x[1])
@@ -894,7 +974,10 @@ coef.glm.mgaussian <- function(object){
   return(list)
 }
 
-glm.glmtrans <- function(x,y,family,alpha=1){
+#'@rdname methods
+#'@export
+#'@keywords internal
+glm.glmtrans <- function(x,y,family="gaussian",alpha=1){
   family <- unique(family)
   if(length(family)>1){stop("glmtrans requires unique family")}
   q <- length(x)
@@ -910,7 +993,9 @@ glm.glmtrans <- function(x,y,family,alpha=1){
   return(object)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 predict.glm.glmtrans <- function(object,newx){
   q <- length(newx)
   y_hat <- list()
@@ -920,7 +1005,9 @@ predict.glm.glmtrans <- function(object,newx){
   return(y_hat)
 }
 
+#'@rdname methods
 #'@export
+#'@keywords internal
 coef.glm.glmtrans <- function(object){
   coef <- sapply(object,function(x) x$beta)
   alpha <- coef[1,]
@@ -929,12 +1016,7 @@ coef.glm.glmtrans <- function(object){
   return(list)
 }
 
-#object <- glm.glmtrans(x=X_train,y=y_train,family=family)
-#y_hat <- predict(object,newx=X_train)
-#coef(object)
-
 #----- simulation and application -----
-
 
 #'@title Data simulation for transfer learning
 #'
