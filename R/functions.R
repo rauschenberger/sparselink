@@ -76,12 +76,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
   alpha.one <- alpha.init
   alpha.two <- alpha
   
-  #warning("remove seed")
-  #set.seed(1)
   cat(paste0("alpha.init=",alpha.init,", alpha=",alpha,", trial=",trial,", type=",type,"\n"))
-  
-  #trial <- TRUE # was FALSE
-  #mode <- ""
   
   if(is.matrix(y) & is.matrix(x)){
     message("mode: multi-target learning")
@@ -91,8 +86,6 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
     foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
     y <- apply(y,2,function(x) x,simplify=FALSE)
     x <- replicate(n=q,expr=x,simplify=FALSE)
-    # Write function for creating fold identifiers (balancing unique rows of binary columns of target matrix).
-    #foldid <- sample(rep(x=seq_len(nfolds),length.out=n[1]))
     foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
     mode <- "multiple"
   } else if(is.list(y) & is.list(x)){
@@ -122,9 +115,6 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
     x_sta[[i]][is.na(x_sta[[i]])] <- 0
   }
   
-  #warning("remove temporary line!")
-  #mode <- "multiple"
-  
   # overall fit
   glm.one.ext <- glm.two.ext <- list()
   beta.ext <- matrix(data=NA,nrow=p,ncol=q)
@@ -137,12 +127,6 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
       beta.ext[,i] <- stats::coef(object=glm.one.ext[[i]],s="lambda.min")[-1]
     }
   }
-  
-  #weight <- c(seq(from=0,to=0.1,by=0.025),0.15,seq(from=0.2,to=0.8,by=0.1),0.85,seq(from=0.9,to=1.0,by=0.025))
-  #warning("remove next line")
-  #weight[weight==0] <- 0.01
-  #weight[weight==1] <- 0.99
-  #weight <- seq(from=0,to=0.5,by=0.1)
   
   if(type %in% c("geo","exp","rem","ari")){
     if(trial){
@@ -162,19 +146,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
     rest.ext <- comb_split(coef=beta.ext,id=i)
     glm.two.ext[[i]] <- list()
     for(l in seq_len(nrow(weight))){
-      
-      # if(trial){
-      #   pf <- 1/(rest.ext$weight.source^weight$source[l]*rest.ext$weight.target^weight$target[l]) # trial!
-      #   #pf <- 1/(rest.ext$weight.source^weight$source[l]+rest.ext$weight.target^weight$target[l]) #- 1*(weight$source[l]==0) - 1*(weight$target[l]==0)) # original #-(weight[l]==0|weight[l]==1)
-      #   #pf <- 1/(rest.ext$weight.source^weight[l]+rest.ext$weight.target^(1-weight[l])) # -(weight[l]==0|weight[l]==1)
-      # } else {
-      #   pf <- 1/(weight$source[l]*rest.ext$weight.source + weight$target[l]*rest.ext$weight.target)
-      # }
-      # if(any(pf<0)){stop("negative pf")}
-      
       pf <- construct_pf(w_int=rest.ext$weight.target,w_ext=rest.ext$weight.source,v_int=weight$target[l],v_ext=weight$source[l],type=type)
-      
-      
       if(all(pf==Inf)){
         glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family[i],lambda=99e99,alpha=alpha.two)
       } else {
@@ -194,7 +166,6 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
   }
   
   for(k in seq_len(nfolds)){
-    
     if(mode=="multiple"){
       beta.int <- matrix(data=NA,nrow=p,ncol=q) 
       for(i in seq_len(q)){
@@ -208,9 +179,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
         }
       }
     }
-    
     for(i in seq_len(q)){
-      
       if(mode=="transfer"){
         beta.int <- beta.ext
         cond <- foldid[[i]]==k
@@ -221,24 +190,10 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
           glm.one.int <- glmnet::glmnet(x=x_sta[[i]][!cond,],y=y_sta[[i]][!cond],family=family[i],alpha=alpha.one,standardize=FALSE)
           beta.int[,i] <- stats::coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)[-1]
         }
-        
       }
-      
       rest.int <- comb_split(coef=beta.int,id=i)
-      
       for(l in seq_len(nrow(weight))){
-        
-        # if(trial){
-        #   pf <- 1/(rest.int$weight.source^weight$source[l]*rest.int$weight.target^weight$target[l]) # trial!
-        #   #pf <- 1/(rest.int$weight.source^weight$source[l]+rest.int$weight.target^weight$target[l]) #- 1*(weight$source[l]==0) - 1*(weight$target[l]==0)) # original
-        #   #pf <- 1/(rest.int$weight.source^weight[l]+rest.int$weight.target^(1-weight[l])) # -(weight[l]==0|weight[l]==1)
-        # } else {
-        #   pf <- 1/(weight$source[l]*rest.int$weight.source + weight$target[l]*rest.int$weight.target)
-        # }
-        # if(any(pf<0)){stop("negative pf")}
-        
         pf <- construct_pf(w_int=rest.int$weight.target,w_ext=rest.int$weight.source,v_int=weight$target[l],v_ext=weight$source[l],type=type)
-        
         if(all(pf==Inf)){
           glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family[i],lambda=99e99,alpha=alpha.two)
         } else {
@@ -248,23 +203,6 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
       }
     }
   }
-  
-  # # original (until 2024-11-27)
-  # metric <- list()
-  # id.min <- lambda.min <- rep(x=NA,times=q)
-  # for(i in seq_len(q)){
-  #   metric[[i]] <- list()
-  #   for(l in seq_len(nrow(weight))){
-  #     metric[[i]][[l]] <- apply(X=y_hat[[i]][[l]],MARGIN=2,FUN=function(x)
-  #       calc.metric(y=y[[i]],y_hat=x,family=family[i]))
-  #   }
-  #   min <- sapply(X=metric[[i]],FUN=min)
-  #   tryCatch(expr=plotWeight(x=weight,y=log(min)),error=function(x) NULL)
-  #   id.exp <- which.min(min)
-  #   id.min[i] <- which.min(metric[[i]][[id.exp]])
-  #   lambda.min[i] <- glm.two.ext[[i]][[id.exp]]$lambda[id.min[i]]
-  #   glm.two.ext[[i]] <- glm.two.ext[[i]][[id.exp]]
-  # }
   
   metric <- list()
   cvm.min <- lambda.ind <- lambda.min <- matrix(data=NA,nrow=nrow(weight),ncol=q)
@@ -848,7 +786,6 @@ glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
                                   loss="deviance")
   }
   class(object) <- "glm.xrnet"
-  # CONTINUE HERE: FINISH AND TEST FUNCTION
   return(object)
 }
 
@@ -995,8 +932,6 @@ coef.glm.glmtrans <- function(object){
 #object <- glm.glmtrans(x=X_train,y=y_train,family=family)
 #y_hat <- predict(object,newx=X_train)
 #coef(object)
-
-#cor(y_train[[3]],y_hat[[3]])
 
 #----- simulation and application -----
 
@@ -1199,20 +1134,10 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
 
 # This cross-validation function only works for transfer learning (not for multi-task learning).
 cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type,trial=FALSE){
-  #if(is.matrix(y) & is.matrix(X)){
-  #  mode <- "multiple"
-  #  foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
-  #  n <- nrow(y)
-  #  q <- ncol(y)
-  #  y <- apply(y,2,function(x) x,simplify=FALSE)
-  #  X <- replicate(n=q,expr=X,simplify=FALSE)
-  #  foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
-  #} else {
-    mode <- "transfer"
-    foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
-    n <- length(y[[1]])
-    q <- length(y)
-  #} 
+  mode <- "transfer"
+  foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+  n <- length(y[[1]])
+  q <- length(y)
   
   y_hat <- list()
   for(j in seq_len(q)){
@@ -1291,10 +1216,8 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
   return(list)
 }
 
-
-
 #test <- traintest(y_train,X_train,y_test,X_test,family)
-#test <- crossval(y=y_train,X=X_train,family=family)
+#test <- cv.transfer(y=y_train,X=X_train,family=family)
 
 #truth <- sample(x=c(-1,0,1),size=20,replace=TRUE)
 #estim <- sample(x=c(-1,0,1),size=20,replace=TRUE)
