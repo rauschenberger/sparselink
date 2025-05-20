@@ -9,7 +9,7 @@ mean_function(eta, family)
 \arguments{
 \item{eta}{numeric vector}
 
-\item{family}{character "gaussian" or "binomial"}
+\item{family}{character \code{"gaussian"} or \code{"binomial"}}
 }
 \description{
 Applies the mean function (inverse link function).

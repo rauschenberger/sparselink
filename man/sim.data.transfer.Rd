@@ -22,7 +22,7 @@ sim.data.transfer(
 
 \item{q}{number of datasets: integer}
 
-\item{n0}{number of training samples: integer vector of length q}
+\item{n0}{number of training samples: integer vector of length \eqn{q}}
 
 \item{n1}{number of testing samples for all datasets: integer}
 
@@ -30,14 +30,14 @@ sim.data.transfer(
 
 \item{rho}{correlation (for decreasing structure)}
 
-\item{family}{character "gaussian" or "binomial"}
+\item{family}{character \code{"gaussian"} or \code{"binomial"}}
 }
 \value{
-Returns a list with slots y_train and X_train for training data,
-y_test and X_test for testing data,
+Returns a list with slots \code{y_train} and \code{X_train} for training data,
+\code{y_test} and \code{X_test} for testing data,
 and beta for effects.
-The training data contains vectors of different lengths (y_train)
-and matrices with different number of rows (X_train).
+The training data contains vectors of different lengths (\code{y_train})
+and matrices with different number of rows (\code{X_train}).
 }
 \description{
 Simulates data for transfer learning.

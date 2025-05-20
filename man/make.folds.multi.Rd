@@ -7,11 +7,11 @@
 make.folds.multi(y, family, nfolds = 10)
 }
 \arguments{
-\item{y}{matrix with n rows (samples) and q columns (outcomes)}
+\item{y}{matrix with \eqn{n} rows (samples) and \eqn{q} columns (outcomes)}
 
-\item{family}{character "gaussian" or "binomial"}
+\item{family}{character \code{"gaussian"} or \code{"binomial"}}
 
-\item{nfolds}{integer between 2 and n}
+\item{nfolds}{integer between 2 and \eqn{n}}
 }
 \description{
 Folds for multi-task learning

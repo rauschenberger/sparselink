@@ -11,7 +11,7 @@ calc.metric(y, y_hat, family)
 
 \item{y_hat}{predictor}
 
-\item{family}{character "gaussian" or "binomial"}
+\item{family}{character \code{"gaussian"} or \code{"binomial"}}
 }
 \description{
 Calculates Gaussian deviance (mean-squared error) and binomial deviance.

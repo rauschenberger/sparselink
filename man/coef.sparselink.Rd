@@ -7,14 +7,14 @@
 \method{coef}{sparselink}(object)
 }
 \arguments{
-\item{object}{object of class `sparselink`}
+\item{object}{object of class \code{sparselink}}
 }
 \value{
 Returns estimated coefficients.
 The output is a list with two slots:
-slot `alpha` with the estimated intercept
+slot \code{alpha} with the estimated intercept
 (vector or length \eqn{q}),
-and slot `beta` with the estimated slopes
+and slot \code{beta} with the estimated slopes
 (matrix with \eqn{p} rows and \eqn{q} columns).
 }
 \description{

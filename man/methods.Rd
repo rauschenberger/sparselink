@@ -2,45 +2,27 @@
 % Please edit documentation in R/functions.R
 \name{methods}
 \alias{methods}
-\alias{glm.common}
-\alias{predict.glm.common}
-\alias{coef.glm.common}
-\alias{glm.spls}
-\alias{predict.glm.spls}
-\alias{coef.glm.spls}
-\alias{glm.xrnet}
-\alias{predict.glm.xrnet}
-\alias{coef.glm.xrnet}
 \alias{glm.empty}
 \alias{glm.separate}
 \alias{predict.glm.separate}
 \alias{coef.glm.separate}
+\alias{glm.common}
+\alias{predict.glm.common}
+\alias{coef.glm.common}
 \alias{glm.mgaussian}
 \alias{predict.glm.mgaussian}
 \alias{coef.glm.mgaussian}
+\alias{glm.spls}
+\alias{predict.glm.spls}
+\alias{coef.glm.spls}
 \alias{glm.glmtrans}
 \alias{predict.glm.glmtrans}
 \alias{coef.glm.glmtrans}
+\alias{glm.xrnet}
+\alias{predict.glm.xrnet}
+\alias{coef.glm.xrnet}
 \title{Available methods}
 \usage{
-glm.common(x, y, family, alpha = 1)
-
-\method{predict}{glm.common}(object, newx)
-
-\method{coef}{glm.common}(object)
-
-glm.spls(x, y, family = "gaussian", alpha = 1, nfolds = 10)
-
-\method{predict}{glm.spls}(object, newx)
-
-\method{coef}{glm.spls}(object)
-
-glm.xrnet(x, y, alpha.init = 0.95, alpha = 1, nfolds = 10, family = "gaussian")
-
-\method{predict}{glm.xrnet}(object, newx)
-
-\method{coef}{glm.xrnet}(object)
-
 glm.empty(x, y, family, alpha = 1)
 
 glm.separate(x, y, family, alpha = 1, lambda = NULL)
@@ -49,17 +31,35 @@ glm.separate(x, y, family, alpha = 1, lambda = NULL)
 
 \method{coef}{glm.separate}(object)
 
+glm.common(x, y, family, alpha = 1)
+
+\method{predict}{glm.common}(object, newx)
+
+\method{coef}{glm.common}(object)
+
 glm.mgaussian(x, y, family = "gaussian", alpha = 1)
 
 \method{predict}{glm.mgaussian}(object, newx)
 
 \method{coef}{glm.mgaussian}(object)
 
+glm.spls(x, y, family = "gaussian", alpha = 1, nfolds = 10)
+
+\method{predict}{glm.spls}(object, newx)
+
+\method{coef}{glm.spls}(object)
+
 glm.glmtrans(x, y, family = "gaussian", alpha = 1)
 
 \method{predict}{glm.glmtrans}(object, newx)
 
 \method{coef}{glm.glmtrans}(object)
+
+glm.xrnet(x, y, alpha.init = 0.95, alpha = 1, nfolds = 10, family = "gaussian")
+
+\method{predict}{glm.xrnet}(object, newx)
+
+\method{coef}{glm.xrnet}(object)
 }
 \arguments{
 \item{x}{feature matrix (multi-task learning)
@@ -74,6 +74,8 @@ possible values are \code{"gaussian"} and sometimes \code{"binomial"} or other}
 \item{alpha}{elastic net mixing parameter:
 number between 0 and 1}
 
+\item{lambda}{sequence of regularisation parameters}
+
 \item{object}{output from multi-task learning or transfer learning method}
 
 \item{newx}{feature matrix (MTL) or list of feature matrices (TL)
@@ -83,12 +85,27 @@ of testing samples}
 
 \item{alpha.init}{elastic net mixing parameter for initial models:
 number between 0 and 1}
-
-\item{lambda}{sequence of regularisation parameters}
 }
 \description{
 Wrapper functions of available methods for related problems.
 }
+\section{Functions}{
+\itemize{
+\item \code{glm.empty()}: intercept-only model (MTL and TL)
+
+\item \code{glm.separate()}: separate model for each problem (MTL and TL)
+
+\item \code{glm.common()}: common model for all problems (TL)
+
+\item \code{glm.mgaussian()}: multivariate Gaussian regression (MTL)
+
+\item \code{glm.spls()}: sparse partial least squares (MTL)
+
+\item \code{glm.glmtrans()}: transfer generalised linear model (TL)
+
+\item \code{glm.xrnet()}: hierarchical regression (TL)
+
+}}
 \examples{
 # multi-task learning
 n_train <- 100
@@ -122,5 +139,9 @@ object <- glm.xrnet(x=x,y=y,family=family)
 coef(object)
 predict(object,newx=newx)
 
+}
+\references{
+See R packages spls, glmnet (with argument family="mgaussian"),
+glmtrans, and xrnet.
 }
 \keyword{internal}

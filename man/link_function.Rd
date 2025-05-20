@@ -9,7 +9,7 @@ link_function(mu, family)
 \arguments{
 \item{mu}{numeric vector (with values in unit interval if family="binomial")}
 
-\item{family}{character "gaussian" or "binomial"}
+\item{family}{character \code{"gaussian"} or \code{"binomial"}}
 }
 \description{
 Applies the link function.

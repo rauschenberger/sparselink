@@ -7,7 +7,7 @@
 \method{predict}{sparselink}(object, newx, weight = NULL, ...)
 }
 \arguments{
-\item{object}{object of class `sparselink`}
+\item{object}{object of class \code{sparselink}}
 
 \item{newx}{features:
 matrix with \eqn{n} rows (samples) and \eqn{p} columns (variables)

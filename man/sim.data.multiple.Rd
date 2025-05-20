@@ -22,7 +22,7 @@ sim.data.multiple(
 
 \item{q}{number of datasets: integer}
 
-\item{n0}{number of training samples: integer vector of length q}
+\item{n0}{number of training samples: integer vector of length \eqn{q}}
 
 \item{n1}{number of testing samples for all datasets: integer}
 
@@ -30,15 +30,15 @@ sim.data.multiple(
 
 \item{rho}{correlation (for decreasing structure)}
 
-\item{family}{character "gaussian" or "binomial"}
+\item{family}{character \code{"gaussian"} or \code{"binomial"}}
 }
 \value{
 Returns list with slots
-y_train (\eqn{n_0 \times q} matrix),
-X_train (\eqn{n_0 \times p} matrix),
-y_test (\eqn{n_1 \times q} matrix),
-X_test (\eqn{n_1 \times p} matrix),
-and beta (\eqn{p \times q} matrix).
+\code{y_train} (\eqn{n_0 \times q} matrix),
+\code{X_train}(\eqn{n_0 \times p} matrix),
+\code{y_test} (\eqn{n_1 \times q} matrix),
+\code{X_test} (\eqn{n_1 \times p} matrix),
+and \code{beta} (\eqn{p \times q} matrix).
 }
 \description{
 Simulates data for multi-task learning.

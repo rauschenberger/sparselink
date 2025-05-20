@@ -22,7 +22,7 @@ or list of \eqn{n_k \times p} matrices (transfer learning)}
 \item{y}{\eqn{n \times q} matrix (multi-task learning)
 or list of \eqn{n_k}-dimensional vectors (transfer learning)}
 
-\item{family}{character "gaussian" or "binomial"}
+\item{family}{character \code{"gaussian"} or \code{"binomial"}}
 
 \item{alpha.init}{elastic net mixing parameter for initial regressions,
 default: 0.95 (lasso-like elastic net)}

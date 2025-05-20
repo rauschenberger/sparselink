@@ -9,9 +9,9 @@ make.folds.trans(y, family, nfolds = 10)
 \arguments{
 \item{y}{list of \eqn{q} numeric vectors}
 
-\item{family}{character "gaussian" or "binomial"}
+\item{family}{character \code{"gaussian"} or \code{"binomial"}}
 
-\item{nfolds}{integer between 2 and n}
+\item{nfolds}{integer between 2 and \eqn{n}}
 }
 \description{
 Folds for transfer learning

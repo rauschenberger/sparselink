@@ -23,7 +23,7 @@ if(FALSE){
 #'or list of \eqn{n_k \times p} matrices (transfer learning)
 #'@param y \eqn{n \times q} matrix (multi-task learning)
 #'or list of \eqn{n_k}-dimensional vectors (transfer learning)
-#'@param family character "gaussian" or "binomial"
+#'@param family character \code{"gaussian"} or \code{"binomial"}
 #'@param alpha.init elastic net mixing parameter for initial regressions,
 #'default: 0.95 (lasso-like elastic net)
 #'@param alpha elastic net mixing parameter of final regressions,
@@ -237,7 +237,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
 #'@export
 #'
 #'@param object
-#'object of class `sparselink`
+#'object of class \code{sparselink}
 #'
 #'@param newx
 #'features:
@@ -304,9 +304,9 @@ predict.sparselink <- function(object,newx,weight=NULL,...){
 #'@returns
 #'Returns estimated coefficients.
 #'The output is a list with two slots:
-#'slot `alpha` with the estimated intercept
+#'slot \code{alpha} with the estimated intercept
 #'(vector or length \eqn{q}),
-#'and slot `beta` with the estimated slopes
+#'and slot \code{beta} with the estimated slopes
 #'(matrix with \eqn{p} rows and \eqn{q} columns).
 #'
 #'@inherit sparselink-package references
@@ -378,7 +378,7 @@ sigmoid <- function(x){
 #'Applies the link function.
 #'
 #'@param mu numeric vector (with values in unit interval if family="binomial")
-#'@param family character "gaussian" or "binomial"
+#'@param family character \code{"gaussian"} or \code{"binomial"}
 #'
 #'@examples
 #'family <- "binomial"
@@ -410,7 +410,7 @@ link_function <- function(mu,family){
 #'Applies the mean function (inverse link function).
 #'
 #'@param eta numeric vector
-#'@param family character "gaussian" or "binomial"
+#'@param family character \code{"gaussian"} or \code{"binomial"}
 #'
 #'@examples
 #'family <- "binomial"
@@ -432,7 +432,6 @@ mean_function <- function(eta,family){
   return(mu)
 }
 
-
 #'@title Calculate deviance
 #'@export
 #'@keywords internal
@@ -442,7 +441,7 @@ mean_function <- function(eta,family){
 #'
 #'@param y response
 #'@param y_hat predictor
-#'@param family character "gaussian" or "binomial"
+#'@param family character \code{"gaussian"} or \code{"binomial"}
 #'
 #'@examples
 #'n <- 100
@@ -478,9 +477,9 @@ calc.metric <- function(y,y_hat,family){
 #'@export
 #'@keywords internal
 #'
-#'@param y matrix with n rows (samples) and q columns (outcomes)
-#'@param family character "gaussian" or "binomial"
-#'@param nfolds integer between 2 and n
+#'@param y matrix with \eqn{n} rows (samples) and \eqn{q} columns (outcomes)
+#'@param family character \code{"gaussian"} or \code{"binomial"}
+#'@param nfolds integer between 2 and \eqn{n}
 #'
 #'@examples
 #'family <- "binomial"
@@ -755,10 +754,76 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
 #'coef(object)
 #'predict(object,newx=newx)
 #'
+#'@references
+#'See R packages spls, glmnet (with argument family="mgaussian"),
+#'glmtrans, and xrnet.
+#'
 #'@name methods
 NULL
 
+#'@describeIn methods intercept-only model (MTL and TL)
+#'@export
+#'@keywords internal
+glm.empty <- function(x,y,family,alpha=1){
+  object <- glm.separate(x=x,y=y,family=family,alpha=alpha,lambda=c(99e99,99e98))
+  return(object)
+}
+
+#'@describeIn methods separate model for each problem (MTL and TL)
+#'@export
+#'@keywords internal
+glm.separate <- function(x,y,family,alpha=1,lambda=NULL){
+  if(is.matrix(x) & is.matrix(y)){
+    q <- ncol(y)
+    x <- replicate(n=q,expr=x,simplify=FALSE)
+    y <- apply(y,2,function(x) x,simplify=FALSE)
+  }
+  if(length(family)==1){
+    family <- rep(x=family,times=length(y))
+  }
+  object <- list()
+  object$info <- get.info(x=x,y=y)
+  object$cv.glmnet <- list()
+  for(i in seq_len(object$info$q)){
+    object$cv.glmnet[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family[i],alpha=alpha,lambda=lambda)
+  }
+  class(object) <- "glm.separate"
+  return(object)
+}
+
 #'@rdname methods
+#'@export
+#'@keywords internal
+predict.glm.separate <- function(object,newx){
+  if(is.matrix(newx)){
+    newx <- replicate(n=object$info$q,expr=newx,simplify=FALSE) 
+  }
+  q <- length(newx)
+  y_hat <- list()
+  for(i in seq_len(q)){
+    y_hat[[i]] <- stats::predict(object$cv.glmnet[[i]],newx=newx[[i]],s="lambda.min",type="response")
+  }
+  return(y_hat)
+}
+
+#'@rdname methods
+#'@export
+#'@keywords internal
+coef.glm.separate <- function(object){
+  p <- object$info$p
+  q <- object$info$q
+  alpha <- rep(x=NA,times=q)
+  beta <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    coef <- stats::coef(object$cv.glmnet[[i]],s="lambda.min")
+    alpha[i] <- coef[1]
+    beta[,i] <- coef[-1]
+  }
+  list <- list(alpha=alpha,beta=beta)
+  return(list)
+}
+
+#'@describeIn methods common model for all problems (TL)
 #'@export
 #'@keywords internal
 glm.common <- function(x,y,family,alpha=1){
@@ -793,7 +858,39 @@ coef.glm.common <- function(object){
   return(list)
 }
 
+#'@describeIn methods multivariate Gaussian regression (MTL)
+#'@export
+#'@keywords internal
+glm.mgaussian <- function(x,y,family="gaussian",alpha=1){
+  object <- list()
+  family <- unique(family)
+  if(length(family)>1){stop("requires unique family")}
+  if(family!="gaussian"){stop("requires gaussian")}
+  object$cv.glmnet <- glmnet::cv.glmnet(x=x,y=y,family="mgaussian",alpha=alpha)
+  class(object) <- "glm.mgaussian"
+  return(object)
+}
+
 #'@rdname methods
+#'@export
+#'@keywords internal
+predict.glm.mgaussian <- function(object,newx){
+  y_hat <- stats::predict(object$cv.glmnet,newx=newx,s="lambda.min")
+  apply(y_hat,2,function(x) x,simplify=FALSE)
+}
+
+#'@rdname methods
+#'@export
+#'@keywords internal
+coef.glm.mgaussian <- function(object){
+  coef <- stats::coef(object$cv.glmnet,s="lambda.min")
+  alpha <- sapply(coef,function(x) x[1])
+  beta <- sapply(coef,function(x) x[-1])
+  list <- list(alpha=alpha,beta=beta)
+  return(list)
+}
+
+#'@describeIn methods sparse partial least squares (MTL)
 #'@export
 #'@keywords internal
 glm.spls <- function(x,y,family="gaussian",alpha=1,nfolds=10){
@@ -824,7 +921,49 @@ coef.glm.spls <- function(object){
   return(list)
 }
 
+#'@describeIn methods transfer generalised linear model (TL)
+#'@export
+#'@keywords internal
+glm.glmtrans <- function(x,y,family="gaussian",alpha=1){
+  family <- unique(family)
+  if(length(family)>1){stop("glmtrans requires unique family")}
+  q <- length(x)
+  source <- list()
+  for(i in seq_len(q)){
+    source[[i]] <- list(y=y[[i]],x=x[[i]])
+  }
+  object <- list()
+  for(i in seq_len(q)){
+    invisible(utils::capture.output(object[[i]] <- glmtrans::glmtrans(target=list(y=y[[i]],x=x[[i]]),source=source[-i],family=family,alpha=alpha)))
+  }
+  class(object) <- "glm.glmtrans"
+  return(object)
+}
+
 #'@rdname methods
+#'@export
+#'@keywords internal
+predict.glm.glmtrans <- function(object,newx){
+  q <- length(newx)
+  y_hat <- list()
+  for(i in seq_len(q)){
+    y_hat[[i]] <- stats::predict(object=object[[i]],newx=newx[[i]],type="response",s="lambda.min")
+  }
+  return(y_hat)
+}
+
+#'@rdname methods
+#'@export
+#'@keywords internal
+coef.glm.glmtrans <- function(object){
+  coef <- sapply(object,function(x) x$beta)
+  alpha <- coef[1,]
+  beta <- coef[-1,]
+  list <- list(alpha=alpha,beta=beta)
+  return(list)
+}
+
+#'@describeIn methods hierarchical regression (TL) 
 #'@export
 #'@keywords internal
 glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
@@ -880,142 +1019,6 @@ coef.glm.xrnet <- function(object){
   return(list)
 }
 
-#'@rdname methods
-#'@export
-#'@keywords internal
-glm.empty <- function(x,y,family,alpha=1){
-  object <- glm.separate(x=x,y=y,family=family,alpha=alpha,lambda=c(99e99,99e98))
-  return(object)
-}
-
-#'@rdname methods
-#'@export
-#'@keywords internal
-glm.separate <- function(x,y,family,alpha=1,lambda=NULL){
-  if(is.matrix(x) & is.matrix(y)){
-    q <- ncol(y)
-    x <- replicate(n=q,expr=x,simplify=FALSE)
-    y <- apply(y,2,function(x) x,simplify=FALSE)
-  }
-  if(length(family)==1){
-    family <- rep(x=family,times=length(y))
-  }
-  object <- list()
-  object$info <- get.info(x=x,y=y)
-  object$cv.glmnet <- list()
-  for(i in seq_len(object$info$q)){
-    object$cv.glmnet[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family[i],alpha=alpha,lambda=lambda)
-  }
-  class(object) <- "glm.separate"
-  return(object)
-}
-
-#'@rdname methods
-#'@export
-#'@keywords internal
-predict.glm.separate <- function(object,newx){
-  if(is.matrix(newx)){
-    newx <- replicate(n=object$info$q,expr=newx,simplify=FALSE) 
-  }
-  q <- length(newx)
-  y_hat <- list()
-  for(i in seq_len(q)){
-    y_hat[[i]] <- stats::predict(object$cv.glmnet[[i]],newx=newx[[i]],s="lambda.min",type="response")
-  }
-  return(y_hat)
-}
-
-#'@rdname methods
-#'@export
-#'@keywords internal
-coef.glm.separate <- function(object){
-  p <- object$info$p
-  q <- object$info$q
-  alpha <- rep(x=NA,times=q)
-  beta <- matrix(data=NA,nrow=p,ncol=q)
-  for(i in seq_len(q)){
-    coef <- stats::coef(object$cv.glmnet[[i]],s="lambda.min")
-    alpha[i] <- coef[1]
-    beta[,i] <- coef[-1]
-  }
-  list <- list(alpha=alpha,beta=beta)
-  return(list)
-}
-
-#'@rdname methods
-#'@export
-#'@keywords internal
-glm.mgaussian <- function(x,y,family="gaussian",alpha=1){
-  object <- list()
-  family <- unique(family)
-  if(length(family)>1){stop("requires unique family")}
-  if(family!="gaussian"){stop("requires gaussian")}
-  object$cv.glmnet <- glmnet::cv.glmnet(x=x,y=y,family="mgaussian",alpha=alpha)
-  class(object) <- "glm.mgaussian"
-  return(object)
-}
-
-#'@rdname methods
-#'@export
-#'@keywords internal
-predict.glm.mgaussian <- function(object,newx){
-  y_hat <- stats::predict(object$cv.glmnet,newx=newx,s="lambda.min")
-  apply(y_hat,2,function(x) x,simplify=FALSE)
-}
-
-#'@rdname methods
-#'@export
-#'@keywords internal
-coef.glm.mgaussian <- function(object){
-  coef <- stats::coef(object$cv.glmnet,s="lambda.min")
-  alpha <- sapply(coef,function(x) x[1])
-  beta <- sapply(coef,function(x) x[-1])
-  list <- list(alpha=alpha,beta=beta)
-  return(list)
-}
-
-#'@rdname methods
-#'@export
-#'@keywords internal
-glm.glmtrans <- function(x,y,family="gaussian",alpha=1){
-  family <- unique(family)
-  if(length(family)>1){stop("glmtrans requires unique family")}
-  q <- length(x)
-  source <- list()
-  for(i in seq_len(q)){
-    source[[i]] <- list(y=y[[i]],x=x[[i]])
-  }
-  object <- list()
-  for(i in seq_len(q)){
-    invisible(utils::capture.output(object[[i]] <- glmtrans::glmtrans(target=list(y=y[[i]],x=x[[i]]),source=source[-i],family=family,alpha=alpha)))
-  }
-  class(object) <- "glm.glmtrans"
-  return(object)
-}
-
-#'@rdname methods
-#'@export
-#'@keywords internal
-predict.glm.glmtrans <- function(object,newx){
-  q <- length(newx)
-  y_hat <- list()
-  for(i in seq_len(q)){
-    y_hat[[i]] <- stats::predict(object=object[[i]],newx=newx[[i]],type="response",s="lambda.min")
-  }
-  return(y_hat)
-}
-
-#'@rdname methods
-#'@export
-#'@keywords internal
-coef.glm.glmtrans <- function(object){
-  coef <- sapply(object,function(x) x$beta)
-  alpha <- coef[1,]
-  beta <- coef[-1,]
-  list <- list(alpha=alpha,beta=beta)
-  return(list)
-}
-
 #----- simulation and application -----
 
 #'@title Data simulation for transfer learning
@@ -1029,18 +1032,18 @@ coef.glm.glmtrans <- function(object){
 #'@param prob.common probability of common effect
 #'@param prob.separate probability of separate effect
 #'@param q number of datasets: integer
-#'@param n0 number of training samples: integer vector of length q
+#'@param n0 number of training samples: integer vector of length \eqn{q}
 #'@param n1 number of testing samples for all datasets: integer
 #'@param p number of features: integer
-#'@param family character "gaussian" or "binomial"
+#'@param family character \code{"gaussian"} or \code{"binomial"}
 #'@param rho correlation (for decreasing structure)
 #'
 #'@returns
-#'Returns a list with slots y_train and X_train for training data,
-#'y_test and X_test for testing data,
+#'Returns a list with slots \code{y_train} and \code{X_train} for training data,
+#'\code{y_test} and \code{X_test} for testing data,
 #'and beta for effects.
-#'The training data contains vectors of different lengths (y_train)
-#'and matrices with different number of rows (X_train).
+#'The training data contains vectors of different lengths (\code{y_train})
+#'and matrices with different number of rows (\code{X_train}).
 #'
 #'@examples
 #'data <- sim.data.transfer()
@@ -1102,11 +1105,11 @@ sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,10
 #'
 #'@returns
 #'Returns list with slots
-#'y_train (\eqn{n_0 \times q} matrix),
-#'X_train (\eqn{n_0 \times p} matrix),
-#'y_test (\eqn{n_1 \times q} matrix),
-#'X_test (\eqn{n_1 \times p} matrix),
-#'and beta (\eqn{p \times q} matrix).
+#'\code{y_train} (\eqn{n_0 \times q} matrix),
+#'\code{X_train}(\eqn{n_0 \times p} matrix),
+#'\code{y_test} (\eqn{n_1 \times q} matrix),
+#'\code{X_test} (\eqn{n_1 \times p} matrix),
+#'and \code{beta} (\eqn{p \times q} matrix).
 #'
 #'@examples
 #'data <- sim.data.multiple()
@@ -1151,7 +1154,7 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #'@param X_train features of training samples: \eqn{n \times p} matrix
 #'@param y_test target of testing samples: vector of length \eqn{m}
 #'@param X_test features of testing samples \eqn{m \times p} matrix
-#'@param family character "gaussian" or "binomial"
+#'@param family character \code{"gaussian"} or \code{"binomial"}
 #'@param alpha.init elastic net mixing parameter for initial regressions
 #'@param alpha elastic net mixing parameter
 #'@param method character vector
@@ -1213,9 +1216,8 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
   return(list)
 }
 
-
 # This cross-validation function only works for transfer learning (not for multi-task learning).
-cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type,trial=FALSE){
+cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink"),alpha.init,type,trial=FALSE){
   mode <- "transfer"
   foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
   n <- length(y[[1]])
@@ -1255,8 +1257,6 @@ cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
   list <- list(deviance=deviance,auc=auc,refit=refit)
   return(list)
 }
-
-
 
 # This cross-validation function only works for multi-task learning (not for transfer learning).
 cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink"),alpha.init,type,trial=FALSE){
@@ -1301,29 +1301,23 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
 #test <- traintest(y_train,X_train,y_test,X_test,family)
 #test <- cv.transfer(y=y_train,X=X_train,family=family)
 
-#truth <- sample(x=c(-1,0,1),size=20,replace=TRUE)
-#estim <- sample(x=c(-1,0,1),size=20,replace=TRUE)
-#table(truth,estim)
-
 #'@title Metrics for sign detection
 #'
-#'@param truth n times p matrix with entries in -1, 0, 1
-#'@param estim n times p matrix with entries in -1, 0, 1
+#'@description
+#'Calculates sensitivity, specificity and precision for ternary data
+#'(with -1 for negative effect, 0 for no effect, 1 for positive effect).
 #'
-count_matrix <- function(truth,estim){
-  if(!is.matrix(truth)){stop()}
-  if(any(dim(truth)!=dim(estim))){stop()}
-  rate <- numeric()
-  for(i in 1:ncol(truth)){
-    rate <- cbind(rate,count_vector(truth=truth[,i],estim=estim[,i]))
-  }
-  return(rate)
-}
-
-#'@title Metrics for sign detection
+#'@export
+#'@keywords internal
 #'
-#'@param truth vector of length p with entries in -1, 0, 1
-#'@param estim vector of length p with entries -1, 0, 1
+#'@param truth (i) vector of length p or (ii) n times p matrix with entries in -1, 0, 1
+#'@param estim (i) vector of length p or (ii) n times p matrix with entries -1, 0, 1
+#'
+#'@examples
+#'truth <- sample(x=c(-1,0,1),size=20,replace=TRUE)
+#'estim <- sample(x=c(-1,0,1),size=20,replace=TRUE)
+#'table(truth,estim)
+#'count_vector(truth,estim)
 #'
 count_vector <- function(truth,estim){
   if(!is.vector(truth)){stop()}
@@ -1342,6 +1336,20 @@ count_vector <- function(truth,estim){
   #return(c(TN=TN,TP=TP,FN=FN,FP=FP)/length(truth))
   precision <- (sum(truth==1 & estim==1)+sum(truth==-1 & estim==-1))/(sum(estim==1 | estim==-1))
   return(c(sensitivity=sensitivity,specificity=specificity,precision=precision))
+}
+
+#'@rdname count_vector
+#'@export
+#'@keywords internal
+#'
+count_matrix <- function(truth,estim){
+  if(!is.matrix(truth)){stop()}
+  if(any(dim(truth)!=dim(estim))){stop()}
+  rate <- numeric()
+  for(i in 1:ncol(truth)){
+    rate <- cbind(rate,count_vector(truth=truth[,i],estim=estim[,i]))
+  }
+  return(rate)
 }
 
 #----- graphics -----
@@ -1398,8 +1406,6 @@ change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase
   graphics::par(xpd=FALSE)
 }
 
-
-
 #'@title Visualise metric that depends on two parameters
 #'@export
 #'@keywords internal
@@ -1441,4 +1447,3 @@ plotWeight <- function(x,y){
     graphics::points(x=x$source[id],y=x$target[id],pch=1,col="red",lwd=2,cex=1)
   }
 }
-

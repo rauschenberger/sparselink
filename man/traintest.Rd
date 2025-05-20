@@ -26,7 +26,7 @@ traintest(
 
 \item{X_test}{features of testing samples \eqn{m \times p} matrix}
 
-\item{family}{character "gaussian" or "binomial"}
+\item{family}{character \code{"gaussian"} or \code{"binomial"}}
 
 \item{alpha}{elastic net mixing parameter}
 
