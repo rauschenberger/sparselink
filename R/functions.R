@@ -1064,11 +1064,13 @@ coef.glm.xrnet <- function(object){
 #'@param rho correlation (for decreasing structure)
 #'
 #'@return
-#'Returns a list with slots \code{y_train} and \code{X_train} for training data,
-#'\code{y_test} and \code{X_test} for testing data,
-#'and beta for effects.
-#'The training data contains vectors of different lengths (\code{y_train})
-#'and matrices with different number of rows (\code{X_train}).
+#'Returns a list with slots
+#'\code{y_train} (\eqn{q} vectors)
+#'and \code{X_train} (\eqn{q} matrices with \eqn{p} columns) for training data,
+#'and \code{y_test} (\eqn{vectors}) and \code{X_test}
+#'(\eqn{q} matrices with \eqn{p} columns)
+#'for testing data,
+#'and \code{beta} for effects (\eqn{p \times q} matrix).
 #'
 #'@examples
 #'data <- sim.data.transfer()
@@ -1129,7 +1131,7 @@ sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,10
 #'@inheritParams sim.data.transfer
 #'
 #'@return
-#'Returns list with slots
+#'Returns a list with slots
 #'\code{y_train} (\eqn{n_0 \times q} matrix),
 #'\code{X_train}(\eqn{n_0 \times p} matrix),
 #'\code{y_test} (\eqn{n_1 \times q} matrix),

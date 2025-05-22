@@ -33,7 +33,7 @@ sim.data.multiple(
 \item{family}{character \code{"gaussian"} or \code{"binomial"}}
 }
 \value{
-Returns list with slots
+Returns a list with slots
 \code{y_train} (\eqn{n_0 \times q} matrix),
 \code{X_train}(\eqn{n_0 \times p} matrix),
 \code{y_test} (\eqn{n_1 \times q} matrix),

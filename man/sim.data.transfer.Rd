@@ -33,11 +33,13 @@ sim.data.transfer(
 \item{family}{character \code{"gaussian"} or \code{"binomial"}}
 }
 \value{
-Returns a list with slots \code{y_train} and \code{X_train} for training data,
-\code{y_test} and \code{X_test} for testing data,
-and beta for effects.
-The training data contains vectors of different lengths (\code{y_train})
-and matrices with different number of rows (\code{X_train}).
+Returns a list with slots
+\code{y_train} (\eqn{q} vectors)
+and \code{X_train} (\eqn{q} matrices with \eqn{p} columns) for training data,
+and \code{y_test} (\eqn{vectors}) and \code{X_test}
+(\eqn{q} matrices with \eqn{p} columns)
+for testing data,
+and \code{beta} for effects (\eqn{p \times q} matrix).
 }
 \description{
 Simulates data for transfer learning.
