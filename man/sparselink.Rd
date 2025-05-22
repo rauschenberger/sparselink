@@ -39,24 +39,21 @@ Should exponents above 1 be used? Default: \code{FALSE}}
 }
 \value{
 Returns an object of class \code{sparselink}, a list with multiple slots.
-\itemize{
-\item Stage 1 regressions (before sharing information):
-Slot \code{glm.one} contains \eqn{q} objects of type \code{cv.glmnet}
-(one for each problem).
-\item Candidate scaling parameters (exponents):
-Slot \code{weight} contains a data frame
-with \eqn{n} combinations of exponents
-for the external (source) and internal (target) weights
-\item Stage 2 regressions (after sharing information):
-Slot \code{glm.two} contains \eqn{q} lists (one for each problem)
+\describe{
+\item{Stage 1 regressions (before sharing information)}{Slot \code{glm.one}
+contains \eqn{q} objects of type \code{cv.glmnet} (one for each problem).}
+\item{Candidate scaling parameters (exponents)}{Slot \code{weight} contains
+a data frame with \eqn{n} combinations of exponents
+for the external (source) and internal (target) weights}
+\item{Stage 2 regressions (after sharing information)}{Slot \code{glm.two}
+contains \eqn{q} lists (one for each problem)
 of \eqn{n} objects of type \code{cv.glmnet}
-(one for each combination of exponents).
-\item Optimal regularisation parameters: 
-Slot \code{lambda.min} contains the cross-validated regularisation parameters
-for the stage 2 regressions.
-\item Optimal scaling parameters:
-Slots \code{weight.ind}/\code{weight.min}
-indicate/contain the cross-validated scaling parameters.
+(one for each combination of exponents).}
+\item{Optimal regularisation parameters}{Slot \code{lambda.min}
+contains the cross-validated regularisation parameters for the stage 2
+regressions.}
+\item{Optimal scaling parameters}{Slots \code{weight.ind} and
+\code{weight.min} indicate or contain the cross-validated scaling parameters.}
 }
 }
 \description{
