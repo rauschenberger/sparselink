@@ -681,6 +681,9 @@ comb_split <- function(coef,id){
 #'as well as internal and external exponents/factors for these weights
 #'to construct penalty factors.
 #'
+#'@export
+#'@keywords internal
+#'
 #'@param w_int internal weights:
 #'numeric vector of length \eqn{p} with non-negative entries
 #'@param w_ext external weights:
@@ -689,8 +692,14 @@ comb_split <- function(coef,id){
 #'non-negative scalar
 #'@param v_ext exponent or factor for external weights:
 #'non-negative scalar
-#'@param type character "geo", "exp", "rem" or "ari"
-#'(with or without addition of ".con")
+#'@param type character \code{"geo"}, \code{"exp"}, \code{"rem"} or \code{"ari"}
+#'(with or without addition of \code{".con"})
+#'
+#'@examples
+#'n <- 10
+#'w_int <- stats::runif(n)
+#'w_ext <- stats::runif(n)
+#'construct_pf(w_int,w_ext,v_int=0.5,v_ext=0.5,type="exp")
 #'
 construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
   if(type %in% c("geo","geo.con")){
@@ -1177,6 +1186,9 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #'@param type character
 #'@param trial see sparselink
 #'
+#'@examples
+#'1+1
+#'
 traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type,trial=FALSE){
   if(is.list(y_train)){
     q <- length(y_train)
@@ -1244,9 +1256,21 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
 #'@inheritParams sparselink
 #'
 #'@examples
-#'1+1
-#' 
-cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink"),alpha.init,type,trial=FALSE){
+#'#--- multi-task learning ---
+#'\dontrun{
+#'family <- "gaussian"
+#'data <- sim.data.multiple(family=family)
+#'metric <- cv.multiple(y=data$y_train,X=data$X_train,family=family,alpha.init=0.95,type="exp")
+#'metric$deviance}
+#'
+#'#--- transfer learning ---
+#'\dontrun{
+#'family <- "gaussian"
+#'data <- sim.data.transfer(family=family)
+#'metric <- cv.transfer(y=data$y_train,X=data$X_train,family=family,alpha.init=0.95,type="exp")
+#'metric$deviance}
+#'
+cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink","glm.spls"),alpha.init,type,trial=FALSE){
   mode <- "multiple"
   foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
   n <- nrow(y)
@@ -1289,7 +1313,7 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
 #'@export
 #'@keywords internal
 #'
-cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink"),alpha.init,type,trial=FALSE){
+cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"),alpha.init,type,trial=FALSE){
   mode <- "transfer"
   foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
   n <- length(y[[1]])
@@ -1388,7 +1412,13 @@ count_matrix <- function(truth,estim){
 
 #----- graphics -----
 
-#'@title Plot pairwise differences
+#'@title Pairwise differences
+#'
+#'@description
+#'Visualises differences within sets of three values in different settings.
+#'
+#'@export
+#'@keywords internal
 #'
 #'@param x setting: character vector
 #'@param y0 values on the left: numeric vector
@@ -1399,6 +1429,15 @@ count_matrix <- function(truth,estim){
 #'@param increase change to arrow NULL, up, down
 #'@param cex.axis numeric
 #'@param cex.main numeric
+#'
+#'@examples
+#'m <- 3 # number of settings
+#'n <- 5 # number of repetitions
+#'x <- rep(LETTERS[1:m],each=n)
+#'y0 <- stats::rnorm(n*m,mean=0)
+#'y1 <- stats::rnorm(n*m,mean=ifelse(x=="A",2,-2))
+#'y2 <- stats::rnorm(n*m,mean=ifelse(x=="A",4,-4))
+#'change(x,y0,y1,y2)
 #'
 change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
   unique <- unique(x)

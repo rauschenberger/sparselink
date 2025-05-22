@@ -11,7 +11,7 @@ cv.multiple(
   family,
   alpha = 1,
   nfolds = 10,
-  method = c("glm.separate", "glm.mgaussian", "sparselink"),
+  method = c("glm.separate", "glm.mgaussian", "sparselink", "glm.spls"),
   alpha.init,
   type,
   trial = FALSE
@@ -23,7 +23,7 @@ cv.transfer(
   family,
   alpha = 1,
   nfolds = 10,
-  method = c("glm.separate", "glm.glmtrans", "sparselink"),
+  method = c("glm.separate", "glm.glmtrans", "sparselink", "glm.xrnet"),
   alpha.init,
   type,
   trial = FALSE
@@ -53,7 +53,19 @@ Compares predictive methods for multi-task learning (\code{cv.multiple}) or
 transfer learning (\code{cv.transfer}) by \eqn{k}-fold cross-validation.
 }
 \examples{
-1+1
+#--- multi-task learning ---
+\dontrun{
+family <- "gaussian"
+data <- sim.data.multiple(family=family)
+metric <- cv.multiple(y=data$y_train,X=data$X_train,family=family,alpha.init=0.95,type="exp")
+metric$deviance}
+
+#--- transfer learning ---
+\dontrun{
+family <- "gaussian"
+data <- sim.data.transfer(family=family)
+metric <- cv.transfer(y=data$y_train,X=data$X_train,family=family,alpha.init=0.95,type="exp")
+metric$deviance}
 
 }
 \keyword{internal}

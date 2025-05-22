@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{change}
 \alias{change}
-\title{Plot pairwise differences}
+\title{Pairwise differences}
 \usage{
 change(
   x,
@@ -36,5 +36,16 @@ change(
 \item{increase}{change to arrow NULL, up, down}
 }
 \description{
-Plot pairwise differences
+Visualises differences within sets of three values in different settings.
 }
+\examples{
+m <- 3 # number of settings
+n <- 5 # number of repetitions
+x <- rep(LETTERS[1:m],each=n)
+y0 <- stats::rnorm(n*m,mean=0)
+y1 <- stats::rnorm(n*m,mean=ifelse(x=="A",2,-2))
+y2 <- stats::rnorm(n*m,mean=ifelse(x=="A",4,-4))
+change(x,y0,y1,y2)
+
+}
+\keyword{internal}

@@ -19,11 +19,19 @@ non-negative scalar}
 \item{v_ext}{exponent or factor for external weights:
 non-negative scalar}
 
-\item{type}{character "geo", "exp", "rem" or "ari"
-(with or without addition of ".con")}
+\item{type}{character \code{"geo"}, \code{"exp"}, \code{"rem"} or \code{"ari"}
+(with or without addition of \code{".con"})}
 }
 \description{
 Uses internal and external weights (for negative and positive effects)
 as well as internal and external exponents/factors for these weights
 to construct penalty factors.
 }
+\examples{
+n <- 10
+w_int <- stats::runif(n)
+w_ext <- stats::runif(n)
+construct_pf(w_int,w_ext,v_int=0.5,v_ext=0.5,type="exp")
+
+}
+\keyword{internal}

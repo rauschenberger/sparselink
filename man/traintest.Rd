@@ -41,3 +41,7 @@ traintest(
 \description{
 Trains and tests prediction models
 }
+\examples{
+1+1
+
+}
