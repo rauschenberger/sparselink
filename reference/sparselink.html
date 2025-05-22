@@ -58,7 +58,7 @@ in multi-task learning or transfer learning.</p>
 <span>  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"exp"</span>,</span>
 <span>  nfolds <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  trial <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  cands <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -95,12 +95,13 @@ default: 1 (lasso)</p></dd>
 
 
 <dt id="arg-nfolds">nfolds<a class="anchor" aria-label="anchor" href="#arg-nfolds"></a></dt>
-<dd><p>number of cross-validation folds, default: 10</p></dd>
+<dd><p>number of internal cross-validation folds,
+default: 10 (10-fold cross-validation)</p></dd>
 
 
-<dt id="arg-trial">trial<a class="anchor" aria-label="anchor" href="#arg-trial"></a></dt>
-<dd><p>experimental argument (to be removed):
-Should exponents above 1 be used? Default: <code>FALSE</code></p></dd>
+<dt id="arg-cands">cands<a class="anchor" aria-label="anchor" href="#arg-cands"></a></dt>
+<dd><p>candidate values for both scaling parameters
+(default <code>NULL</code>: \(\{0, 0.2, 0.4, 0.6, 0.8, 1\}\))</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -156,7 +157,7 @@ and <code><a href="predict.sparselink.html">predict</a></code> to make predictio
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n<span class="op">=</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">n</span>,ncol<span class="op">=</span><span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">q</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">n</span>,ncol<span class="op">=</span><span class="va">q</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">sparselink</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alpha.init=0.95, alpha=1, trial=FALSE, type=exp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha.init=0.95, alpha=1, type=exp</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#--- transfer learning ---</span></span></span>
@@ -166,7 +167,7 @@ and <code><a href="predict.sparselink.html">predict</a></code> to make predictio
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span>X<span class="op">=</span><span class="va">n</span>,<span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">family</span> <span class="op">&lt;-</span> <span class="st">"gaussian"</span></span></span>
 <span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">sparselink</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alpha.init=0.95, alpha=1, trial=FALSE, type=exp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha.init=0.95, alpha=1, type=exp</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
