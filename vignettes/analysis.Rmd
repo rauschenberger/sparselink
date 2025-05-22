@@ -237,7 +237,7 @@ round(runtime/runtime["glm.separate"],digits=2)
 grDevices::dev.off()
 ```
 
-## Sample size and sparsity (under development)
+## Sample size and sparsity (revision)
 
 ```{r sim_extra,eval=sim.app}
 # Effect of sample size in source or target dataset (TL), effect of sample size (MTL).
@@ -361,10 +361,7 @@ for(mode in c("MTL-size","TL-source","TL-target")){
   }
 }
 grDevices::dev.off()
-
-# Change settings so that competing methods are useful.
 ```
-
 
 # Application
 
@@ -815,6 +812,7 @@ graphics::abline(v=seq(from=0.5,to=5.5,by=1))
 grDevices::dev.off()
 ```
 
+<!--
 ## Data-based simulation (under development)
 
 ```{r,eval=FALSE}
@@ -1167,6 +1165,7 @@ for(i in seq_along(vars)){
 rowMeans(sapply(metric,function(x) colMeans(x$deviance/x$deviance[,"glm.empty"])))
 
 ```
+-->
 
 This chunk saves the session information for generating figures and tables.
 
