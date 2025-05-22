@@ -64,11 +64,11 @@
 
 
 <dl><dt id="arg-prob-common">prob.common<a class="anchor" aria-label="anchor" href="#arg-prob-common"></a></dt>
-<dd><p>probability of common effect</p></dd>
+<dd><p>probability of common effect (number between 0 and 1)</p></dd>
 
 
 <dt id="arg-prob-separate">prob.separate<a class="anchor" aria-label="anchor" href="#arg-prob-separate"></a></dt>
-<dd><p>probability of separate effect</p></dd>
+<dd><p>probability of separate effect (number between 0 and 1)</p></dd>
 
 
 <dt id="arg-q">q<a class="anchor" aria-label="anchor" href="#arg-q"></a></dt>
@@ -97,11 +97,13 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Returns a list with slots <code>y_train</code> and <code>X_train</code> for training data,
-<code>y_test</code> and <code>X_test</code> for testing data,
-and beta for effects.
-The training data contains vectors of different lengths (<code>y_train</code>)
-and matrices with different number of rows (<code>X_train</code>).</p>
+    <p>Returns a list with slots
+<code>y_train</code> (\(q\) vectors)
+and <code>X_train</code> (\(q\) matrices with \(p\) columns) for training data,
+and <code>y_test</code> (\(vectors\)) and <code>X_test</code>
+(\(q\) matrices with \(p\) columns)
+for testing data,
+and <code>beta</code> for effects (\(p \times q\) matrix).</p>
     </div>
 
     <div class="section level2">
