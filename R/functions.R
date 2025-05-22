@@ -759,8 +759,8 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
 #'predict(object,newx=newx)
 #'
 #'@references
-#'See R packages spls, glmnet (with argument family="mgaussian"),
-#'glmtrans, and xrnet.
+#'See R packages \link[glmnet]{cv.glmnet} (with argument family="mgaussian")
+#'\link[spls]{spls}, \link[glmtrans]{glmtrans}, and \link[xrnet]{xrnet}.
 #'
 #'@name methods
 NULL
