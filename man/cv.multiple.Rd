@@ -58,14 +58,14 @@ transfer learning (\code{cv.transfer}) by \eqn{k}-fold cross-validation.
 \dontrun{
 family <- "gaussian"
 data <- sim.data.multiple(family=family)
-metric <- cv.multiple(y=data$y_train,X=data$X_train,family=family,alpha.init=0.95,type="exp")
+metric <- cv.multiple(y=data$y_train,X=data$X_train,family=family)
 metric$deviance}
 
 #--- transfer learning ---
 \dontrun{
 family <- "gaussian"
 data <- sim.data.transfer(family=family)
-metric <- cv.transfer(y=data$y_train,X=data$X_train,family=family,alpha.init=0.95,type="exp")
+metric <- cv.transfer(y=data$y_train,X=data$X_train,family=family)
 metric$deviance}
 
 }

@@ -9,8 +9,8 @@ traintest(
   X_train,
   y_test = NULL,
   X_test = NULL,
-  family,
-  alpha,
+  family = "gaussian",
+  alpha = 1,
   method = c("glm.empty", "glm.separate", "sparselink"),
   alpha.init = 0.95,
   type = "exp",
@@ -57,14 +57,14 @@ Trains and tests prediction models
 \dontrun{
 family <- "gaussian"
 data <- sim.data.multiple(family=family)
-result <- traintest(data$y_train,data$X_train,family=family,alpha=1,method="glm.separate",alpha.init=0.95,type="exp")
+result <- traintest(data$y_train,data$X_train,family=family)
 }
 
 #--- transfer learning ---
 \dontrun{
 family <- "gaussian"
 data <- sim.data.transfer(family=family)
-result <- traintest(data$y_train,data$X_train,family=family,alpha=1,alpha.init=0.95,type="exp")
+result <- traintest(data$y_train,data$X_train,family=family)
 }
 
 }

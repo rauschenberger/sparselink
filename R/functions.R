@@ -1,5 +1,6 @@
 
 if(FALSE){
+  rm(list=ls(all.names=TRUE))
   #install.packages(c("roxygen2","pkgdown","rcmdcheck","usethis","remotes","testthat"))
   setwd("C:/Users/arauschenberger/Desktop/sparselink/package")
   roxygen2::roxygenise()
@@ -1232,17 +1233,17 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #'\dontrun{
 #'family <- "gaussian"
 #'data <- sim.data.multiple(family=family)
-#'result <- traintest(data$y_train,data$X_train,family=family,alpha=1,method="glm.separate",alpha.init=0.95,type="exp")
+#'result <- traintest(data$y_train,data$X_train,family=family)
 #'}
 #'
 #'#--- transfer learning ---
 #'\dontrun{
 #'family <- "gaussian"
 #'data <- sim.data.transfer(family=family)
-#'result <- traintest(data$y_train,data$X_train,family=family,alpha=1,alpha.init=0.95,type="exp")
+#'result <- traintest(data$y_train,data$X_train,family=family)
 #'}
 #'
-traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.empty","glm.separate","sparselink"),alpha.init=0.95,type="exp",cands=NULL){
+traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",alpha=1,method=c("glm.empty","glm.separate","sparselink"),alpha.init=0.95,type="exp",cands=NULL){
   if(is.list(y_train)){
     q <- length(y_train)
   } else {
@@ -1313,14 +1314,14 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
 #'\dontrun{
 #'family <- "gaussian"
 #'data <- sim.data.multiple(family=family)
-#'metric <- cv.multiple(y=data$y_train,X=data$X_train,family=family,alpha.init=0.95,type="exp")
+#'metric <- cv.multiple(y=data$y_train,X=data$X_train,family=family)
 #'metric$deviance}
 #'
 #'#--- transfer learning ---
 #'\dontrun{
 #'family <- "gaussian"
 #'data <- sim.data.transfer(family=family)
-#'metric <- cv.transfer(y=data$y_train,X=data$X_train,family=family,alpha.init=0.95,type="exp")
+#'metric <- cv.transfer(y=data$y_train,X=data$X_train,family=family)
 #'metric$deviance}
 #'
 cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink","glm.spls"),alpha.init=0.95,type="exp",cands=NULL){
