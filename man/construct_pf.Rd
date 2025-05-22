@@ -8,10 +8,10 @@ construct_pf(w_int, w_ext, v_int, v_ext, type)
 }
 \arguments{
 \item{w_int}{internal weights:
-numeric vector of length p with non-negative entries}
+numeric vector of length \eqn{p} with non-negative entries}
 
 \item{w_ext}{external weights:
-numeric vector of length p with non-negative entries}
+numeric vector of length \eqn{p} with non-negative entries}
 
 \item{v_int}{exponent or factor for internal weights:
 non-negative scalar}

@@ -86,6 +86,13 @@ of testing samples}
 \item{alpha.init}{elastic net mixing parameter for initial models:
 number between 0 and 1}
 }
+\value{
+The wrapper functions \code{glm.empty}, \code{glm.separate},
+\code{glm.common}, \code{glm.mgaussian}, \code{glm.spls},
+\code{glm.glmtrans}, and \code{glm.xrnet} return fitted models,
+and the generic functions \code{coef} and \code{predict}
+return coefficients or predicted values in a standardised format.
+}
 \description{
 Wrapper functions of available methods for related problems.
 }
@@ -107,7 +114,7 @@ Wrapper functions of available methods for related problems.
 
 }}
 \examples{
-# multi-task learning
+#--- multi-task learning ---
 n_train <- 100
 n_test <- 10
 p <- 50
@@ -123,7 +130,7 @@ object <- glm.spls(x=x,y=y,family=family)
 coef(object)
 predict(object,newx=newx)
 
-# transfer learning
+#--- transfer learning ---
 n_train <- c(100,50)
 n_test <- c(10,10)
 p <- 50

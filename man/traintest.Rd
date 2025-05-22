@@ -18,7 +18,7 @@ traintest(
 )
 }
 \arguments{
-\item{y_train}{target of training samples: vector of length n}
+\item{y_train}{target of training samples: vector of length \eqn{n}}
 
 \item{X_train}{features of training samples: \eqn{n \times p} matrix}
 

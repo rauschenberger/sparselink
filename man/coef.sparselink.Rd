@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{coef.sparselink}
 \alias{coef.sparselink}
-\title{Extract Coefficients}
+\title{Regression Coefficients}
 \usage{
 \method{coef}{sparselink}(object)
 }
@@ -13,13 +13,12 @@
 Returns estimated coefficients.
 The output is a list with two slots:
 slot \code{alpha} with the estimated intercept
-(vector or length \eqn{q}),
+(vector of length \eqn{q}),
 and slot \code{beta} with the estimated slopes
 (matrix with \eqn{p} rows and \eqn{q} columns).
 }
 \description{
-Extracts coefficients
-from an object of class [sparselink].
+Extracts coefficients from multi-task or transfer learning regression model.
 }
 \examples{
 family <- "gaussian"
@@ -36,4 +35,8 @@ coef <- coef(object=object)
 (2025).
 "Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation".
 \emph{Under revision}. \url{https://hdl.handle.net/10993/63425}
+}
+\seealso{
+Use \code{\link{sparselink}} to fit the model
+and \code{\link[=predict.sparselink]{predict}} to make predictions.
 }

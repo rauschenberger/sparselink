@@ -10,9 +10,11 @@ count_vector(truth, estim)
 count_matrix(truth, estim)
 }
 \arguments{
-\item{truth}{(i) vector of length p or (ii) n times p matrix with entries in -1, 0, 1}
+\item{truth}{(i) vector of length \eqn{p} or
+(ii) \eqn{n \times p} matrix with entries in -1, 0, 1}
 
-\item{estim}{(i) vector of length p or (ii) n times p matrix with entries -1, 0, 1}
+\item{estim}{(i) vector of length \eqn{p} or
+(ii) \eqn{n \times p} matrix with entries -1, 0, 1}
 }
 \description{
 Calculates sensitivity, specificity and precision for ternary data

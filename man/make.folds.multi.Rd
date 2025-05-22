@@ -23,12 +23,12 @@ list of \eqn{q} numeric vectors}
 Create folds for multi-task and transfer learning
 }
 \examples{
-#multi-task learning
+#--- multi-task learning ---
 family <- "binomial"
 y <- sim.data.multiple(family=family)$y_train
 fold <- make.folds.multi(y=y,family=family)
 
-# transfer learning
+#--- transfer learning ---
 family <- "binomial"
 y <- sim.data.transfer(family=family)$y_train
 fold <- make.folds.trans(y,family=family)

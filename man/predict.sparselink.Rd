@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{predict.sparselink}
 \alias{predict.sparselink}
-\title{Make Predictions}
+\title{Out-of-sample Predictions}
 \usage{
 \method{predict}{sparselink}(object, newx, weight = NULL, ...)
 }
@@ -30,7 +30,7 @@ The output is a list of \eqn{q} column vectors of length \eqn{n_k}
 for \eqn{k} in \eqn{1,\ldots,q}.
 }
 \description{
-Predicts outcome
+Predicts outcomes with a multi-task or transfer learning regression model.
 }
 \examples{
 family <- "gaussian"
@@ -47,4 +47,8 @@ y_hat <- predict(object=object,newx=data$X_test)
 (2025).
 "Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation".
 \emph{Under revision}. \url{https://hdl.handle.net/10993/63425}
+}
+\seealso{
+Use \code{\link{sparselink}} to fit the model
+and \code{\link[=coef.sparselink]{coef}} to extract coefficients.
 }

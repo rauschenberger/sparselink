@@ -61,10 +61,10 @@ indicate/contain the cross-validated scaling parameters.
 }
 \description{
 Estimates sparse regression models (i.e., selecting few variables)
-in multi-task learning or transfer learning
+in multi-task learning or transfer learning.
 }
 \examples{
-# multi-task learning
+#--- multi-task learning ---
 n <- 100
 p <- 50
 q <- 3
@@ -73,7 +73,7 @@ x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
 object <- sparselink(x=x,y=y,family=family)
 
-# transfer learning
+#--- transfer learning ---
 n <- c(100,50)
 p <- 50
 x <- lapply(X=n,function(x) matrix(data=stats::rnorm(n*p),nrow=x,ncol=p))
@@ -89,4 +89,8 @@ object <- sparselink(x=x,y=y,family=family)
 (2025).
 "Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation".
 \emph{Under revision}. \url{https://hdl.handle.net/10993/63425}
+}
+\seealso{
+Use \code{\link[=coef.sparselink]{coef}} to extract coefficients
+and \code{\link[=predict.sparselink]{predict}} to make predictions.
 }

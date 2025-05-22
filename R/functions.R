@@ -15,7 +15,7 @@ if(FALSE){
 #'
 #'@description
 #'Estimates sparse regression models (i.e., selecting few variables)
-#'in multi-task learning or transfer learning
+#'in multi-task learning or transfer learning.
 #'
 #'@export
 #'
@@ -57,8 +57,12 @@ if(FALSE){
 #'
 #'@inherit sparselink-package references
 #'
+#'@seealso
+#'Use \code{\link[=coef.sparselink]{coef}} to extract coefficients
+#'and \code{\link[=predict.sparselink]{predict}} to make predictions.
+#'
 #'@examples
-#'# multi-task learning
+#'#--- multi-task learning ---
 #'n <- 100
 #'p <- 50
 #'q <- 3
@@ -67,7 +71,7 @@ if(FALSE){
 #'y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
 #'object <- sparselink(x=x,y=y,family=family)
 #'
-#'# transfer learning
+#'#--- transfer learning ---
 #'n <- c(100,50)
 #'p <- 50
 #'x <- lapply(X=n,function(x) matrix(data=stats::rnorm(n*p),nrow=x,ncol=p))
@@ -231,12 +235,57 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
   return(list)
 }
 
-
 #'@title
-#'Make Predictions
+#'Regression Coefficients
 #'
 #'@description
-#'Predicts outcome
+#'Extracts coefficients from multi-task or transfer learning regression model.
+#'
+#'@export
+#'
+#'@inheritParams predict.sparselink
+#'
+#'@returns
+#'Returns estimated coefficients.
+#'The output is a list with two slots:
+#'slot \code{alpha} with the estimated intercept
+#'(vector of length \eqn{q}),
+#'and slot \code{beta} with the estimated slopes
+#'(matrix with \eqn{p} rows and \eqn{q} columns).
+#'
+#'@inherit sparselink-package references
+#'
+#'@seealso
+#'Use \code{\link{sparselink}} to fit the model
+#'and \code{\link[=predict.sparselink]{predict}} to make predictions.
+#'
+#'@examples
+#'family <- "gaussian"
+#'data <- sim.data.transfer(family=family)
+#'#data <- sim.data.multiple(family=family)
+#'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
+#'coef <- coef(object=object)
+#'
+coef.sparselink <- function(object){
+  id <- object$weight.ind
+  p <- object$info$p
+  q <- object$info$q #length(object$lambda.min)
+  alpha <- rep(x=NA,times=object$info$q)
+  beta <- matrix(data=NA,nrow=object$info$p,ncol=object$info$q)
+  for(i in seq_len(q)){
+    temp <- stats::coef(object=object$glm.two[[i]][[id[i]]],s=object$lambda.min[id[i],i])
+    alpha[i] <- temp[1]
+    beta[,i] <- temp[-1][seq_len(p)]+temp[-1][seq(from=p+1,to=2*p)]
+  }
+  coef <- list(alpha=alpha,beta=beta)
+  return(coef)
+}
+
+#'@title
+#'Out-of-sample Predictions
+#'
+#'@description
+#'Predicts outcomes with a multi-task or transfer learning regression model.
 #'
 #'@export
 #'
@@ -266,6 +315,10 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
 #'
 #'@inherit sparselink-package references
 #'
+#'@seealso
+#'Use \code{\link{sparselink}} to fit the model
+#'and \code{\link[=coef.sparselink]{coef}} to extract coefficients.
+#'
 #'@examples
 #'family <- "gaussian"
 #'data <- sim.data.transfer(family=family)
@@ -292,49 +345,6 @@ predict.sparselink <- function(object,newx,weight=NULL,...){
     }
   }
   return(y_hat)
-}
-
-#'@title
-#'Extract Coefficients
-#'
-#'@description
-#'Extracts coefficients
-#'from an object of class [sparselink].
-#'
-#'@export
-#'
-#'@inheritParams predict.sparselink
-#'
-#'@returns
-#'Returns estimated coefficients.
-#'The output is a list with two slots:
-#'slot \code{alpha} with the estimated intercept
-#'(vector or length \eqn{q}),
-#'and slot \code{beta} with the estimated slopes
-#'(matrix with \eqn{p} rows and \eqn{q} columns).
-#'
-#'@inherit sparselink-package references
-#'
-#'@examples
-#'family <- "gaussian"
-#'data <- sim.data.transfer(family=family)
-#'#data <- sim.data.multiple(family=family)
-#'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
-#'coef <- coef(object=object)
-#'
-coef.sparselink <- function(object){
-  id <- object$weight.ind
-  p <- object$info$p
-  q <- object$info$q #length(object$lambda.min)
-  alpha <- rep(x=NA,times=object$info$q)
-  beta <- matrix(data=NA,nrow=object$info$p,ncol=object$info$q)
-  for(i in seq_len(q)){
-    temp <- stats::coef(object=object$glm.two[[i]][[id[i]]],s=object$lambda.min[id[i],i])
-    alpha[i] <- temp[1]
-    beta[,i] <- temp[-1][seq_len(p)]+temp[-1][seq(from=p+1,to=2*p)]
-  }
-  coef <- list(alpha=alpha,beta=beta)
-  return(coef)
 }
 
 #----- internal functions -----
@@ -490,12 +500,12 @@ calc.metric <- function(y,y_hat,family){
 #'@param nfolds integer between 2 and \eqn{n}
 #'
 #'@examples
-#'#multi-task learning
+#'#--- multi-task learning ---
 #'family <- "binomial"
 #'y <- sim.data.multiple(family=family)$y_train
 #'fold <- make.folds.multi(y=y,family=family)
 #'
-#'# transfer learning
+#'#--- transfer learning ---
 #'family <- "binomial"
 #'y <- sim.data.transfer(family=family)$y_train
 #'fold <- make.folds.trans(y,family=family)
@@ -675,9 +685,9 @@ comb_split <- function(coef,id){
 #'to construct penalty factors.
 #'
 #'@param w_int internal weights:
-#'numeric vector of length p with non-negative entries
+#'numeric vector of length \eqn{p} with non-negative entries
 #'@param w_ext external weights:
-#'numeric vector of length p with non-negative entries
+#'numeric vector of length \eqn{p} with non-negative entries
 #'@param v_int exponent or factor for internal weights:
 #'non-negative scalar
 #'@param v_ext exponent or factor for external weights:
@@ -723,8 +733,15 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
 #'@param newx feature matrix (MTL) or list of feature matrices (TL)
 #'of testing samples
 #'
+#'@returns
+#'The wrapper functions \code{glm.empty}, \code{glm.separate},
+#'\code{glm.common}, \code{glm.mgaussian}, \code{glm.spls},
+#'\code{glm.glmtrans}, and \code{glm.xrnet} return fitted models,
+#'and the generic functions \code{coef} and \code{predict}
+#'return coefficients or predicted values in a standardised format.
+#'
 #'@examples
-#'# multi-task learning
+#'#--- multi-task learning ---
 #'n_train <- 100
 #'n_test <- 10
 #'p <- 50
@@ -734,13 +751,13 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
 #'newx <- matrix(data=rnorm(n=n_test*p),nrow=n_test,ncol=p)
 #'y <- matrix(data=rnorm(n_train*q),nrow=n_train,ncol=q)
 #'object <- glm.empty(x=x,y=y,family=family)
-#'object <- glm.separate(x=x,y=y,family=family)
-#'object <- glm.mgaussian(x=x,y=y,family=family)
-#'object <- glm.spls(x=x,y=y,family=family)
+#'#object <- glm.separate(x=x,y=y,family=family)
+#'#object <- glm.mgaussian(x=x,y=y,family=family)
+#'#object <- glm.spls(x=x,y=y,family=family)
 #'coef(object)
 #'predict(object,newx=newx)
 #'
-#'# transfer learning
+#'#--- transfer learning ---
 #'n_train <- c(100,50)
 #'n_test <- c(10,10)
 #'p <- 50
@@ -749,10 +766,10 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
 #'y <- lapply(X=n_train,function(n) stats::rnorm(n))
 #'family <- "gaussian"
 #'object <- glm.empty(x=x,y=y,family=family)
-#'object <- glm.separate(x=x,y=y,family=family)
-#'object <- glm.common(x=x,y=y,family=family)
-#'object <- glm.glmtrans(x=x,y=y,family=family)
-#'object <- glm.xrnet(x=x,y=y,family=family)
+#'#object <- glm.separate(x=x,y=y,family=family)
+#'#object <- glm.common(x=x,y=y,family=family)
+#'#object <- glm.glmtrans(x=x,y=y,family=family)
+#'#object <- glm.xrnet(x=x,y=y,family=family)
 #'coef(object)
 #'predict(object,newx=newx)
 #'
@@ -1152,7 +1169,7 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #'@description
 #'Trains and tests prediction models
 #'
-#'@param y_train target of training samples: vector of length n
+#'@param y_train target of training samples: vector of length \eqn{n}
 #'@param X_train features of training samples: \eqn{n \times p} matrix
 #'@param y_test target of testing samples: vector of length \eqn{m}
 #'@param X_test features of testing samples \eqn{m \times p} matrix
@@ -1328,8 +1345,10 @@ cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
 #'@export
 #'@keywords internal
 #'
-#'@param truth (i) vector of length p or (ii) n times p matrix with entries in -1, 0, 1
-#'@param estim (i) vector of length p or (ii) n times p matrix with entries -1, 0, 1
+#'@param truth (i) vector of length \eqn{p} or
+#'(ii) \eqn{n \times p} matrix with entries in -1, 0, 1
+#'@param estim (i) vector of length \eqn{p} or
+#'(ii) \eqn{n \times p} matrix with entries -1, 0, 1
 #'
 #'@examples
 #'truth <- sample(x=c(-1,0,1),size=20,replace=TRUE)
