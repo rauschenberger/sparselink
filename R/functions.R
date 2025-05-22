@@ -476,21 +476,29 @@ calc.metric <- function(y,y_hat,family){
   return(metric)
 }
 
-#'@title  Folds for multi-task learning
+#'@title Create folds for multi-task and transfer learning
 #'
 #'@export
 #'@keywords internal
 #'
-#'@param y matrix with \eqn{n} rows (samples) and \eqn{q} columns (outcomes)
+#'@param y
+#'multi-task learning:
+#'y matrix with \eqn{n} rows (samples) and \eqn{q} columns (outcomes)
+#'transfer learning:
+#'list of \eqn{q} numeric vectors
 #'@param family character \code{"gaussian"} or \code{"binomial"}
 #'@param nfolds integer between 2 and \eqn{n}
 #'
 #'@examples
+#'#multi-task learning
 #'family <- "binomial"
 #'y <- sim.data.multiple(family=family)$y_train
 #'fold <- make.folds.multi(y=y,family=family)
-#'table(fold)
-#'table(y[,3],fold)
+#'
+#'# transfer learning
+#'family <- "binomial"
+#'y <- sim.data.transfer(family=family)$y_train
+#'fold <- make.folds.trans(y,family=family)
 #'
 make.folds.multi <- function(y,family,nfolds=10){
   n <- nrow(y)
@@ -523,19 +531,9 @@ make.folds.multi <- function(y,family,nfolds=10){
   return(foldid)
 }
 
-#'@title Folds for transfer learning
-#'
+#'@rdname make.folds.multi
 #'@export
 #'@keywords internal
-#'
-#'@param y list of \eqn{q} numeric vectors
-#'@inheritParams make.folds.multi
-#'
-#'@examples
-#'family <- "binomial"
-#'y <- sim.data.transfer(family=family)$y_train
-#'fold <- make.folds.trans(y,family=family)
-#'
 make.folds.trans <- function(y,family,nfolds=10){
   q <- length(y)
   if(length(family)==1){
@@ -1220,19 +1218,19 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
   return(list)
 }
 
-#' @title Model comparison
-#' 
-#' @description
-#' Compares predictive methods for multi-task learning (\code{cv.multiple}) or
-#' transfer learning (\code{cv.transfer}) by \eqn{k}-fold cross-validation.
-#' 
-#' @export
-#' @keywords internal
-#' 
-#' @inheritParams sparselink
-#' 
-#' @examples
-#' 1+1
+#'@title Model comparison
+#'
+#'@description
+#'Compares predictive methods for multi-task learning (\code{cv.multiple}) or
+#'transfer learning (\code{cv.transfer}) by \eqn{k}-fold cross-validation.
+#'
+#'@export
+#'@keywords internal
+#'
+#'@inheritParams sparselink
+#'
+#'@examples
+#'1+1
 #' 
 cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink"),alpha.init,type,trial=FALSE){
   mode <- "multiple"
@@ -1273,7 +1271,10 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
   return(list)
 }
 
-#' @rdname cv.multiple
+#'@rdname cv.multiple
+#'@export
+#'@keywords internal
+#'
 cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink"),alpha.init,type,trial=FALSE){
   mode <- "transfer"
   foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
@@ -1314,8 +1315,6 @@ cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
   list <- list(deviance=deviance,auc=auc,refit=refit)
   return(list)
 }
-
-
 
 #test <- traintest(y_train,X_train,y_test,X_test,family)
 #test <- cv.transfer(y=y_train,X=X_train,family=family)

@@ -2,26 +2,36 @@
 % Please edit documentation in R/functions.R
 \name{make.folds.multi}
 \alias{make.folds.multi}
-\title{Folds for multi-task learning}
+\alias{make.folds.trans}
+\title{Create folds for multi-task and transfer learning}
 \usage{
 make.folds.multi(y, family, nfolds = 10)
+
+make.folds.trans(y, family, nfolds = 10)
 }
 \arguments{
-\item{y}{matrix with \eqn{n} rows (samples) and \eqn{q} columns (outcomes)}
+\item{y}{multi-task learning:
+y matrix with \eqn{n} rows (samples) and \eqn{q} columns (outcomes)
+transfer learning:
+list of \eqn{q} numeric vectors}
 
 \item{family}{character \code{"gaussian"} or \code{"binomial"}}
 
 \item{nfolds}{integer between 2 and \eqn{n}}
 }
 \description{
-Folds for multi-task learning
+Create folds for multi-task and transfer learning
 }
 \examples{
+#multi-task learning
 family <- "binomial"
 y <- sim.data.multiple(family=family)$y_train
 fold <- make.folds.multi(y=y,family=family)
-table(fold)
-table(y[,3],fold)
+
+# transfer learning
+family <- "binomial"
+y <- sim.data.transfer(family=family)$y_train
+fold <- make.folds.trans(y,family=family)
 
 }
 \keyword{internal}
