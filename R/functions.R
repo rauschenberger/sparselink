@@ -1220,7 +1220,60 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
   return(list)
 }
 
-# This cross-validation function only works for transfer learning (not for multi-task learning).
+#' @title Model comparison
+#' 
+#' @description
+#' Compares predictive methods for multi-task learning (\code{cv.multiple}) or
+#' transfer learning (\code{cv.transfer}) by \eqn{k}-fold cross-validation.
+#' 
+#' @export
+#' @keywords internal
+#' 
+#' @inheritParams sparselink
+#' 
+#' @examples
+#' 1+1
+#' 
+cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink"),alpha.init,type,trial=FALSE){
+  mode <- "multiple"
+  foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
+  n <- nrow(y)
+  q <- ncol(y)
+  
+  y_hat <- list()
+  for(k in method){
+    y_hat[[k]] <- matrix(data=NA,nrow=nrow(y),ncol=q)
+  }
+  
+  for(i in seq_len(nfolds)){
+    cat("fold",i,"\n")
+    y_train <- y[foldid!=i,]
+    y_test <- y[foldid==i,]
+    X_train <- X[foldid!=i,,drop=FALSE]
+    X_test <- X[foldid==i,,drop=FALSE]
+    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,y_test=y_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
+    for(k in method){
+      y_hat[[k]][foldid==i,] <- as.matrix(as.data.frame(test$y_hat[[k]]))
+    }
+  }
+  
+  deviance <- auc <- matrix(data=NA,nrow=ncol(y),ncol=length(method),dimnames=list(names(y),method))
+  for(j in seq_len(ncol(y))){
+    for(k in method){
+      deviance[j,k] <- calc.metric(y=y[,j],y_hat=y_hat[[k]][,j],family=family)
+      if(family=="binomial"){
+        auc[j,k] <- pROC::auc(response=y[,j],predictor=as.vector(y_hat[[k]][,j]),direction="<",levels=c(0,1))
+      }
+    }
+  }
+  # refit model on all folds
+  #cat("refit on all folds","\n")
+  #refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha)
+  list <- list(deviance=deviance,auc=auc)
+  return(list)
+}
+
+#' @rdname cv.multiple
 cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink"),alpha.init,type,trial=FALSE){
   mode <- "transfer"
   foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
@@ -1262,45 +1315,7 @@ cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
   return(list)
 }
 
-# This cross-validation function only works for multi-task learning (not for transfer learning).
-cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink"),alpha.init,type,trial=FALSE){
-  mode <- "multiple"
-  foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
-  n <- nrow(y)
-  q <- ncol(y)
-  
-  y_hat <- list()
-  for(k in method){
-    y_hat[[k]] <- matrix(data=NA,nrow=nrow(y),ncol=q)
-  }
-    
-  for(i in seq_len(nfolds)){
-    cat("fold",i,"\n")
-    y_train <- y[foldid!=i,]
-    y_test <- y[foldid==i,]
-    X_train <- X[foldid!=i,,drop=FALSE]
-    X_test <- X[foldid==i,,drop=FALSE]
-    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,y_test=y_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
-    for(k in method){
-        y_hat[[k]][foldid==i,] <- as.matrix(as.data.frame(test$y_hat[[k]]))
-    }
-  }
-  
-  deviance <- auc <- matrix(data=NA,nrow=ncol(y),ncol=length(method),dimnames=list(names(y),method))
-  for(j in seq_len(ncol(y))){
-    for(k in method){
-      deviance[j,k] <- calc.metric(y=y[,j],y_hat=y_hat[[k]][,j],family=family)
-      if(family=="binomial"){
-        auc[j,k] <- pROC::auc(response=y[,j],predictor=as.vector(y_hat[[k]][,j]),direction="<",levels=c(0,1))
-      }
-    }
-  }
-  # refit model on all folds
-  #cat("refit on all folds","\n")
-  #refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha)
-  list <- list(deviance=deviance,auc=auc)
-  return(list)
-}
+
 
 #test <- traintest(y_train,X_train,y_test,X_test,family)
 #test <- cv.transfer(y=y_train,X=X_train,family=family)
