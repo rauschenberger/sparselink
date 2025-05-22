@@ -28,10 +28,11 @@ if(FALSE){
 #'default: 0.95 (lasso-like elastic net)
 #'@param alpha elastic net mixing parameter of final regressions,
 #'default: 1 (lasso)
-#'@param nfolds number of cross-validation folds, default: 10
+#'@param nfolds number of internal cross-validation folds,
+#'default: 10 (10-fold cross-validation)
 #'@param type character
-#'@param trial experimental argument (to be removed):
-#'Should exponents above 1 be used? Default: \code{FALSE}
+#'@param cands candidate values for both scaling parameters
+#'(default \code{NULL}: \eqn{\{0, 0.2, 0.4, 0.6, 0.8, 1\}})
 #'
 #'@return
 #'Returns an object of class \code{sparselink}, a list with multiple slots.
@@ -76,12 +77,12 @@ if(FALSE){
 #'family <- "gaussian"
 #'object <- sparselink(x=x,y=y,family=family)
 #'
-sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,trial=FALSE){ # was alpha.init=0.95, alpha=1 and trial=FALSE
+sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,cands=NULL){
   
   alpha.one <- alpha.init
   alpha.two <- alpha
   
-  cat(paste0("alpha.init=",alpha.init,", alpha=",alpha,", trial=",trial,", type=",type,"\n"))
+  cat(paste0("alpha.init=",alpha.init,", alpha=",alpha,", type=",type,"\n"))
   
   if(is.matrix(y) & is.matrix(x)){
     message("mode: multi-target learning")
@@ -134,9 +135,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
   }
   
   if(type %in% c("geo","exp","rem","ari")){
-    if(trial){
-      cands <- c(0.0,0.2,0.5,1.0,2.0,5.0)
-    } else {
+    if(is.null(cands)){
       cands <- seq(from=0,to=1,by=0.2)
     }
     weight <- expand.grid(source=cands,target=cands)
@@ -220,9 +219,9 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
       lambda.min[l,i] <- glm.two.ext[[i]][[l]]$lambda[lambda.ind[l,i]]
     }
     cvm.min[,i] <- sapply(X=metric[[i]],FUN=min)
-    if(trial){
-      tryCatch(expr=plotWeight(x=weight,y=cvm.min[,i]),error=function(x) NULL)
-    }
+    #if(trial){
+    #  tryCatch(expr=plotWeight(x=weight,y=cvm.min[,i]),error=function(x) NULL)
+    #}
   }
   weight.ind <- apply(X=cvm.min,MARGIN=2,FUN=which.min)
   weight.min <- weight[weight.ind,]
@@ -1226,12 +1225,7 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #' \eqn{m \times p} matrix (multi-task learning) or
 #'list of \eqn{q} matrices of dimensions
 #'\eqn{m_1 \times p,\ldots,m_q \times p} (transfer learning)
-#'@param family character \code{"gaussian"} or \code{"binomial"}
-#'@param alpha.init elastic net mixing parameter for initial regressions
-#'@param alpha elastic net mixing parameter
-#'@param method character vector
-#'@param type character
-#'@param trial see sparselink
+#'@inheritParams sparselink
 #'
 #'@examples
 #'#--- multi-task learning ---
@@ -1248,7 +1242,7 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #'result <- traintest(data$y_train,data$X_train,family=family,alpha=1,alpha.init=0.95,type="exp")
 #'}
 #'
-traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.empty","glm.separate","sparselink"),alpha.init,type,trial=FALSE){
+traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.empty","glm.separate","sparselink"),alpha.init=0.95,type="exp",cands=NULL){
   if(is.list(y_train)){
     q <- length(y_train)
   } else {
@@ -1271,7 +1265,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
     start <- Sys.time()
     hyperpar <- NULL
     if(method[i]=="sparselink"){
-      object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha,type=type,trial=trial)
+      object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha,type=type,cands=cands)
       hyperpar <- object$weight.min
     } else if(method[i]=="devel"){
       object <- func(x=X_train,y=y_train,family=family,alpha.init=alpha.init,alpha=alpha)
@@ -1329,7 +1323,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,metho
 #'metric <- cv.transfer(y=data$y_train,X=data$X_train,family=family,alpha.init=0.95,type="exp")
 #'metric$deviance}
 #'
-cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink","glm.spls"),alpha.init,type,trial=FALSE){
+cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink","glm.spls"),alpha.init=0.95,type="exp",cands=NULL){
   mode <- "multiple"
   foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
   n <- nrow(y)
@@ -1346,7 +1340,7 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
     y_test <- y[foldid==i,]
     X_train <- X[foldid!=i,,drop=FALSE]
     X_test <- X[foldid==i,,drop=FALSE]
-    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,y_test=y_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
+    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,y_test=y_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type,cands=cands)
     for(k in method){
       y_hat[[k]][foldid==i,] <- as.matrix(as.data.frame(test$y_hat[[k]]))
     }
@@ -1372,7 +1366,7 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
 #'@export
 #'@keywords internal
 #'
-cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"),alpha.init,type,trial=FALSE){
+cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"),alpha.init=0.95,type="exp",cands=NULL){
   mode <- "transfer"
   foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
   n <- length(y[[1]])
@@ -1390,7 +1384,7 @@ cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
       X_train[[j]] <- X[[j]][foldid[[j]]!=i,,drop=FALSE]
       X_test[[j]] <- X[[j]][foldid[[j]]==i,,drop=FALSE]
     }
-    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
+    test <- traintest(y_train=y_train,X_train=X_train,X_test=X_test,family=family,method=method,alpha=alpha,alpha.init=alpha.init,type=type,cands=cands)
     for(j in seq_len(q)){
       for(k in method){
         y_hat[[j]][foldid[[j]]==i,k] <- test$y_hat[[k]][[j]]
@@ -1408,7 +1402,7 @@ cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
   }
   # refit model on all folds
   cat("refit on all folds","\n")
-  refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha,trial=trial)
+  refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha,cands=cands)
   list <- list(deviance=deviance,auc=auc,refit=refit)
   return(list)
 }

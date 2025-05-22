@@ -12,9 +12,9 @@ cv.multiple(
   alpha = 1,
   nfolds = 10,
   method = c("glm.separate", "glm.mgaussian", "sparselink", "glm.spls"),
-  alpha.init,
-  type,
-  trial = FALSE
+  alpha.init = 0.95,
+  type = "exp",
+  cands = NULL
 )
 
 cv.transfer(
@@ -24,9 +24,9 @@ cv.transfer(
   alpha = 1,
   nfolds = 10,
   method = c("glm.separate", "glm.glmtrans", "sparselink", "glm.xrnet"),
-  alpha.init,
-  type,
-  trial = FALSE
+  alpha.init = 0.95,
+  type = "exp",
+  cands = NULL
 )
 }
 \arguments{
@@ -38,15 +38,16 @@ or list of \eqn{n_k}-dimensional vectors (transfer learning)}
 \item{alpha}{elastic net mixing parameter of final regressions,
 default: 1 (lasso)}
 
-\item{nfolds}{number of cross-validation folds, default: 10}
+\item{nfolds}{number of internal cross-validation folds,
+default: 10 (10-fold cross-validation)}
 
 \item{alpha.init}{elastic net mixing parameter for initial regressions,
 default: 0.95 (lasso-like elastic net)}
 
 \item{type}{character}
 
-\item{trial}{experimental argument (to be removed):
-Should exponents above 1 be used? Default: \code{FALSE}}
+\item{cands}{candidate values for both scaling parameters
+(default \code{NULL}: \eqn{\{0, 0.2, 0.4, 0.6, 0.8, 1\}})}
 }
 \description{
 Compares predictive methods for multi-task learning (\code{cv.multiple}) or

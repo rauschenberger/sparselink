@@ -12,9 +12,9 @@ traintest(
   family,
   alpha,
   method = c("glm.empty", "glm.separate", "sparselink"),
-  alpha.init,
-  type,
-  trial = FALSE
+  alpha.init = 0.95,
+  type = "exp",
+  cands = NULL
 )
 }
 \arguments{
@@ -38,15 +38,16 @@ list of \eqn{q} matrices of dimensions
 
 \item{family}{character \code{"gaussian"} or \code{"binomial"}}
 
-\item{alpha}{elastic net mixing parameter}
+\item{alpha}{elastic net mixing parameter of final regressions,
+default: 1 (lasso)}
 
-\item{method}{character vector}
-
-\item{alpha.init}{elastic net mixing parameter for initial regressions}
+\item{alpha.init}{elastic net mixing parameter for initial regressions,
+default: 0.95 (lasso-like elastic net)}
 
 \item{type}{character}
 
-\item{trial}{see sparselink}
+\item{cands}{candidate values for both scaling parameters
+(default \code{NULL}: \eqn{\{0, 0.2, 0.4, 0.6, 0.8, 1\}})}
 }
 \description{
 Trains and tests prediction models

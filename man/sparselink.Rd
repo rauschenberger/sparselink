@@ -12,7 +12,7 @@ sparselink(
   alpha = 1,
   type = "exp",
   nfolds = 10,
-  trial = FALSE
+  cands = NULL
 )
 }
 \arguments{
@@ -32,10 +32,11 @@ default: 1 (lasso)}
 
 \item{type}{character}
 
-\item{nfolds}{number of cross-validation folds, default: 10}
+\item{nfolds}{number of internal cross-validation folds,
+default: 10 (10-fold cross-validation)}
 
-\item{trial}{experimental argument (to be removed):
-Should exponents above 1 be used? Default: \code{FALSE}}
+\item{cands}{candidate values for both scaling parameters
+(default \code{NULL}: \eqn{\{0, 0.2, 0.4, 0.6, 0.8, 1\}})}
 }
 \value{
 Returns an object of class \code{sparselink}, a list with multiple slots.
