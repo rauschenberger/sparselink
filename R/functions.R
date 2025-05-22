@@ -1054,8 +1054,8 @@ coef.glm.xrnet <- function(object){
 #'@export
 #'@keywords internal
 #'
-#'@param prob.common probability of common effect
-#'@param prob.separate probability of separate effect
+#'@param prob.common probability of common effect (number between 0 and 1)
+#'@param prob.separate probability of separate effect (number between 0 and 1)
 #'@param q number of datasets: integer
 #'@param n0 number of training samples: integer vector of length \eqn{q}
 #'@param n1 number of testing samples for all datasets: integer

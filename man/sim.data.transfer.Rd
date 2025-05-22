@@ -16,9 +16,9 @@ sim.data.transfer(
 )
 }
 \arguments{
-\item{prob.common}{probability of common effect}
+\item{prob.common}{probability of common effect (number between 0 and 1)}
 
-\item{prob.separate}{probability of separate effect}
+\item{prob.separate}{probability of separate effect (number between 0 and 1)}
 
 \item{q}{number of datasets: integer}
 
