@@ -1175,10 +1175,23 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #'@description
 #'Trains and tests prediction models
 #'
-#'@param y_train target of training samples: vector of length \eqn{n}
-#'@param X_train features of training samples: \eqn{n \times p} matrix
-#'@param y_test target of testing samples: vector of length \eqn{m}
-#'@param X_test features of testing samples \eqn{m \times p} matrix
+#'@export
+#'@keywords internal
+#'
+#'@param y_train target of training samples:
+#'\eqn{n \times q} matrix (multi-task learning)
+#'or list of \eqn{q} vectors of length \eqn{n_1,\ldots,n_q} (transfer learning)
+#'@param X_train features of training samples:
+#'\eqn{n \times p} matrix (multi-task learning)
+#'or list of \eqn{q} matrices of dimensions
+#'\eqn{n_1 \times p,\ldots,n_q \times p} (transfer learning)
+#'@param y_test target of testing samples:
+#'\eqn{m \times p} matrix (multi-task learning)
+#' or list of \eqn{q} vectors of length \eqn{m_1,\ldots,m_q} (transfer learning)
+#'@param X_test features of testing samples:
+#' \eqn{m \times p} matrix (multi-task learning) or
+#'list of \eqn{q} matrices of dimensions
+#'\eqn{m_1 \times p,\ldots,m_q \times p} (transfer learning)
 #'@param family character \code{"gaussian"} or \code{"binomial"}
 #'@param alpha.init elastic net mixing parameter for initial regressions
 #'@param alpha elastic net mixing parameter
@@ -1187,9 +1200,21 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #'@param trial see sparselink
 #'
 #'@examples
-#'1+1
+#'#--- multi-task learning ---
+#'\dontrun{
+#'family <- "gaussian"
+#'data <- sim.data.multiple(family=family)
+#'result <- traintest(data$y_train,data$X_train,family=family,alpha=1,method="glm.separate",alpha.init=0.95,type="exp")
+#'}
 #'
-traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.separate","glm.glmtrans","sparselink","glm.common"),alpha.init,type,trial=FALSE){
+#'#--- transfer learning ---
+#'\dontrun{
+#'family <- "gaussian"
+#'data <- sim.data.transfer(family=family)
+#'result <- traintest(data$y_train,data$X_train,family=family,alpha=1,alpha.init=0.95,type="exp")
+#'}
+#'
+traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family,alpha,method=c("glm.empty","glm.separate","sparselink"),alpha.init,type,trial=FALSE){
   if(is.list(y_train)){
     q <- length(y_train)
   } else {

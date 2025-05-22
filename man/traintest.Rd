@@ -11,20 +11,30 @@ traintest(
   X_test = NULL,
   family,
   alpha,
-  method = c("glm.separate", "glm.glmtrans", "sparselink", "glm.common"),
+  method = c("glm.empty", "glm.separate", "sparselink"),
   alpha.init,
   type,
   trial = FALSE
 )
 }
 \arguments{
-\item{y_train}{target of training samples: vector of length \eqn{n}}
+\item{y_train}{target of training samples:
+\eqn{n \times q} matrix (multi-task learning)
+or list of \eqn{q} vectors of length \eqn{n_1,\ldots,n_q} (transfer learning)}
 
-\item{X_train}{features of training samples: \eqn{n \times p} matrix}
+\item{X_train}{features of training samples:
+\eqn{n \times p} matrix (multi-task learning)
+or list of \eqn{q} matrices of dimensions
+\eqn{n_1 \times p,\ldots,n_q \times p} (transfer learning)}
 
-\item{y_test}{target of testing samples: vector of length \eqn{m}}
+\item{y_test}{target of testing samples:
+\eqn{m \times p} matrix (multi-task learning)
+or list of \eqn{q} vectors of length \eqn{m_1,\ldots,m_q} (transfer learning)}
 
-\item{X_test}{features of testing samples \eqn{m \times p} matrix}
+\item{X_test}{features of testing samples:
+\eqn{m \times p} matrix (multi-task learning) or
+list of \eqn{q} matrices of dimensions
+\eqn{m_1 \times p,\ldots,m_q \times p} (transfer learning)}
 
 \item{family}{character \code{"gaussian"} or \code{"binomial"}}
 
@@ -42,6 +52,19 @@ traintest(
 Trains and tests prediction models
 }
 \examples{
-1+1
+#--- multi-task learning ---
+\dontrun{
+family <- "gaussian"
+data <- sim.data.multiple(family=family)
+result <- traintest(data$y_train,data$X_train,family=family,alpha=1,method="glm.separate",alpha.init=0.95,type="exp")
+}
+
+#--- transfer learning ---
+\dontrun{
+family <- "gaussian"
+data <- sim.data.transfer(family=family)
+result <- traintest(data$y_train,data$X_train,family=family,alpha=1,alpha.init=0.95,type="exp")
+}
 
 }
+\keyword{internal}
