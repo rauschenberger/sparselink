@@ -33,7 +33,7 @@ if(FALSE){
 #'@param trial experimental argument (to be removed):
 #'Should exponents above 1 be used? Default: \code{FALSE}
 #'
-#'@returns
+#'@return
 #'Returns an object of class \code{sparselink}, a list with multiple slots.
 #'\itemize{
 #'\item Stage 1 regressions (before sharing information):
@@ -245,7 +245,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,t
 #'
 #'@inheritParams predict.sparselink
 #'
-#'@returns
+#'@return
 #'Returns estimated coefficients.
 #'The output is a list with two slots:
 #'slot \code{alpha} with the estimated intercept
@@ -308,7 +308,7 @@ coef.sparselink <- function(object){
 #'
 #'@param ... (not applicable)
 #'
-#'@returns
+#'@return
 #'Returns predicted values or predicted probabilities.
 #'The output is a list of \eqn{q} column vectors of length \eqn{n_k}
 #'for \eqn{k} in \eqn{1,\ldots,q}.
@@ -579,7 +579,7 @@ make.folds.trans <- function(y,family,nfolds=10){
 #'with \eqn{n_k} entries,
 #'for \eqn{k} in \eqn{1,\ldots,q}
 #'
-#'@returns
+#'@return
 #'Returns a list with the slots
 #'\eqn{q} (scalar, number of problems),
 #'\eqn{n} (vector of length \eqn{q}, number of samples)
@@ -646,11 +646,11 @@ fuse.data <- function(x,y=NULL,foldid=NULL){
 #'@param coef matrix with \eqn{p} rows (features) and \eqn{q} columns (problems)
 #'@param id integer in \eqn{1,\ldots,q}
 #'
-#'@returns
+#'@return
 #'Returns a list with slots
-#'lower.limits, upper.limits,
-#'weight.source (external weights)
-#'and weight.target (internal weights).
+#'\code{lower.limits}, \code{upper.limits},
+#'\code{weight.source} (external weights)
+#'and \code{weight.target} (internal weights).
 #'Each slot is a vector of length \eqn{2*p},
 #'with the first \eqn{p} entries for positive effects
 #'and the last \eqn{p} entries for negative effects.
@@ -733,7 +733,7 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
 #'@param newx feature matrix (MTL) or list of feature matrices (TL)
 #'of testing samples
 #'
-#'@returns
+#'@return
 #'The wrapper functions \code{glm.empty}, \code{glm.separate},
 #'\code{glm.common}, \code{glm.mgaussian}, \code{glm.spls},
 #'\code{glm.glmtrans}, and \code{glm.xrnet} return fitted models,
@@ -1057,7 +1057,7 @@ coef.glm.xrnet <- function(object){
 #'@param family character \code{"gaussian"} or \code{"binomial"}
 #'@param rho correlation (for decreasing structure)
 #'
-#'@returns
+#'@return
 #'Returns a list with slots \code{y_train} and \code{X_train} for training data,
 #'\code{y_test} and \code{X_test} for testing data,
 #'and beta for effects.
@@ -1122,7 +1122,7 @@ sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,10
 #'
 #'@inheritParams sim.data.transfer
 #'
-#'@returns
+#'@return
 #'Returns list with slots
 #'\code{y_train} (\eqn{n_0 \times q} matrix),
 #'\code{X_train}(\eqn{n_0 \times p} matrix),

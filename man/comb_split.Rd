@@ -13,9 +13,9 @@ comb_split(coef, id)
 }
 \value{
 Returns a list with slots
-lower.limits, upper.limits,
-weight.source (external weights)
-and weight.target (internal weights).
+\code{lower.limits}, \code{upper.limits},
+\code{weight.source} (external weights)
+and \code{weight.target} (internal weights).
 Each slot is a vector of length \eqn{2*p},
 with the first \eqn{p} entries for positive effects
 and the last \eqn{p} entries for negative effects.
