@@ -32,7 +32,7 @@ default: 1 (lasso)}
 
 \item{type}{character}
 
-\item{nfolds}{number of cross-validation folds}
+\item{nfolds}{number of cross-validation folds, default: 10}
 
 \item{trial}{experimental argument (to be removed):
 Should exponents above 1 be used? Default: \code{FALSE}}

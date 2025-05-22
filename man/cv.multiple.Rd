@@ -38,7 +38,7 @@ or list of \eqn{n_k}-dimensional vectors (transfer learning)}
 \item{alpha}{elastic net mixing parameter of final regressions,
 default: 1 (lasso)}
 
-\item{nfolds}{number of cross-validation folds}
+\item{nfolds}{number of cross-validation folds, default: 10}
 
 \item{alpha.init}{elastic net mixing parameter for initial regressions,
 default: 0.95 (lasso-like elastic net)}
