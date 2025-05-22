@@ -6,8 +6,8 @@
     }
   };
 </script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Sparse regression for related problems — sparselink"><meta name="description" content="Estimates sparse regression models (i.e., selecting few variables)
-in multi-task learning or transfer learning"><meta property="og:description" content="Estimates sparse regression models (i.e., selecting few variables)
-in multi-task learning or transfer learning"></head><body>
+in multi-task learning or transfer learning."><meta property="og:description" content="Estimates sparse regression models (i.e., selecting few variables)
+in multi-task learning or transfer learning."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -45,7 +45,7 @@ in multi-task learning or transfer learning"></head><body>
 
     <div class="ref-description section level2">
     <p>Estimates sparse regression models (i.e., selecting few variables)
-in multi-task learning or transfer learning</p>
+in multi-task learning or transfer learning.</p>
     </div>
 
     <div class="section level2">
@@ -105,24 +105,32 @@ Should exponents above 1 be used? Default: <code>FALSE</code></p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Returns an object of class <code>sparselink</code>, a list with multiple slots.</p><ul><li><p>Stage 1 regressions (before sharing information):
-Slot <code>glm.one</code> contains \(q\) objects of type <code>cv.glmnet</code>
-(one for each problem).</p></li>
-<li><p>Candidate scaling parameters (exponents):
-Slot <code>weight</code> contains a data frame
-with \(n\) combinations of exponents
-for the external (source) and internal (target) weights</p></li>
-<li><p>Stage 2 regressions (after sharing information):
-Slot <code>glm.two</code> contains \(q\) lists (one for each problem)
+    <p>Returns an object of class <code>sparselink</code>, a list with multiple slots.</p><dl><dt>Stage 1 regressions (before sharing information)</dt>
+<dd><p>Slot <code>glm.one</code>
+contains \(q\) objects of type <code>cv.glmnet</code> (one for each problem).</p></dd>
+
+<dt>Candidate scaling parameters (exponents)</dt>
+<dd><p>Slot <code>weight</code> contains
+a data frame with \(n\) combinations of exponents
+for the external (source) and internal (target) weights</p></dd>
+
+<dt>Stage 2 regressions (after sharing information)</dt>
+<dd><p>Slot <code>glm.two</code>
+contains \(q\) lists (one for each problem)
 of \(n\) objects of type <code>cv.glmnet</code>
-(one for each combination of exponents).</p></li>
-<li><p>Optimal regularisation parameters:
-Slot <code>lambda.min</code> contains the cross-validated regularisation parameters
-for the stage 2 regressions.</p></li>
-<li><p>Optimal scaling parameters:
-Slots <code>weight.ind</code>/<code>weight.min</code>
-indicate/contain the cross-validated scaling parameters.</p></li>
-</ul></div>
+(one for each combination of exponents).</p></dd>
+
+<dt>Optimal regularisation parameters</dt>
+<dd><p>Slot <code>lambda.min</code>
+contains the cross-validated regularisation parameters for the stage 2
+regressions.</p></dd>
+
+<dt>Optimal scaling parameters</dt>
+<dd><p>Slots <code>weight.ind</code> and
+<code>weight.min</code> indicate or contain the cross-validated scaling parameters.</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p><a href="https://orcid.org/0000-0001-6498-4801" class="external-link">Armin Rauschenberger</a>,
@@ -132,10 +140,15 @@ indicate/contain the cross-validated scaling parameters.</p></li>
 "Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation".
 <em>Under revision</em>. <a href="https://hdl.handle.net/10993/63425" class="external-link">https://hdl.handle.net/10993/63425</a></p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Use <code><a href="coef.sparselink.html">coef</a></code> to extract coefficients
+and <code><a href="predict.sparselink.html">predict</a></code> to make predictions.</p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># multi-task learning</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#--- multi-task learning ---</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">50</span></span></span>
 <span class="r-in"><span><span class="va">q</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
@@ -146,7 +159,7 @@ indicate/contain the cross-validated scaling parameters.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alpha.init=0.95, alpha=1, trial=FALSE, type=exp</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># transfer learning</span></span></span>
+<span class="r-in"><span><span class="co">#--- transfer learning ---</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>,<span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">50</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span>X<span class="op">=</span><span class="va">n</span>,<span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">x</span>,ncol<span class="op">=</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span></span>
