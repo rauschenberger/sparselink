@@ -31,15 +31,27 @@ reference:
   - predict.sparselink
 - title: "Other functions"
   contents:
-  - get.info
-  - sim.data.multiple
-  - sim.data.transfer
-  - calc.metric
-  - change
-  - construct_pf
-  - count_matrix
-  - count_vector
-  - fuse.data
-  - make.folds.multi
-  - make.folds.trans
+  - logit
+  - sigmoid
+  - link_function
+  - mean_function
+  - calc_metric
+  - make_folds_multi
+  - make_folds_trans
+  - get_info
+  - fuse_data
+  - construct_weights
+  - construct_penfacs
+  - wrap_empty
+  - sim_data_trans
+  - sim_data_multi
   - traintest
+  - cv_multiple
+  - cv_transfer
+  - count_vector
+  - count_matrix
+  - change
+  - plot_weight
+
+
+
