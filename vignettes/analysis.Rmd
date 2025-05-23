@@ -140,7 +140,7 @@ for(mode in c("transfer","multiple")){
     } else if(mode=="multiple"){
       #--- multi-task learning ---
       data <- sim_data_multi(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i])
-      method <- c("wrap_separate","wrap_mgaussian","sparselink","wrap_spls") # add glmnet "mgaussian" (only for linear case) or "MTPS" (not sparse)?
+      method <- c("wrap_separate","wrap_mgaussian","sparselink","wrap_spls")
     }
     
     result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid$family[i],method=method)
