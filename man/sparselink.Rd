@@ -35,26 +35,28 @@ default: 1 (lasso)}
 \item{nfolds}{number of internal cross-validation folds,
 default: 10 (10-fold cross-validation)}
 
-\item{cands}{candidate values for both scaling parameters
-(default \code{NULL}: \eqn{\{0, 0.2, 0.4, 0.6, 0.8, 1\}})}
+\item{cands}{candidate values for both scaling parameters,
+default: \code{NULL} (\{0, 0.2, 0.4, 0.6, 0.8, 1\})}
 }
 \value{
 Returns an object of class \code{sparselink}, a list with multiple slots.
-\describe{
-\item{Stage 1 regressions (before sharing information)}{Slot \code{glm.one}
-contains \eqn{q} objects of type \code{cv.glmnet} (one for each problem).}
-\item{Candidate scaling parameters (exponents)}{Slot \code{weight} contains
-a data frame with \eqn{n} combinations of exponents
-for the external (source) and internal (target) weights}
-\item{Stage 2 regressions (after sharing information)}{Slot \code{glm.two}
-contains \eqn{q} lists (one for each problem)
+\itemize{
+\item Stage 1 regressions (before sharing information):
+Slot \code{glm.one} contains \eqn{q} objects of type
+\code{cv.glmnet} (one for each problem).
+\item Candidate scaling parameters (exponents):
+Slot \code{weight} contains
+a data frame with \eqn{n} combinations of exponents for the external (source)
+and internal (target) weights
+\item Stage 2 regressions (after sharing information):
+Slot \code{glm.two} contains \eqn{q} lists (one for each problem)
 of \eqn{n} objects of type \code{cv.glmnet}
-(one for each combination of exponents).}
-\item{Optimal regularisation parameters}{Slot \code{lambda.min}
+(one for each combination of exponents).
+\item Optimal regularisation parameters: Slot \code{lambda.min}
 contains the cross-validated regularisation parameters for the stage 2
-regressions.}
-\item{Optimal scaling parameters}{Slots \code{weight.ind} and
-\code{weight.min} indicate or contain the cross-validated scaling parameters.}
+regressions.
+\item Optimal scaling parameters: Slots \code{weight.ind} and
+\code{weight.min} indicate or contain the cross-validated scaling parameters.
 }
 }
 \description{

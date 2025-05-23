@@ -46,8 +46,8 @@ default: 0.95 (lasso-like elastic net)}
 
 \item{type}{character}
 
-\item{cands}{candidate values for both scaling parameters
-(default \code{NULL}: \eqn{\{0, 0.2, 0.4, 0.6, 0.8, 1\}})}
+\item{cands}{candidate values for both scaling parameters,
+default: \code{NULL} (\{0, 0.2, 0.4, 0.6, 0.8, 1\})}
 }
 \description{
 Trains and tests prediction models
