@@ -70,8 +70,8 @@ if(FALSE){
 #'
 #'@examples
 #'#--- multi-task learning ---
-#'n <- 100
-#'p <- 50
+#'n <- 50
+#'p <- 60
 #'q <- 3
 #'family <- "gaussian"
 #'x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
@@ -79,8 +79,8 @@ if(FALSE){
 #'object <- sparselink(x=x,y=y,family=family)
 #'
 #'#--- transfer learning ---
-#'n <- c(100,50)
-#'p <- 50
+#'n <- c(50,25)
+#'p <- 60
 #'x <- lapply(X=n,function(x) matrix(data=stats::rnorm(n*p),nrow=x,ncol=p))
 #'y <- lapply(X=n,function(x) stats::rnorm(x))
 #'family <- "gaussian"
@@ -297,7 +297,8 @@ print.sparselink <- function(x,...){
 #'
 #'@examples
 #'family <- "gaussian"
-#'data <- sim_data_trans(family=family)
+#'\dontshow{data <- sim_data_trans(family=family,n0=50,p=70)}
+#'\dontrun{data <- sim_data_trans(family=family)}
 #'#data <- sim_data_multi(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'coef <- coef(object=object)
@@ -364,7 +365,8 @@ coef.sparselink <- function(object){
 #'
 #'@examples
 #'family <- "gaussian"
-#'data <- sim_data_multi(family=family)
+#'\dontshow{data <- sim_data_multi(family=family,n0=50,p=70)}
+#'\dontrun{data <- sim_data_multi(family=family)}
 #'#data <- sim_data_trans(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'y_hat <- predict(object=object,newx=data$X_test)
@@ -804,6 +806,7 @@ construct_penfacs <- function(w_int,w_ext,v_int,v_ext,type){
 #'@param object output from multi-task learning or transfer learning method
 #'@param newx feature matrix (MTL) or list of feature matrices (TL)
 #'of testing samples
+#'@param ... (not applicable)
 #'
 #'@return
 #'The wrapper functions \code{wrap_empty}, \code{wrap_separate},
@@ -917,7 +920,7 @@ wrap_separate <- function(x,y,family,alpha=1,lambda=NULL){
 #'@export
 #'@keywords internal
 #'
-predict.wrap_separate <- function(object,newx){
+predict.wrap_separate <- function(object,newx,...){
   if(is.matrix(newx)){
     newx <- replicate(n=object$info$q,expr=newx,simplify=FALSE) 
   }
@@ -932,7 +935,7 @@ predict.wrap_separate <- function(object,newx){
 #'@rdname methods
 #'@export
 #'@keywords internal
-coef.wrap_separate <- function(object){
+coef.wrap_separate <- function(object,...){
   p <- object$info$p
   q <- object$info$q
   alpha <- rep(x=NA,times=q)
@@ -965,7 +968,7 @@ wrap_common <- function(x,y,family,alpha=1){
 #'@export
 #'@keywords internal
 #'
-predict.wrap_common <- function(object,newx){
+predict.wrap_common <- function(object,newx,...){
   fuse <- fuse_data(x=newx,y=NULL,foldid=NULL)
   temp <- stats::predict(object=object$cv.glmnet,newx=fuse$x,s=object$cv.glmnet$lambda.min,type="response")
   y_hat <- tapply(X=temp,INDEX=fuse$index,FUN=function(x) x)
@@ -976,7 +979,7 @@ predict.wrap_common <- function(object,newx){
 #'@export
 #'@keywords internal
 #'
-coef.wrap_common <- function(object){
+coef.wrap_common <- function(object,...){
   coef <- stats::coef(object=object$cv.glmnet,s="lambda.min")
   alpha <- rep(x=coef[1],times=object$info$q)
   beta <- matrix(data=coef[-1],nrow=object$info$p,ncol=object$info$q)
@@ -1002,7 +1005,7 @@ wrap_mgaussian <- function(x,y,family="gaussian",alpha=1){
 #'@export
 #'@keywords internal
 #'
-predict.wrap_mgaussian <- function(object,newx){
+predict.wrap_mgaussian <- function(object,newx,...){
   y_hat <- stats::predict(object$cv.glmnet,newx=newx,s="lambda.min")
   apply(y_hat,2,function(x) x,simplify=FALSE)
 }
@@ -1010,7 +1013,7 @@ predict.wrap_mgaussian <- function(object,newx){
 #'@rdname methods
 #'@export
 #'@keywords internal
-coef.wrap_mgaussian <- function(object){
+coef.wrap_mgaussian <- function(object,...){
   coef <- stats::coef(object$cv.glmnet,s="lambda.min")
   alpha <- sapply(coef,function(x) x[1])
   beta <- sapply(coef,function(x) x[-1])
@@ -1036,7 +1039,7 @@ wrap_spls <- function(x,y,family="gaussian",alpha=1,nfolds=10){
 #'@export
 #'@keywords internal
 #'
-predict.wrap_spls <- function(object,newx){
+predict.wrap_spls <- function(object,newx,...){
   temp <- spls::predict.spls(object=object,newx=newx,type="fit")
   y_hat <- apply(X=temp,MARGIN=2,FUN=function(x) x,simplify=FALSE)
   return(y_hat)
@@ -1046,7 +1049,7 @@ predict.wrap_spls <- function(object,newx){
 #'@export
 #'@keywords internal
 #'
-coef.wrap_spls <- function(object){
+coef.wrap_spls <- function(object,...){
   coef <- spls::coef.spls(object=object)
   list <- list(alpha=NA,beta=coef)
   return(list)
@@ -1076,7 +1079,7 @@ wrap_glmtrans <- function(x,y,family="gaussian",alpha=1){
 #'@export
 #'@keywords internal
 #'
-predict.wrap_glmtrans <- function(object,newx){
+predict.wrap_glmtrans <- function(object,newx,...){
   q <- length(newx)
   y_hat <- list()
   for(i in seq_len(q)){
@@ -1089,7 +1092,7 @@ predict.wrap_glmtrans <- function(object,newx){
 #'@export
 #'@keywords internal
 #'
-coef.wrap_glmtrans <- function(object){
+coef.wrap_glmtrans <- function(object,...){
   coef <- sapply(object,function(x) x$beta)
   alpha <- coef[1,]
   beta <- coef[-1,]
@@ -1133,7 +1136,7 @@ wrap_xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
 #'@export
 #'@keywords internal
 #'
-predict.wrap_xrnet <- function(object,newx){
+predict.wrap_xrnet <- function(object,newx,...){
   y_hat <- list()
   for(i in seq_along(object)){
     y_hat[[i]] <- stats::predict(object[[i]],newdata=newx[[i]])
@@ -1145,7 +1148,7 @@ predict.wrap_xrnet <- function(object,newx){
 #'@export
 #'@keywords internal
 #'
-coef.wrap_xrnet <- function(object){
+coef.wrap_xrnet <- function(object,...){
   alpha <- beta <- numeric()
   for(i in seq_along(object)){
     coef <- stats::coef(object[[i]])

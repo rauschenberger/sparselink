@@ -27,33 +27,33 @@ wrap_empty(x, y, family, alpha = 1)
 
 wrap_separate(x, y, family, alpha = 1, lambda = NULL)
 
-\method{predict}{wrap_separate}(object, newx)
+\method{predict}{wrap_separate}(object, newx, ...)
 
-\method{coef}{wrap_separate}(object)
+\method{coef}{wrap_separate}(object, ...)
 
 wrap_common(x, y, family, alpha = 1)
 
-\method{predict}{wrap_common}(object, newx)
+\method{predict}{wrap_common}(object, newx, ...)
 
-\method{coef}{wrap_common}(object)
+\method{coef}{wrap_common}(object, ...)
 
 wrap_mgaussian(x, y, family = "gaussian", alpha = 1)
 
-\method{predict}{wrap_mgaussian}(object, newx)
+\method{predict}{wrap_mgaussian}(object, newx, ...)
 
-\method{coef}{wrap_mgaussian}(object)
+\method{coef}{wrap_mgaussian}(object, ...)
 
 wrap_spls(x, y, family = "gaussian", alpha = 1, nfolds = 10)
 
-\method{predict}{wrap_spls}(object, newx)
+\method{predict}{wrap_spls}(object, newx, ...)
 
-\method{coef}{wrap_spls}(object)
+\method{coef}{wrap_spls}(object, ...)
 
 wrap_glmtrans(x, y, family = "gaussian", alpha = 1)
 
-\method{predict}{wrap_glmtrans}(object, newx)
+\method{predict}{wrap_glmtrans}(object, newx, ...)
 
-\method{coef}{wrap_glmtrans}(object)
+\method{coef}{wrap_glmtrans}(object, ...)
 
 wrap_xrnet(
   x,
@@ -64,9 +64,9 @@ wrap_xrnet(
   family = "gaussian"
 )
 
-\method{predict}{wrap_xrnet}(object, newx)
+\method{predict}{wrap_xrnet}(object, newx, ...)
 
-\method{coef}{wrap_xrnet}(object)
+\method{coef}{wrap_xrnet}(object, ...)
 }
 \arguments{
 \item{x}{feature matrix (multi-task learning)
@@ -87,6 +87,8 @@ number between 0 and 1}
 
 \item{newx}{feature matrix (MTL) or list of feature matrices (TL)
 of testing samples}
+
+\item{...}{(not applicable)}
 
 \item{nfolds}{number of cross-validation folds: positive integer}
 

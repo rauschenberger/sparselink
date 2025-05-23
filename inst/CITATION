@@ -6,13 +6,12 @@ bibentry(
   author   = c(person("Armin","Rauschenberger"),
               person("Petr V.","Nazarov"),
               person("Enrico","Glaab")),
-  journal  = "Manuscript in preparation",
-  year     = 2024,
+  journal  = "Under revision",
+  year     = 2025,
   volume   = "X",
   number   = "X",
   pages    = "X",
-  doi      = "X",
-  textVersion = paste("Armin Rauschenberger, Petr V. Nazarov, and Enrico Glaab (2024).",
+  textVersion = paste("Armin Rauschenberger, Petr V. Nazarov, and Enrico Glaab (2025).",
 		"\"Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation\".",
-		"Manuscript in preparation")
+		"Under revision")
 )
