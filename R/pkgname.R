@@ -22,6 +22,11 @@
 #' Type `vignette("sparselink")` or `browseVignettes("sparselink")`
 #' to open the vignette.
 #' 
+#' @seealso
+#' First use \code{\link{sparselink}} to fit the models,
+#' and then \code{\link[=coef.sparselink]{coef}} to extract coefficients
+#' or \code{\link[=predict.sparselink]{predict}} to make predictions.
+#' 
 #' @references
 #' \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger},
 #' \href{https://orcid.org/0000-0003-3443-0298}{Petr N. Nazarov},
@@ -32,7 +37,7 @@
 #' 
 #' @examples
 #' ?sparselink
-#' ?predict.sparselink
 #' ?coef.sparselink
+#' ?predict.sparselink
 #' 
 "_PACKAGE"

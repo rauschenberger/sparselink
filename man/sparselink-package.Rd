@@ -20,8 +20,8 @@ to open the vignette.
 }
 \examples{
 ?sparselink
-?predict.sparselink
 ?coef.sparselink
+?predict.sparselink
 
 }
 \references{
@@ -33,13 +33,9 @@ to open the vignette.
 \emph{Under revision}. \url{https://hdl.handle.net/10993/63425}
 }
 \seealso{
-Useful links:
-\itemize{
-  \item \url{https://github.com/rauschenberger/sparselink}
-  \item \url{https://rauschenberger.github.io/sparselink/}
-  \item Report bugs at \url{https://github.com/rauschenberger/sparselink/issues}
-}
-
+First use \code{\link{sparselink}} to fit the models,
+and then \code{\link[=coef.sparselink]{coef}} to extract coefficients
+or \code{\link[=predict.sparselink]{predict}} to make predictions.
 }
 \author{
 \strong{Maintainer}: Armin Rauschenberger \email{armin.rauschenberger@uni.lu} (\href{https://orcid.org/0000-0001-6498-4801}{ORCID})
