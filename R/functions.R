@@ -300,7 +300,7 @@ print.sparselink <- function(x,...){
 #'@examples
 #'family <- "gaussian"
 #'data <- sim_data_trans(family=family)
-#'\dontshow{data <- sim_data_trans(family=family,n0=20,p=10)}
+#'\dontshow{data <- sim_data_trans(family=family,n0=10,p=5)}
 #'#data <- sim_data_multi(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'coef <- coef(object=object)
@@ -368,7 +368,7 @@ coef.sparselink <- function(object,...){
 #'@examples
 #'family <- "gaussian"
 #'data <- sim_data_multi(family=family)
-#'\dontshow{data <- sim_data_multi(family=family,n0=20,p=10)}
+#'\dontshow{data <- sim_data_multi(family=family,n0=10,p=5)}
 #'#data <- sim_data_trans(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'y_hat <- predict(object=object,newx=data$X_test)
@@ -882,7 +882,7 @@ construct_penfacs <- function(w_int,w_ext,v_int,v_ext,type){
 #'"xrnet: Hierarchical Regularized Regression to Incorporate External Data".
 #'\emph{Journal of Open Source Software}
 #'4(44):1761.
-#'\doi{doi.org/10.21105/joss.01761}.
+#'\doi{10.21105/joss.01761}.
 #'(\link[xrnet]{xrnet})
 #'
 #'@name methods

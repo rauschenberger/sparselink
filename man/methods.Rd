@@ -180,7 +180,7 @@ Garrett M. Weaver and Juan Pablo Lewinger (2019).
 "xrnet: Hierarchical Regularized Regression to Incorporate External Data".
 \emph{Journal of Open Source Software}
 4(44):1761.
-\doi{doi.org/10.21105/joss.01761}.
+\doi{10.21105/joss.01761}.
 (\link[xrnet]{xrnet})
 }
 \seealso{
