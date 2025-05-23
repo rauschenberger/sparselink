@@ -35,7 +35,7 @@ if(FALSE){
 #'default: 10 (10-fold cross-validation)
 #'@param type default \code{"exp"} scales weights with
 #'\eqn{w_{ext}^{v_{ext}}+w_{int}^{v_{int}}}
-#'(see internal function \link{construct_pf} for details)
+#'(see internal function \link{construct_penfacs} for details)
 #'@param cands candidate values for both scaling parameters,
 #'default: \code{NULL} (\{0, 0.2, 0.4, 0.6, 0.8, 1\})
 #'
@@ -154,10 +154,10 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,c
   }
   
   for(i in seq_len(q)){
-    rest.ext <- comb_split(coef=beta.ext,id=i)
+    rest.ext <- construct_weights(coef=beta.ext,id=i)
     glm.two.ext[[i]] <- list()
     for(l in seq_len(nrow(weight))){
-      pf <- construct_pf(w_int=rest.ext$weight.target,w_ext=rest.ext$weight.source,v_int=weight$target[l],v_ext=weight$source[l],type=type)
+      pf <- construct_penfacs(w_int=rest.ext$weight.target,w_ext=rest.ext$weight.source,v_int=weight$target[l],v_ext=weight$source[l],type=type)
       if(all(pf==Inf)){
         glm.two.ext[[i]][[l]] <- glmnet::glmnet(x=cbind(x[[i]],x[[i]]),y=y[[i]],family=family[i],lambda=99e99,alpha=alpha.two)
       } else {
@@ -202,9 +202,9 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,c
           beta.int[,i] <- stats::coef(object=glm.one.int,s=glm.one.ext[[i]]$lambda.min)[-1]
         }
       }
-      rest.int <- comb_split(coef=beta.int,id=i)
+      rest.int <- construct_weights(coef=beta.int,id=i)
       for(l in seq_len(nrow(weight))){
-        pf <- construct_pf(w_int=rest.int$weight.target,w_ext=rest.int$weight.source,v_int=weight$target[l],v_ext=weight$source[l],type=type)
+        pf <- construct_penfacs(w_int=rest.int$weight.target,w_ext=rest.int$weight.source,v_int=weight$target[l],v_ext=weight$source[l],type=type)
         if(all(pf==Inf)){
           glm.two.int <- glmnet::glmnet(x=cbind(x[[i]],x[[i]])[!cond,],y=y[[i]][!cond],family=family[i],lambda=99e99,alpha=alpha.two)
         } else {
@@ -680,7 +680,7 @@ fuse.data <- function(x,y=NULL,foldid=NULL){
 }
 
 #'@title
-#'Extract internal and external weights
+#'Construct internal and external weights
 #'
 #'@export
 #'@keywords internal
@@ -701,9 +701,9 @@ fuse.data <- function(x,y=NULL,foldid=NULL){
 #'q <- 3
 #'data <- stats::rbinom(p*q,size=1,prob=0.2)*stats::rnorm(p*q)
 #'coef <- matrix(data=data,nrow=p,ncol=q)
-#'comb_split(coef=coef,id=1)
+#'construct_weights(coef=coef,id=1)
 #'
-comb_split <- function(coef,id){
+construct_weights <- function(coef,id){
   lower.limits <- rep(x=c(0,-Inf),each=nrow(coef))
   upper.limits <- rep(x=c(Inf,0),each=nrow(coef))
   #--- external weights ---
@@ -762,9 +762,9 @@ comb_split <- function(coef,id){
 #'n <- 10
 #'w_int <- stats::runif(n)
 #'w_ext <- stats::runif(n)
-#'construct_pf(w_int,w_ext,v_int=0.5,v_ext=0.5,type="exp")
+#'construct_penfacs(w_int,w_ext,v_int=0.5,v_ext=0.5,type="exp")
 #'
-construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
+construct_penfacs <- function(w_int,w_ext,v_int,v_ext,type){
   if(type %in% c("exp","exp.con")){
     pf <- 1/((w_int^v_int)+(w_ext^v_ext))
   } else if(type %in% c("ari","ari.con")){

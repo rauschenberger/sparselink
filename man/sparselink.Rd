@@ -32,7 +32,7 @@ default: 1 (lasso)}
 
 \item{type}{default \code{"exp"} scales weights with
 \eqn{w_{ext}^{v_{ext}}+w_{int}^{v_{int}}}
-(see internal function \link{construct_pf} for details)}
+(see internal function \link{construct_penfacs} for details)}
 
 \item{nfolds}{number of internal cross-validation folds,
 default: 10 (10-fold cross-validation)}

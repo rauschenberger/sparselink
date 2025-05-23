@@ -184,17 +184,17 @@ w_int <- stats::runif(n=n)
 w_ext <- stats::runif(n=n)
 
 testthat::test_that("w_tot=w_int+1 if v_int=1 and v_ext=0",{
-  w_tot <- 1/construct_pf(w_int=w_int,w_ext=w_ext,v_int=1,v_ext=0,type="exp")
+  w_tot <- 1/construct_penfacs(w_int=w_int,w_ext=w_ext,v_int=1,v_ext=0,type="exp")
   testthat::expect_true(all(abs(w_tot-(w_int+1))<eps))
 })
 
 testthat::test_that("w_tot=w_ext+1 if v_int=1 and v_ext=0",{
-  w_tot <- 1/construct_pf(w_int=w_int,w_ext=w_ext,v_int=0,v_ext=1,type="exp")
+  w_tot <- 1/construct_penfacs(w_int=w_int,w_ext=w_ext,v_int=0,v_ext=1,type="exp")
   testthat::expect_true(all(abs(w_tot-(w_ext+1))<eps))
 })
 
 testthat::test_that("w_tot=w_int+w_ext if v_int=1 and v_ext=1",{
-  w_tot <- 1/construct_pf(w_int=w_int,w_ext=w_ext,v_int=1,v_ext=1,type="exp")
+  w_tot <- 1/construct_penfacs(w_int=w_int,w_ext=w_ext,v_int=1,v_ext=1,type="exp")
   testthat::expect_true(all(abs(w_tot-(w_int+w_ext)<eps)))
 })
 
