@@ -31,4 +31,8 @@ coef <- matrix(data=data,nrow=p,ncol=q)
 construct_weights(coef=coef,id=1)
 
 }
+\seealso{
+Use \code{\link{construct_penfacs}} to obtain penalty factors
+(i.e., for scaling and inverting weights).
+}
 \keyword{internal}

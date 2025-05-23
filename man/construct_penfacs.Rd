@@ -53,4 +53,7 @@ w_ext <- stats::runif(n)
 construct_penfacs(w_int,w_ext,v_int=0.5,v_ext=0.5,type="exp")
 
 }
+\seealso{
+Use \code{\link{construct_weights}} to obtain \code{w_int} and \code{w_ext}.
+}
 \keyword{internal}

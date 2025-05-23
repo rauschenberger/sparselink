@@ -705,6 +705,10 @@ fuse_data <- function(x,y=NULL,foldid=NULL){
 #'with the first \eqn{p} entries for positive effects
 #'and the last \eqn{p} entries for negative effects.
 #'
+#'@seealso
+#'Use \code{\link{construct_penfacs}} to obtain penalty factors
+#'(i.e., for scaling and inverting weights).
+#'
 #'@examples
 #'p <- 10
 #'q <- 3
@@ -766,6 +770,8 @@ construct_weights <- function(coef,id){
 #'character \code{"exp"}, \code{"ari"}, \code{"geo"}, or \code{"rem"}
 #'(with or without addition of \code{".con"}),
 #'default: \code{"exp"}
+#'@seealso
+#'Use \code{\link{construct_weights}} to obtain \code{w_int} and \code{w_ext}.
 #'
 #'@examples
 #'n <- 10
