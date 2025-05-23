@@ -1109,10 +1109,10 @@ coef.wrap_xrnet <- function(object){
 
 #----- simulation and application -----
 
-#'@title Data simulation for transfer learning
+#'@title Data simulation for related problems
 #'
 #'@description
-#'Simulates data for transfer learning.
+#'Simulates data for multi-task learning and transfer learning.
 #'
 #'@export
 #'@keywords internal
@@ -1127,6 +1127,15 @@ coef.wrap_xrnet <- function(object){
 #'@param rho correlation (for decreasing structure)
 #'
 #'@return
+#'\itemize{
+#'\item Multi-task learning:
+#'Returns a list with slots
+#'\code{y_train} (\eqn{n_0 \times q} matrix),
+#'\code{X_train}(\eqn{n_0 \times p} matrix),
+#'\code{y_test} (\eqn{n_1 \times q} matrix),
+#'\code{X_test} (\eqn{n_1 \times p} matrix),
+#'and \code{beta} (\eqn{p \times q} matrix).
+#'\item Transfer learning:
 #'Returns a list with slots
 #'\code{y_train} (\eqn{q} vectors)
 #'and \code{X_train} (\eqn{q} matrices with \eqn{p} columns) for training data,
@@ -1134,8 +1143,14 @@ coef.wrap_xrnet <- function(object){
 #'(\eqn{q} matrices with \eqn{p} columns)
 #'for testing data,
 #'and \code{beta} for effects (\eqn{p \times q} matrix).
+#'}
 #'
 #'@examples
+#'#--- multit-task learning ---
+#'data <- sim_data_multi()
+#'sapply(X=data,FUN=dim)
+#'
+#'#--- transfer learning ---
 #'data <- sim_data_trans()
 #'sapply(X=data$y_train,FUN=length)
 #'sapply(X=data$X_train,FUN=dim)
@@ -1143,6 +1158,39 @@ coef.wrap_xrnet <- function(object){
 #'sapply(X=data$X_test,FUN=dim)
 #'dim(data$beta)
 #'
+sim_data_multi <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=10000,p=200,rho=0.5,family="gaussian"){
+  n <- n0 + n1
+  theta <- stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.common)
+  if(rho==0){
+    X <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
+  } else {
+    mean <- rep(x=0,times=p)
+    sigma <- matrix(data=NA,nrow=p,ncol=p)
+    sigma <- rho^abs(row(sigma)-col(sigma))
+    X <- mvtnorm::rmvnorm(n=n,mean=mean,sigma=sigma)
+  }
+  y <- matrix(data=NA,nrow=n,ncol=q)
+  beta <- matrix(data=NA,nrow=p,ncol=q)
+  for(i in seq_len(q)){
+    beta[,i] <- theta + stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.separate)
+    y[,i] <- X %*% beta[,i] + stats::rnorm(n=n)
+    if(family=="binomial"){
+      y[,i] <- 1*(y[,i]>=0)
+    }
+  }
+  foldid <- rep(x=c(0,1),times=c(n0,n1))
+  cond <- foldid==0
+  y_train <- y[cond,]
+  y_test <- y[!cond,]
+  X_train <- X[cond,]
+  X_test <- X[!cond,]
+  list <- list(y_train=y_train,X_train=X_train,y_test=y_test,X_test=X_test,beta=beta)
+  return(list)
+}
+
+#'@rdname sim_data_multi
+#'@export
+#'@keywords internal
 sim_data_trans <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,200),n1=10000,p=200,rho=0.5,family="gaussian"){
   if(length(n0)==1){
     n0 <- rep(x=n0,times=q)
@@ -1179,58 +1227,6 @@ sim_data_trans <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,2
     X_train[[i]] <- X[[i]][cond,]
     X_test[[i]] <- X[[i]][!cond,]
   }
-  list <- list(y_train=y_train,X_train=X_train,y_test=y_test,X_test=X_test,beta=beta)
-  return(list)
-}
-
-#'@title Data simulation for multi-task learning
-#'
-#'@description
-#'Simulates data for multi-task learning.
-#'
-#'@export
-#'@keywords internal
-#'
-#'@inheritParams sim_data_trans
-#'
-#'@return
-#'Returns a list with slots
-#'\code{y_train} (\eqn{n_0 \times q} matrix),
-#'\code{X_train}(\eqn{n_0 \times p} matrix),
-#'\code{y_test} (\eqn{n_1 \times q} matrix),
-#'\code{X_test} (\eqn{n_1 \times p} matrix),
-#'and \code{beta} (\eqn{p \times q} matrix).
-#'
-#'@examples
-#'data <- sim_data_multi()
-#'sapply(X=data,FUN=dim)
-#' 
-sim_data_multi <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=10000,p=200,rho=0.5,family="gaussian"){
-  n <- n0 + n1
-  theta <- stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.common)
-  if(rho==0){
-    X <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
-  } else {
-    mean <- rep(x=0,times=p)
-    sigma <- matrix(data=NA,nrow=p,ncol=p)
-    sigma <- rho^abs(row(sigma)-col(sigma))
-    X <- mvtnorm::rmvnorm(n=n,mean=mean,sigma=sigma)
-  }
-  y <- matrix(data=NA,nrow=n,ncol=q)
-  beta <- matrix(data=NA,nrow=p,ncol=q)
-  for(i in seq_len(q)){
-    beta[,i] <- theta + stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.separate)
-    y[,i] <- X %*% beta[,i] + stats::rnorm(n=n)
-    if(family=="binomial"){
-      y[,i] <- 1*(y[,i]>=0)
-    }
-  }
-  foldid <- rep(x=c(0,1),times=c(n0,n1))
-  cond <- foldid==0
-  y_train <- y[cond,]
-  y_test <- y[!cond,]
-  X_train <- X[cond,]
-  X_test <- X[!cond,]
   list <- list(y_train=y_train,X_train=X_train,y_test=y_test,X_test=X_test,beta=beta)
   return(list)
 }
@@ -1521,9 +1517,9 @@ count_matrix <- function(truth,estim){
 #'y0 <- stats::rnorm(n*m,mean=0)
 #'y1 <- stats::rnorm(n*m,mean=ifelse(x=="A",2,-2))
 #'y2 <- stats::rnorm(n*m,mean=ifelse(x=="A",4,-4))
-#'change(x,y0,y1,y2)
+#'plot_change(x,y0,y1,y2)
 #'
-change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
+plot_change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase=TRUE){
   unique <- unique(x)
   graphics::plot.new()
   xlim <- c(1-0.2,length(unique)+0.2)

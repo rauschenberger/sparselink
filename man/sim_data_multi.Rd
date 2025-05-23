@@ -2,13 +2,25 @@
 % Please edit documentation in R/functions.R
 \name{sim_data_multi}
 \alias{sim_data_multi}
-\title{Data simulation for multi-task learning}
+\alias{sim_data_trans}
+\title{Data simulation for related problems}
 \usage{
 sim_data_multi(
   prob.common = 0.05,
   prob.separate = 0.05,
   q = 3,
   n0 = 100,
+  n1 = 10000,
+  p = 200,
+  rho = 0.5,
+  family = "gaussian"
+)
+
+sim_data_trans(
+  prob.common = 0.05,
+  prob.separate = 0.05,
+  q = 3,
+  n0 = c(50, 100, 200),
   n1 = 10000,
   p = 200,
   rho = 0.5,
@@ -33,19 +45,39 @@ sim_data_multi(
 \item{family}{character \code{"gaussian"} or \code{"binomial"}}
 }
 \value{
+\itemize{
+\item Multi-task learning:
 Returns a list with slots
 \code{y_train} (\eqn{n_0 \times q} matrix),
 \code{X_train}(\eqn{n_0 \times p} matrix),
 \code{y_test} (\eqn{n_1 \times q} matrix),
 \code{X_test} (\eqn{n_1 \times p} matrix),
 and \code{beta} (\eqn{p \times q} matrix).
+\item Transfer learning:
+Returns a list with slots
+\code{y_train} (\eqn{q} vectors)
+and \code{X_train} (\eqn{q} matrices with \eqn{p} columns) for training data,
+and \code{y_test} (\eqn{vectors}) and \code{X_test}
+(\eqn{q} matrices with \eqn{p} columns)
+for testing data,
+and \code{beta} for effects (\eqn{p \times q} matrix).
+}
 }
 \description{
-Simulates data for multi-task learning.
+Simulates data for multi-task learning and transfer learning.
 }
 \examples{
+#--- multit-task learning ---
 data <- sim_data_multi()
 sapply(X=data,FUN=dim)
+
+#--- transfer learning ---
+data <- sim_data_trans()
+sapply(X=data$y_train,FUN=length)
+sapply(X=data$X_train,FUN=dim)
+sapply(X=data$y_test,FUN=length)
+sapply(X=data$X_test,FUN=dim)
+dim(data$beta)
 
 }
 \keyword{internal}
