@@ -8,7 +8,6 @@
 <url><loc>https://rauschenberger.github.io/sparselink/index.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/news/index.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/calc_metric.html</loc></url>
-<url><loc>https://rauschenberger.github.io/sparselink/reference/change.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/coef.sparselink.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/construct_penfacs.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/construct_weights.html</loc></url>
@@ -22,12 +21,12 @@
 <url><loc>https://rauschenberger.github.io/sparselink/reference/make_folds_multi.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/mean_function.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/methods.html</loc></url>
+<url><loc>https://rauschenberger.github.io/sparselink/reference/plot_change.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/plot_weight.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/predict.sparselink.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/print.sparselink.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/sigmoid.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/sim_data_multi.html</loc></url>
-<url><loc>https://rauschenberger.github.io/sparselink/reference/sim_data_trans.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/sparselink-package.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/sparselink.html</loc></url>
 <url><loc>https://rauschenberger.github.io/sparselink/reference/traintest.html</loc></url>

@@ -193,7 +193,7 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-in"><span><span class="co">#object &lt;- wrap_spls(x=x,y=y,family=family)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alpha</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.043397061  0.005472131  0.212608438</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.07797227 -0.11486182  0.15806312</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1] [,2] [,3]</span>
@@ -250,43 +250,43 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>,newx<span class="op">=</span><span class="va">newx</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.04339706</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.04339706</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.04339706</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.04339706</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.04339706</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.04339706</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.04339706</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.04339706</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.04339706</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.04339706</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.07797227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.07797227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.07797227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.07797227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.07797227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.07797227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.07797227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.07797227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.07797227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.07797227</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.005472131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.005472131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.005472131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.005472131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.005472131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.005472131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.005472131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.005472131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.005472131</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.005472131</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.1148618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.1148618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.1148618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.1148618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.1148618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.1148618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.1148618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.1148618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.1148618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.1148618</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[3]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  0.2126084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  0.2126084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  0.2126084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.2126084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  0.2126084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  0.2126084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  0.2126084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  0.2126084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  0.2126084</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  0.2126084</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  0.1580631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  0.1580631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  0.1580631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.1580631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  0.1580631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  0.1580631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  0.1580631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  0.1580631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  0.1580631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  0.1580631</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#--- transfer learning ---</span></span></span>
@@ -304,7 +304,7 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-in"><span><span class="co">#object &lt;- wrap_xrnet(x=x,y=y,family=family)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alpha</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.0378806 -0.1204643</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.02370291 -0.06693200</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1] [,2]</span>
@@ -362,29 +362,29 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>,newx<span class="op">=</span><span class="va">newx</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  0.0378806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  0.0378806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  0.0378806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.0378806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  0.0378806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  0.0378806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  0.0378806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  0.0378806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  0.0378806</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  0.0378806</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.02370291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.02370291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.02370291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.02370291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.02370291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.02370291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.02370291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.02370291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.02370291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.02370291</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.1204643</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.1204643</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.1204643</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.1204643</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.1204643</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.1204643</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.1204643</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.1204643</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.1204643</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.1204643</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  -0.066932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  -0.066932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  -0.066932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  -0.066932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  -0.066932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  -0.066932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  -0.066932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  -0.066932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  -0.066932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  -0.066932</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
