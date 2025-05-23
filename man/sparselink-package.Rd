@@ -38,7 +38,7 @@ and then \code{\link[=coef.sparselink]{coef}} to extract coefficients
 or \code{\link[=predict.sparselink]{predict}} to make predictions.
 }
 \author{
-\strong{Maintainer}: Armin Rauschenberger \email{armin.rauschenberger@uni.lu} (\href{https://orcid.org/0000-0001-6498-4801}{ORCID})
+\strong{Maintainer}: Armin Rauschenberger \email{armin.rauschenberger@lih.lu} (\href{https://orcid.org/0000-0001-6498-4801}{ORCID})
 
 }
 \keyword{documentation}
