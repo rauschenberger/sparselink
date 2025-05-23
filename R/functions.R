@@ -843,9 +843,38 @@ construct_penfacs <- function(w_int,w_ext,v_int,v_ext,type){
 #'coef(object)
 #'predict(object,newx=newx)
 #'
-#'@references
-#'See R packages \link[glmnet]{cv.glmnet} (with argument \code{family="mgaussian"})
+#'@seealso
+#'See original functions
+#'\link[glmnet]{cv.glmnet} (with argument \code{family="mgaussian"})
 #'\link[spls]{spls}, \link[glmtrans]{glmtrans}, and \link[xrnet]{xrnet}.
+#'
+#'@references
+#'Noah Simon, Jerome H. Friedman, and TrevorHastie (2013). 
+#"A blockwise descent algorithm for group-penalized multiresponse and multinomial regression".
+#'\emph{arXiv} (Preprint).
+#'\doi{10.48550/arXiv.1311.6529}.
+#'(\link[glmnet]{cv.glmnet})
+#'
+#'Hyonho Chun and S??nd??z Kele?? (2010).
+#'"Sparse Partial Least Squares Regression for Simultaneous Dimension Reduction and Variable Selection".
+#'\emph{Journal of the Royal Statistical Society Series B: Statistical Methodology}
+#'72(1);3???25.
+#'\doi{10.1111/j.1467-9868.2009.00723.x}.
+#'(\link[spls]{spls})
+#'
+#'Ye Tian and Yang Feng (2022).
+#'"Transfer learning under high-dimensional generalized linear models".
+#'\emph{Journal of the American Statistical Association}
+#'118(544):2684-2697.
+#'\doi{10.1080/01621459.2022.2071278}.
+#'(\link[glmtrans]{glmtrans})
+#'
+#'Garrett M. Weaver and Juan Pablo Lewinger (2019).
+#'"xrnet: Hierarchical Regularized Regression to Incorporate External Data".
+#'\emph{Journal of Open Source Software}
+#'4(44):1761.
+#'\doi{doi.org/10.21105/joss.01761}.
+#'(\link[xrnet]{xrnet})
 #'
 #'@name methods
 #'

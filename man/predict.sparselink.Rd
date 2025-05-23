@@ -48,7 +48,7 @@ y_hat <- predict(object=object,newx=data$X_test)
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger},
-\href{https://orcid.org/0000-0003-3443-0298}{Petr N. Nazarov},
+\href{https://orcid.org/0000-0003-3443-0298}{Petr N. Nazarov}, and
 \href{https://orcid.org/0000-0003-3977-7469}{Enrico Glaab}
 (2025).
 "Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation".
