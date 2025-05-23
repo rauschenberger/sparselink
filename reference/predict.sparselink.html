@@ -110,11 +110,14 @@ and <code><a href="coef.sparselink.html">coef</a></code> to extract coefficients
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">family</span> <span class="op">&lt;-</span> <span class="st">"gaussian"</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim_data_multi.html">sim_data_multi</a></span><span class="op">(</span>family<span class="op">=</span><span class="va">family</span><span class="op">)</span> <span class="co"># \dontrun{}</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim_data_multi.html">sim_data_multi</a></span><span class="op">(</span>family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">#data &lt;- sim_data_trans(family=family)</span></span></span>
 <span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu"><a href="sparselink.html">sparselink</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">X_train</span>,y<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">y_train</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alpha.init=0.95, alpha=1, type=exp</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object<span class="op">=</span><span class="va">object</span>,newx<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">X_test</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
