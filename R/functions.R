@@ -803,9 +803,9 @@ construct_penfacs <- function(w_int,w_ext,v_int,v_ext,type){
 #'of testing samples
 #'
 #'@return
-#'The wrapper functions \code{glm.empty}, \code{glm.separate},
-#'\code{glm.common}, \code{glm.mgaussian}, \code{glm.spls},
-#'\code{glm.glmtrans}, and \code{glm.xrnet} return fitted models,
+#'The wrapper functions \code{wrap_empty}, \code{wrap_separate},
+#'\code{wrap_common}, \code{wrap_mgaussian}, \code{wrap_spls},
+#'\code{wrap_glmtrans}, and \code{wrap_xrnet} return fitted models,
 #'and the generic functions \code{coef} and \code{predict}
 #'return coefficients or predicted values in a standardised format.
 #'
@@ -819,10 +819,10 @@ construct_penfacs <- function(w_int,w_ext,v_int,v_ext,type){
 #'x <- matrix(data=rnorm(n=n_train*p),nrow=n_train,ncol=p)
 #'newx <- matrix(data=rnorm(n=n_test*p),nrow=n_test,ncol=p)
 #'y <- matrix(data=rnorm(n_train*q),nrow=n_train,ncol=q)
-#'object <- glm.empty(x=x,y=y,family=family)
-#'#object <- glm.separate(x=x,y=y,family=family)
-#'#object <- glm.mgaussian(x=x,y=y,family=family)
-#'#object <- glm.spls(x=x,y=y,family=family)
+#'object <- wrap_empty(x=x,y=y,family=family)
+#'#object <- wrap_separate(x=x,y=y,family=family)
+#'#object <- wrap_mgaussian(x=x,y=y,family=family)
+#'#object <- wrap_spls(x=x,y=y,family=family)
 #'coef(object)
 #'predict(object,newx=newx)
 #'
@@ -834,11 +834,11 @@ construct_penfacs <- function(w_int,w_ext,v_int,v_ext,type){
 #'newx <- lapply(X=n_test,function(n) matrix(data=stats::rnorm(n*p),nrow=n,ncol=p))
 #'y <- lapply(X=n_train,function(n) stats::rnorm(n))
 #'family <- "gaussian"
-#'object <- glm.empty(x=x,y=y,family=family)
-#'#object <- glm.separate(x=x,y=y,family=family)
-#'#object <- glm.common(x=x,y=y,family=family)
-#'#object <- glm.glmtrans(x=x,y=y,family=family)
-#'#object <- glm.xrnet(x=x,y=y,family=family)
+#'object <- wrap_empty(x=x,y=y,family=family)
+#'#object <- wrap_separate(x=x,y=y,family=family)
+#'#object <- wrap_common(x=x,y=y,family=family)
+#'#object <- wrap_glmtrans(x=x,y=y,family=family)
+#'#object <- wrap_xrnet(x=x,y=y,family=family)
 #'coef(object)
 #'predict(object,newx=newx)
 #'
@@ -852,15 +852,15 @@ NULL
 #'@describeIn methods intercept-only model (MTL and TL)
 #'@export
 #'@keywords internal
-glm.empty <- function(x,y,family,alpha=1){
-  object <- glm.separate(x=x,y=y,family=family,alpha=alpha,lambda=c(99e99,99e98))
+wrap_empty <- function(x,y,family,alpha=1){
+  object <- wrap_separate(x=x,y=y,family=family,alpha=alpha,lambda=c(99e99,99e98))
   return(object)
 }
 
 #'@describeIn methods separate model for each problem (MTL and TL)
 #'@export
 #'@keywords internal
-glm.separate <- function(x,y,family,alpha=1,lambda=NULL){
+wrap_separate <- function(x,y,family,alpha=1,lambda=NULL){
   if(is.matrix(x) & is.matrix(y)){
     q <- ncol(y)
     x <- replicate(n=q,expr=x,simplify=FALSE)
@@ -875,14 +875,14 @@ glm.separate <- function(x,y,family,alpha=1,lambda=NULL){
   for(i in seq_len(object$info$q)){
     object$cv.glmnet[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family[i],alpha=alpha,lambda=lambda)
   }
-  class(object) <- "glm.separate"
+  class(object) <- "wrap_separate"
   return(object)
 }
 
 #'@rdname methods
 #'@export
 #'@keywords internal
-predict.glm.separate <- function(object,newx){
+predict.wrap_separate <- function(object,newx){
   if(is.matrix(newx)){
     newx <- replicate(n=object$info$q,expr=newx,simplify=FALSE) 
   }
@@ -897,7 +897,7 @@ predict.glm.separate <- function(object,newx){
 #'@rdname methods
 #'@export
 #'@keywords internal
-coef.glm.separate <- function(object){
+coef.wrap_separate <- function(object){
   p <- object$info$p
   q <- object$info$q
   alpha <- rep(x=NA,times=q)
@@ -914,21 +914,21 @@ coef.glm.separate <- function(object){
 #'@describeIn methods common model for all problems (TL)
 #'@export
 #'@keywords internal
-glm.common <- function(x,y,family,alpha=1){
+wrap_common <- function(x,y,family,alpha=1){
   family <- unique(family)
   if(length(family)>1){stop("requires unique family")}
   object <- list()
   object$info <- get_info(x=x,y=y)
   fuse <- fuse_data(x=x,y=y,foldid=NULL)
   object$cv.glmnet <- glmnet::cv.glmnet(x=fuse$x,y=fuse$y,family=family,alpha=alpha)
-  class(object) <- "glm.common"
+  class(object) <- "wrap_common"
   return(object)
 }
 
 #'@rdname methods
 #'@export
 #'@keywords internal
-predict.glm.common <- function(object,newx){
+predict.wrap_common <- function(object,newx){
   fuse <- fuse_data(x=newx,y=NULL,foldid=NULL)
   temp <- stats::predict(object=object$cv.glmnet,newx=fuse$x,s=object$cv.glmnet$lambda.min,type="response")
   y_hat <- tapply(X=temp,INDEX=fuse$index,FUN=function(x) x)
@@ -938,7 +938,7 @@ predict.glm.common <- function(object,newx){
 #'@rdname methods
 #'@export
 #'@keywords internal
-coef.glm.common <- function(object){
+coef.wrap_common <- function(object){
   coef <- stats::coef(object=object$cv.glmnet,s="lambda.min")
   alpha <- rep(x=coef[1],times=object$info$q)
   beta <- matrix(data=coef[-1],nrow=object$info$p,ncol=object$info$q)
@@ -949,20 +949,20 @@ coef.glm.common <- function(object){
 #'@describeIn methods multivariate Gaussian regression (MTL)
 #'@export
 #'@keywords internal
-glm.mgaussian <- function(x,y,family="gaussian",alpha=1){
+wrap_mgaussian <- function(x,y,family="gaussian",alpha=1){
   object <- list()
   family <- unique(family)
   if(length(family)>1){stop("requires unique family")}
   if(family!="gaussian"){stop("requires gaussian")}
   object$cv.glmnet <- glmnet::cv.glmnet(x=x,y=y,family="mgaussian",alpha=alpha)
-  class(object) <- "glm.mgaussian"
+  class(object) <- "wrap_mgaussian"
   return(object)
 }
 
 #'@rdname methods
 #'@export
 #'@keywords internal
-predict.glm.mgaussian <- function(object,newx){
+predict.wrap_mgaussian <- function(object,newx){
   y_hat <- stats::predict(object$cv.glmnet,newx=newx,s="lambda.min")
   apply(y_hat,2,function(x) x,simplify=FALSE)
 }
@@ -970,7 +970,7 @@ predict.glm.mgaussian <- function(object,newx){
 #'@rdname methods
 #'@export
 #'@keywords internal
-coef.glm.mgaussian <- function(object){
+coef.wrap_mgaussian <- function(object){
   coef <- stats::coef(object$cv.glmnet,s="lambda.min")
   alpha <- sapply(coef,function(x) x[1])
   beta <- sapply(coef,function(x) x[-1])
@@ -981,20 +981,20 @@ coef.glm.mgaussian <- function(object){
 #'@describeIn methods sparse partial least squares (MTL)
 #'@export
 #'@keywords internal
-glm.spls <- function(x,y,family="gaussian",alpha=1,nfolds=10){
+wrap_spls <- function(x,y,family="gaussian",alpha=1,nfolds=10){
   if(any(family!="gaussian")){stop("SPLS requires Gaussian family.")}
   if(alpha!=1){stop("SPLS requires alpha=1")}
   invisible(utils::capture.output(cv.spls <- spls::cv.spls(x=x,y=y,fold=10,K=seq_len(min(ncol(x),10)),
                                                            eta=seq(from=0.0,to=0.9,by=0.1),plot.it=FALSE)))
   object <- spls::spls(x=x,y=y,K=cv.spls$K.opt,eta=cv.spls$eta.opt)
-  class(object) <- "glm.spls"
+  class(object) <- "wrap_spls"
   return(object)
 }
 
 #'@rdname methods
 #'@export
 #'@keywords internal
-predict.glm.spls <- function(object,newx){
+predict.wrap_spls <- function(object,newx){
   temp <- spls::predict.spls(object=object,newx=newx,type="fit")
   y_hat <- apply(X=temp,MARGIN=2,FUN=function(x) x,simplify=FALSE)
   return(y_hat)
@@ -1003,7 +1003,7 @@ predict.glm.spls <- function(object,newx){
 #'@rdname methods
 #'@export
 #'@keywords internal
-coef.glm.spls <- function(object){
+coef.wrap_spls <- function(object){
   coef <- spls::coef.spls(object=object)
   list <- list(alpha=NA,beta=coef)
   return(list)
@@ -1012,7 +1012,7 @@ coef.glm.spls <- function(object){
 #'@describeIn methods transfer generalised linear model (TL)
 #'@export
 #'@keywords internal
-glm.glmtrans <- function(x,y,family="gaussian",alpha=1){
+wrap_glmtrans <- function(x,y,family="gaussian",alpha=1){
   family <- unique(family)
   if(length(family)>1){stop("glmtrans requires unique family")}
   q <- length(x)
@@ -1024,14 +1024,14 @@ glm.glmtrans <- function(x,y,family="gaussian",alpha=1){
   for(i in seq_len(q)){
     invisible(utils::capture.output(object[[i]] <- glmtrans::glmtrans(target=list(y=y[[i]],x=x[[i]]),source=source[-i],family=family,alpha=alpha)))
   }
-  class(object) <- "glm.glmtrans"
+  class(object) <- "wrap_glmtrans"
   return(object)
 }
 
 #'@rdname methods
 #'@export
 #'@keywords internal
-predict.glm.glmtrans <- function(object,newx){
+predict.wrap_glmtrans <- function(object,newx){
   q <- length(newx)
   y_hat <- list()
   for(i in seq_len(q)){
@@ -1043,7 +1043,7 @@ predict.glm.glmtrans <- function(object,newx){
 #'@rdname methods
 #'@export
 #'@keywords internal
-coef.glm.glmtrans <- function(object){
+coef.wrap_glmtrans <- function(object){
   coef <- sapply(object,function(x) x$beta)
   alpha <- coef[1,]
   beta <- coef[-1,]
@@ -1054,7 +1054,7 @@ coef.glm.glmtrans <- function(object){
 #'@describeIn methods hierarchical regression (TL) 
 #'@export
 #'@keywords internal
-glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
+wrap_xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   family <- unique(family)
   if(length(family)!=1){stop("XRNET requires single family")}
   q <- length(x)
@@ -1078,14 +1078,14 @@ glm.xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
                                   nfolds=nfolds,
                                   loss="deviance")
   }
-  class(object) <- "glm.xrnet"
+  class(object) <- "wrap_xrnet"
   return(object)
 }
 
 #'@rdname methods
 #'@export
 #'@keywords internal
-predict.glm.xrnet <- function(object,newx){
+predict.wrap_xrnet <- function(object,newx){
   y_hat <- list()
   for(i in seq_along(object)){
     y_hat[[i]] <- stats::predict(object[[i]],newdata=newx[[i]])
@@ -1096,7 +1096,7 @@ predict.glm.xrnet <- function(object,newx){
 #'@rdname methods
 #'@export
 #'@keywords internal
-coef.glm.xrnet <- function(object){
+coef.wrap_xrnet <- function(object){
   alpha <- beta <- numeric()
   for(i in seq_along(object)){
     coef <- stats::coef(object[[i]])
@@ -1274,7 +1274,7 @@ sim_data_multi <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=100
 #'result <- traintest(data$y_train,data$X_train,family=family)
 #'}
 #'
-traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",alpha=1,method=c("glm.empty","glm.separate","sparselink"),alpha.init=0.95,type="exp",cands=NULL){
+traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",alpha=1,method=c("wrap_empty","wrap_separate","sparselink"),alpha.init=0.95,type="exp",cands=NULL){
   if(is.list(y_train)){
     q <- length(y_train)
   } else {
@@ -1292,7 +1292,6 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",
   coef <- y_hat <- list()
   for(i in seq_along(method)){
     cat("method",method[i],"\n")
-    #func <- eval(parse(text=paste0("glm.",method[i])))
     func <- eval(parse(text=paste0(method[i])))
     start <- Sys.time()
     hyperpar <- NULL
@@ -1355,7 +1354,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",
 #'metric <- cv_transfer(y=data$y_train,X=data$X_train,family=family)
 #'metric$deviance}
 #'
-cv_multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink","glm.spls"),alpha.init=0.95,type="exp",cands=NULL){
+cv_multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("wrap_separate","wrap_mgaussian","sparselink","wrap_spls"),alpha.init=0.95,type="exp",cands=NULL){
   mode <- "multiple"
   foldid <- make_folds_multi(y=y,family=family,nfolds=nfolds)
   n <- nrow(y)
@@ -1398,7 +1397,7 @@ cv_multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
 #'@export
 #'@keywords internal
 #'
-cv_transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"),alpha.init=0.95,type="exp",cands=NULL){
+cv_transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("wrap_separate","wrap_glmtrans","sparselink","wrap_xrnet"),alpha.init=0.95,type="exp",cands=NULL){
   mode <- "transfer"
   foldid <- make_folds_trans(y=y,family=family,nfolds=nfolds)
   n <- length(y[[1]])

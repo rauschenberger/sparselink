@@ -11,7 +11,7 @@ traintest(
   X_test = NULL,
   family = "gaussian",
   alpha = 1,
-  method = c("glm.empty", "glm.separate", "sparselink"),
+  method = c("wrap_empty", "wrap_separate", "sparselink"),
   alpha.init = 0.95,
   type = "exp",
   cands = NULL

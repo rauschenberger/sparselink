@@ -11,7 +11,7 @@ cv_multiple(
   family,
   alpha = 1,
   nfolds = 10,
-  method = c("glm.separate", "glm.mgaussian", "sparselink", "glm.spls"),
+  method = c("wrap_separate", "wrap_mgaussian", "sparselink", "wrap_spls"),
   alpha.init = 0.95,
   type = "exp",
   cands = NULL
@@ -23,7 +23,7 @@ cv_transfer(
   family,
   alpha = 1,
   nfolds = 10,
-  method = c("glm.separate", "glm.glmtrans", "sparselink", "glm.xrnet"),
+  method = c("wrap_separate", "wrap_glmtrans", "sparselink", "wrap_xrnet"),
   alpha.init = 0.95,
   type = "exp",
   cands = NULL

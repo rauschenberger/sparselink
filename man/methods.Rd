@@ -2,64 +2,71 @@
 % Please edit documentation in R/functions.R
 \name{methods}
 \alias{methods}
-\alias{glm.empty}
-\alias{glm.separate}
-\alias{predict.glm.separate}
-\alias{coef.glm.separate}
-\alias{glm.common}
-\alias{predict.glm.common}
-\alias{coef.glm.common}
-\alias{glm.mgaussian}
-\alias{predict.glm.mgaussian}
-\alias{coef.glm.mgaussian}
-\alias{glm.spls}
-\alias{predict.glm.spls}
-\alias{coef.glm.spls}
-\alias{glm.glmtrans}
-\alias{predict.glm.glmtrans}
-\alias{coef.glm.glmtrans}
-\alias{glm.xrnet}
-\alias{predict.glm.xrnet}
-\alias{coef.glm.xrnet}
+\alias{wrap_empty}
+\alias{wrap_separate}
+\alias{predict.wrap_separate}
+\alias{coef.wrap_separate}
+\alias{wrap_common}
+\alias{predict.wrap_common}
+\alias{coef.wrap_common}
+\alias{wrap_mgaussian}
+\alias{predict.wrap_mgaussian}
+\alias{coef.wrap_mgaussian}
+\alias{wrap_spls}
+\alias{predict.wrap_spls}
+\alias{coef.wrap_spls}
+\alias{wrap_glmtrans}
+\alias{predict.wrap_glmtrans}
+\alias{coef.wrap_glmtrans}
+\alias{wrap_xrnet}
+\alias{predict.wrap_xrnet}
+\alias{coef.wrap_xrnet}
 \title{Available methods}
 \usage{
-glm.empty(x, y, family, alpha = 1)
+wrap_empty(x, y, family, alpha = 1)
 
-glm.separate(x, y, family, alpha = 1, lambda = NULL)
+wrap_separate(x, y, family, alpha = 1, lambda = NULL)
 
-\method{predict}{glm.separate}(object, newx)
+\method{predict}{wrap_separate}(object, newx)
 
-\method{coef}{glm.separate}(object)
+\method{coef}{wrap_separate}(object)
 
-glm.common(x, y, family, alpha = 1)
+wrap_common(x, y, family, alpha = 1)
 
-\method{predict}{glm.common}(object, newx)
+\method{predict}{wrap_common}(object, newx)
 
-\method{coef}{glm.common}(object)
+\method{coef}{wrap_common}(object)
 
-glm.mgaussian(x, y, family = "gaussian", alpha = 1)
+wrap_mgaussian(x, y, family = "gaussian", alpha = 1)
 
-\method{predict}{glm.mgaussian}(object, newx)
+\method{predict}{wrap_mgaussian}(object, newx)
 
-\method{coef}{glm.mgaussian}(object)
+\method{coef}{wrap_mgaussian}(object)
 
-glm.spls(x, y, family = "gaussian", alpha = 1, nfolds = 10)
+wrap_spls(x, y, family = "gaussian", alpha = 1, nfolds = 10)
 
-\method{predict}{glm.spls}(object, newx)
+\method{predict}{wrap_spls}(object, newx)
 
-\method{coef}{glm.spls}(object)
+\method{coef}{wrap_spls}(object)
 
-glm.glmtrans(x, y, family = "gaussian", alpha = 1)
+wrap_glmtrans(x, y, family = "gaussian", alpha = 1)
 
-\method{predict}{glm.glmtrans}(object, newx)
+\method{predict}{wrap_glmtrans}(object, newx)
 
-\method{coef}{glm.glmtrans}(object)
+\method{coef}{wrap_glmtrans}(object)
 
-glm.xrnet(x, y, alpha.init = 0.95, alpha = 1, nfolds = 10, family = "gaussian")
+wrap_xrnet(
+  x,
+  y,
+  alpha.init = 0.95,
+  alpha = 1,
+  nfolds = 10,
+  family = "gaussian"
+)
 
-\method{predict}{glm.xrnet}(object, newx)
+\method{predict}{wrap_xrnet}(object, newx)
 
-\method{coef}{glm.xrnet}(object)
+\method{coef}{wrap_xrnet}(object)
 }
 \arguments{
 \item{x}{feature matrix (multi-task learning)
@@ -87,9 +94,9 @@ of testing samples}
 number between 0 and 1}
 }
 \value{
-The wrapper functions \code{glm.empty}, \code{glm.separate},
-\code{glm.common}, \code{glm.mgaussian}, \code{glm.spls},
-\code{glm.glmtrans}, and \code{glm.xrnet} return fitted models,
+The wrapper functions \code{wrap_empty}, \code{wrap_separate},
+\code{wrap_common}, \code{wrap_mgaussian}, \code{wrap_spls},
+\code{wrap_glmtrans}, and \code{wrap_xrnet} return fitted models,
 and the generic functions \code{coef} and \code{predict}
 return coefficients or predicted values in a standardised format.
 }
@@ -98,19 +105,19 @@ Wrapper functions of available methods for related problems.
 }
 \section{Functions}{
 \itemize{
-\item \code{glm.empty()}: intercept-only model (MTL and TL)
+\item \code{wrap_empty()}: intercept-only model (MTL and TL)
 
-\item \code{glm.separate()}: separate model for each problem (MTL and TL)
+\item \code{wrap_separate()}: separate model for each problem (MTL and TL)
 
-\item \code{glm.common()}: common model for all problems (TL)
+\item \code{wrap_common()}: common model for all problems (TL)
 
-\item \code{glm.mgaussian()}: multivariate Gaussian regression (MTL)
+\item \code{wrap_mgaussian()}: multivariate Gaussian regression (MTL)
 
-\item \code{glm.spls()}: sparse partial least squares (MTL)
+\item \code{wrap_spls()}: sparse partial least squares (MTL)
 
-\item \code{glm.glmtrans()}: transfer generalised linear model (TL)
+\item \code{wrap_glmtrans()}: transfer generalised linear model (TL)
 
-\item \code{glm.xrnet()}: hierarchical regression (TL)
+\item \code{wrap_xrnet()}: hierarchical regression (TL)
 
 }}
 \examples{
@@ -123,10 +130,10 @@ family <- "gaussian"
 x <- matrix(data=rnorm(n=n_train*p),nrow=n_train,ncol=p)
 newx <- matrix(data=rnorm(n=n_test*p),nrow=n_test,ncol=p)
 y <- matrix(data=rnorm(n_train*q),nrow=n_train,ncol=q)
-object <- glm.empty(x=x,y=y,family=family)
-#object <- glm.separate(x=x,y=y,family=family)
-#object <- glm.mgaussian(x=x,y=y,family=family)
-#object <- glm.spls(x=x,y=y,family=family)
+object <- wrap_empty(x=x,y=y,family=family)
+#object <- wrap_separate(x=x,y=y,family=family)
+#object <- wrap_mgaussian(x=x,y=y,family=family)
+#object <- wrap_spls(x=x,y=y,family=family)
 coef(object)
 predict(object,newx=newx)
 
@@ -138,11 +145,11 @@ x <- lapply(X=n_train,function(n) matrix(data=stats::rnorm(n*p),nrow=n,ncol=p))
 newx <- lapply(X=n_test,function(n) matrix(data=stats::rnorm(n*p),nrow=n,ncol=p))
 y <- lapply(X=n_train,function(n) stats::rnorm(n))
 family <- "gaussian"
-object <- glm.empty(x=x,y=y,family=family)
-#object <- glm.separate(x=x,y=y,family=family)
-#object <- glm.common(x=x,y=y,family=family)
-#object <- glm.glmtrans(x=x,y=y,family=family)
-#object <- glm.xrnet(x=x,y=y,family=family)
+object <- wrap_empty(x=x,y=y,family=family)
+#object <- wrap_separate(x=x,y=y,family=family)
+#object <- wrap_common(x=x,y=y,family=family)
+#object <- wrap_glmtrans(x=x,y=y,family=family)
+#object <- wrap_xrnet(x=x,y=y,family=family)
 coef(object)
 predict(object,newx=newx)
 
