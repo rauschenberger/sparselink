@@ -47,54 +47,61 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">glm.empty</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">wrap_empty</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">glm.separate</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, alpha <span class="op">=</span> <span class="fl">1</span>, lambda <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">wrap_separate</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, alpha <span class="op">=</span> <span class="fl">1</span>, lambda <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.separate'</span></span>
+<span><span class="co"># S3 method for class 'wrap_separate'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">newx</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.separate'</span></span>
+<span><span class="co"># S3 method for class 'wrap_separate'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">glm.common</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">wrap_common</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.common'</span></span>
+<span><span class="co"># S3 method for class 'wrap_common'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">newx</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.common'</span></span>
+<span><span class="co"># S3 method for class 'wrap_common'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">glm.mgaussian</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">wrap_mgaussian</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.mgaussian'</span></span>
+<span><span class="co"># S3 method for class 'wrap_mgaussian'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">newx</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.mgaussian'</span></span>
+<span><span class="co"># S3 method for class 'wrap_mgaussian'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">glm.spls</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, alpha <span class="op">=</span> <span class="fl">1</span>, nfolds <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="fu">wrap_spls</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, alpha <span class="op">=</span> <span class="fl">1</span>, nfolds <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.spls'</span></span>
+<span><span class="co"># S3 method for class 'wrap_spls'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">newx</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.spls'</span></span>
+<span><span class="co"># S3 method for class 'wrap_spls'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">glm.glmtrans</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">wrap_glmtrans</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.glmtrans'</span></span>
+<span><span class="co"># S3 method for class 'wrap_glmtrans'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">newx</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.glmtrans'</span></span>
+<span><span class="co"># S3 method for class 'wrap_glmtrans'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">glm.xrnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, alpha.init <span class="op">=</span> <span class="fl">0.95</span>, alpha <span class="op">=</span> <span class="fl">1</span>, nfolds <span class="op">=</span> <span class="fl">10</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span>
+<span><span class="fu">wrap_xrnet</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">y</span>,</span>
+<span>  alpha.init <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  nfolds <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"gaussian"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.xrnet'</span></span>
+<span><span class="co"># S3 method for class 'wrap_xrnet'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">newx</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'glm.xrnet'</span></span>
+<span><span class="co"># S3 method for class 'wrap_xrnet'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -146,22 +153,22 @@ number between 0 and 1</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The wrapper functions <code>glm.empty</code>, <code>glm.separate</code>,
-<code>glm.common</code>, <code>glm.mgaussian</code>, <code>glm.spls</code>,
-<code>glm.glmtrans</code>, and <code>glm.xrnet</code> return fitted models,
+    <p>The wrapper functions <code>wrap_empty</code>, <code>wrap_separate</code>,
+<code>wrap_common</code>, <code>wrap_mgaussian</code>, <code>wrap_spls</code>,
+<code>wrap_glmtrans</code>, and <code>wrap_xrnet</code> return fitted models,
 and the generic functions <code>coef</code> and <code>predict</code>
 return coefficients or predicted values in a standardised format.</p>
     </div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
 
-<ul><li><p><code>glm.empty()</code>: intercept-only model (MTL and TL)</p></li>
-<li><p><code>glm.separate()</code>: separate model for each problem (MTL and TL)</p></li>
-<li><p><code>glm.common()</code>: common model for all problems (TL)</p></li>
-<li><p><code>glm.mgaussian()</code>: multivariate Gaussian regression (MTL)</p></li>
-<li><p><code>glm.spls()</code>: sparse partial least squares (MTL)</p></li>
-<li><p><code>glm.glmtrans()</code>: transfer generalised linear model (TL)</p></li>
-<li><p><code>glm.xrnet()</code>: hierarchical regression (TL)</p></li>
+<ul><li><p><code>wrap_empty()</code>: intercept-only model (MTL and TL)</p></li>
+<li><p><code>wrap_separate()</code>: separate model for each problem (MTL and TL)</p></li>
+<li><p><code>wrap_common()</code>: common model for all problems (TL)</p></li>
+<li><p><code>wrap_mgaussian()</code>: multivariate Gaussian regression (MTL)</p></li>
+<li><p><code>wrap_spls()</code>: sparse partial least squares (MTL)</p></li>
+<li><p><code>wrap_glmtrans()</code>: transfer generalised linear model (TL)</p></li>
+<li><p><code>wrap_xrnet()</code>: hierarchical regression (TL)</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -180,10 +187,10 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n<span class="op">=</span><span class="va">n_train</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">n_train</span>,ncol<span class="op">=</span><span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">newx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n<span class="op">=</span><span class="va">n_test</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">n_test</span>,ncol<span class="op">=</span><span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_train</span><span class="op">*</span><span class="va">q</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">n_train</span>,ncol<span class="op">=</span><span class="va">q</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">glm.empty</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- glm.separate(x=x,y=y,family=family)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- glm.mgaussian(x=x,y=y,family=family)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- glm.spls(x=x,y=y,family=family)</span></span></span>
+<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_empty</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">#object &lt;- wrap_separate(x=x,y=y,family=family)</span></span></span>
+<span class="r-in"><span><span class="co">#object &lt;- wrap_mgaussian(x=x,y=y,family=family)</span></span></span>
+<span class="r-in"><span><span class="co">#object &lt;- wrap_spls(x=x,y=y,family=family)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alpha</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.043397061  0.005472131  0.212608438</span>
@@ -290,11 +297,11 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-in"><span><span class="va">newx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span>X<span class="op">=</span><span class="va">n_test</span>,<span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">n</span>,ncol<span class="op">=</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span>X<span class="op">=</span><span class="va">n_train</span>,<span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">family</span> <span class="op">&lt;-</span> <span class="st">"gaussian"</span></span></span>
-<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">glm.empty</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- glm.separate(x=x,y=y,family=family)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- glm.common(x=x,y=y,family=family)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- glm.glmtrans(x=x,y=y,family=family)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- glm.xrnet(x=x,y=y,family=family)</span></span></span>
+<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_empty</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">#object &lt;- wrap_separate(x=x,y=y,family=family)</span></span></span>
+<span class="r-in"><span><span class="co">#object &lt;- wrap_common(x=x,y=y,family=family)</span></span></span>
+<span class="r-in"><span><span class="co">#object &lt;- wrap_glmtrans(x=x,y=y,family=family)</span></span></span>
+<span class="r-in"><span><span class="co">#object &lt;- wrap_xrnet(x=x,y=y,family=family)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alpha</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.0378806 -0.1204643</span>

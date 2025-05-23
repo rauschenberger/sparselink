@@ -87,8 +87,8 @@ and <code><a href="predict.sparselink.html">predict</a></code> to make predictio
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">family</span> <span class="op">&lt;-</span> <span class="st">"gaussian"</span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim.data.transfer.html">sim.data.transfer</a></span><span class="op">(</span>family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">#data &lt;- sim.data.multiple(family=family)</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim_data_trans.html">sim_data_trans</a></span><span class="op">(</span>family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">#data &lt;- sim_data_multi(family=family)</span></span></span>
 <span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu"><a href="sparselink.html">sparselink</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">X_train</span>,y<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">y_train</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alpha.init=0.95, alpha=1, type=exp</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning</span>
