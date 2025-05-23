@@ -69,17 +69,19 @@ and transfer learning involves multiple datasets.
 }
 \examples{
 #--- multi-task learning ---
-n <- 50
-p <- 60
+n <- 100
+p <- 200
 q <- 3
+\dontshow{n <- 20; p <- 5; q <- 2}
 family <- "gaussian"
 x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
 object <- sparselink(x=x,y=y,family=family)
 
 #--- transfer learning ---
-n <- c(50,25)
-p <- 60
+n <- c(100,50)
+p <- 200
+\dontshow{n <- c(10,10); p <- 5}
 x <- lapply(X=n,function(x) matrix(data=stats::rnorm(n*p),nrow=x,ncol=p))
 y <- lapply(X=n,function(x) stats::rnorm(x))
 family <- "gaussian"

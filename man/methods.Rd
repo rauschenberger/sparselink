@@ -157,15 +157,15 @@ predict(object,newx=newx)
 
 }
 \references{
-Noah Simon, Jerome H. Friedman, and TrevorHastie (2013). 
+Noah Simon, Jerome H. Friedman, and Trevor Hastie (2013). 
 \emph{arXiv} (Preprint).
 \doi{10.48550/arXiv.1311.6529}.
 (\link[glmnet]{cv.glmnet})
 
-Hyonho Chun and S??nd??z Kele?? (2010).
+Hyonho Chun and Sündüz Keleş (2010).
 "Sparse Partial Least Squares Regression for Simultaneous Dimension Reduction and Variable Selection".
 \emph{Journal of the Royal Statistical Society Series B: Statistical Methodology}
-72(1);3???25.
+72(1);3–25.
 \doi{10.1111/j.1467-9868.2009.00723.x}.
 (\link[spls]{spls})
 

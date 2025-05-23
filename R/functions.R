@@ -70,17 +70,19 @@ if(FALSE){
 #'
 #'@examples
 #'#--- multi-task learning ---
-#'n <- 50
-#'p <- 60
+#'n <- 100
+#'p <- 200
 #'q <- 3
+#'\dontshow{n <- 20; p <- 5; q <- 2}
 #'family <- "gaussian"
 #'x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 #'y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
 #'object <- sparselink(x=x,y=y,family=family)
 #'
 #'#--- transfer learning ---
-#'n <- c(50,25)
-#'p <- 60
+#'n <- c(100,50)
+#'p <- 200
+#'\dontshow{n <- c(10,10); p <- 5}
 #'x <- lapply(X=n,function(x) matrix(data=stats::rnorm(n*p),nrow=x,ncol=p))
 #'y <- lapply(X=n,function(x) stats::rnorm(x))
 #'family <- "gaussian"
@@ -297,13 +299,13 @@ print.sparselink <- function(x,...){
 #'
 #'@examples
 #'family <- "gaussian"
-#'\dontshow{data <- sim_data_trans(family=family,n0=50,p=70)}
-#'\dontrun{data <- sim_data_trans(family=family)}
+#'data <- sim_data_trans(family=family)
+#'\dontshow{data <- sim_data_trans(family=family,n0=20,p=10)}
 #'#data <- sim_data_multi(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'coef <- coef(object=object)
 #'
-coef.sparselink <- function(object){
+coef.sparselink <- function(object,...){
   id <- object$weight.ind
   p <- object$info$p
   q <- object$info$q
@@ -365,8 +367,8 @@ coef.sparselink <- function(object){
 #'
 #'@examples
 #'family <- "gaussian"
-#'\dontshow{data <- sim_data_multi(family=family,n0=50,p=70)}
-#'\dontrun{data <- sim_data_multi(family=family)}
+#'data <- sim_data_multi(family=family)
+#'\dontshow{data <- sim_data_multi(family=family,n0=20,p=10)}
 #'#data <- sim_data_trans(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'y_hat <- predict(object=object,newx=data$X_test)
@@ -535,6 +537,8 @@ calc_metric <- function(y,y_hat,family){
 #'
 #'@export
 #'@keywords internal
+#'
+#'@aliases make_folds_trans
 #'
 #'@param y
 #'multi-task learning:
@@ -854,16 +858,16 @@ construct_penfacs <- function(w_int,w_ext,v_int,v_ext,type){
 #'\link[spls]{spls}, \link[glmtrans]{glmtrans}, and \link[xrnet]{xrnet}.
 #'
 #'@references
-#'Noah Simon, Jerome H. Friedman, and TrevorHastie (2013). 
+#'Noah Simon, Jerome H. Friedman, and Trevor Hastie (2013). 
 #"A blockwise descent algorithm for group-penalized multiresponse and multinomial regression".
 #'\emph{arXiv} (Preprint).
 #'\doi{10.48550/arXiv.1311.6529}.
 #'(\link[glmnet]{cv.glmnet})
 #'
-#'Hyonho Chun and S??nd??z Kele?? (2010).
+#'Hyonho Chun and Sündüz Keleş (2010).
 #'"Sparse Partial Least Squares Regression for Simultaneous Dimension Reduction and Variable Selection".
 #'\emph{Journal of the Royal Statistical Society Series B: Statistical Methodology}
-#'72(1);3???25.
+#'72(1);3–25.
 #'\doi{10.1111/j.1467-9868.2009.00723.x}.
 #'(\link[spls]{spls})
 #'
@@ -1169,6 +1173,8 @@ coef.wrap_xrnet <- function(object,...){
 #'@export
 #'@keywords internal
 #'
+#'@aliases sim_data_trans
+#'
 #'@param prob.common probability of common effect (number between 0 and 1)
 #'@param prob.separate probability of separate effect (number between 0 and 1)
 #'@param q number of datasets: integer
@@ -1386,6 +1392,8 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",
 #'@export
 #'@keywords internal
 #'
+#'@aliases cv_transfer
+#'
 #'@inheritParams sparselink
 #'
 #'@examples
@@ -1495,6 +1503,8 @@ cv_transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("wrap_separate","w
 #'
 #'@export
 #'@keywords internal
+#'
+#'@aliases count_matrix
 #'
 #'@param truth (i) vector of length \eqn{p} or
 #'(ii) \eqn{n \times p} matrix with entries in -1, 0, 1

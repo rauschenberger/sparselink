@@ -40,8 +40,8 @@ Predicts outcomes with a multi-task or transfer learning regression model.
 }
 \examples{
 family <- "gaussian"
-\dontshow{data <- sim_data_multi(family=family,n0=50,p=70)}
-\dontrun{data <- sim_data_multi(family=family)}
+data <- sim_data_multi(family=family)
+\dontshow{data <- sim_data_multi(family=family,n0=20,p=10)}
 #data <- sim_data_trans(family=family)
 object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 y_hat <- predict(object=object,newx=data$X_test)

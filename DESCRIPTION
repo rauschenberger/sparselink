@@ -1,6 +1,6 @@
 Package: sparselink
 Version: 0.0.1
-Title: Sparse regression for related problems
+Title: Sparse Regression for Related Problems
 Description: Estimates sparse regression models (i.e., with few non-zero coefficients) in high-dimensional multi-task learning and transfer learning settings.
 Depends: R (>= 3.0.0)
 Imports: glmnet, pROC, stats, mvtnorm, spls, xrnet
