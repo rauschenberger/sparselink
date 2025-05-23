@@ -5,10 +5,10 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Construct penalty factors — construct_pf"><meta name="description" content="Uses internal and external weights (for negative and positive effects)
-as well as internal and external exponents/factors for these weights
-to construct penalty factors."><meta property="og:description" content="Uses internal and external weights (for negative and positive effects)
-as well as internal and external exponents/factors for these weights
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Construct penalty factors — construct_pf"><meta name="description" content="Uses internal and external weights
+as well as internal and external exponents or factors for these weights
+to construct penalty factors."><meta property="og:description" content="Uses internal and external weights
+as well as internal and external exponents or factors for these weights
 to construct penalty factors."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
@@ -46,8 +46,8 @@ to construct penalty factors."></head><body>
     </div>
 
     <div class="ref-description section level2">
-    <p>Uses internal and external weights (for negative and positive effects)
-as well as internal and external exponents/factors for these weights
+    <p>Uses internal and external weights
+as well as internal and external exponents or factors for these weights
 to construct penalty factors.</p>
     </div>
 
@@ -81,10 +81,26 @@ non-negative scalar</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>character <code>"geo"</code>, <code>"exp"</code>, <code>"rem"</code> or <code>"ari"</code>
-(with or without addition of <code>".con"</code>)</p></dd>
+<dd><p>scaling of weights:
+character <code>"exp"</code>, <code>"ari"</code>, <code>"geo"</code>, or <code>"rem"</code>
+(with or without addition of <code>".con"</code>),
+default: <code>"exp"</code></p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>While internal weights are from the problem of interest ("supported" problem),
+external weights are from the other problems ("supporting" problems).</p>
+<p>Multiple options exist for scaling prior weights:</p><ul><li><p><code>"exp"</code>: \(w_{int}^{v_{int}}+w_{ext}^{v_{ext}}\)</p></li>
+<li><p><code>"ari"</code>: \(v_{int} w_{int} + v_{ext} w_{ext}\)</p></li>
+<li><p><code>"geo"</code>: \(w_{int}^{v_{int}} w_{ext}^{v_{ext}}\)</p></li>
+<li><p><code>"rem"</code>: \(w_{int}^{v_{int}}+w_{ext}^{v_{ext}}-\mathbb{I}(v_{int}=0)-\mathbb{I}(v_{ext}=0))\)</p></li>
+</ul><p>The constrained versions <code>"exp.con"</code>, <code>"ari.con"</code>,
+<code>"geo.con"</code>, and <code>"rem.con"</code> impose \(v_{int}+v_{ext}=1\).
+The penalty factors are the inverse weights.
+Suggested choices are <code>"exp"</code> for predictivity
+and <code>"ari.con"</code> for interpretability.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

@@ -70,11 +70,14 @@ for transfer learning, for each \(k\) in \(1,\ldots,q\)</p></dd>
 
 
 <dt id="arg-weight">weight<a class="anchor" aria-label="anchor" href="#arg-weight"></a></dt>
-<dd><p>experimental argument:
+<dd><p>hyperparameters for scaling external and internal weights:
 numeric vector of length 2,
-with the first entry for the internal weight,
-and the second entry for the external weight,
-overwrites the cross-validated weights</p></dd>
+with the first entry for the external weights
+(prior coefficients from source data),
+and the second entry for the internal weights
+(prior coefficients from target data),
+selected values must be among the candidate values,
+default: <code>NULL</code> (using cross-validated weights)</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -85,7 +88,9 @@ overwrites the cross-validated weights</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Returns predicted values or predicted probabilities.
 The output is a list of \(q\) column vectors of length \(n_k\)
-for \(k\) in \(1,\ldots,q\).</p>
+for \(k\) in \(1,\ldots,q\).
+Each vector corresponds to one target (multi-task learning)
+or one dataset (transfer learning).</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
