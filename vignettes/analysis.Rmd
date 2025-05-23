@@ -122,7 +122,7 @@ This chunk performs the simulation.
 ```{r simulation,eval=sim.app}
 #<<setup>>
 
-alpha.init <- 0.95; type <- "exp";  repetitions <- 10
+repetitions <- 10
 
 for(mode in c("transfer","multiple")){
   
@@ -143,7 +143,7 @@ for(mode in c("transfer","multiple")){
       method <- c("glm.separate","glm.mgaussian","sparselink","glm.spls") # add glmnet "mgaussian" (only for linear case) or "MTPS" (not sparse)?
     }
     
-    result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1,trial=FALSE)
+    result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid$family[i],method=method)
     hyperpar[[i]] <- result$hyperpar
     time[[i]] <- result$time
     auc[[i]] <- result$auc
@@ -243,7 +243,7 @@ grDevices::dev.off()
 # Effect of sample size in source or target dataset (TL), effect of sample size (MTL).
 #<<setup>>
 
-alpha.init <- 0.95; type <- "exp";  repetitions <- 50 # was repetitions <- 10
+repetitions <- 50
 grid <- metric <- list()
 
 for(mode in c("MTL-size","TL-source","TL-target")){ #,"TL-prop","MTL-prop"
@@ -281,7 +281,7 @@ for(mode in c("MTL-size","TL-source","TL-target")){ #,"TL-prop","MTL-prop"
       } else {
         stop("Wrong mode.")
       }
-      result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid[[mode]]$family[i],method=method,alpha.init=alpha.init,type=type,alpha=1,trial=FALSE)
+      result <- traintest(y_train=data$y_train,X_train=data$X_train,y_test=data$y_test,X_test=data$X_test,family=grid[[mode]]$family[i],method=method)
       metric[[mode]][[i]] <- result$deviance
     }
 }
@@ -677,8 +677,6 @@ This chunk performs the transfer learning analysis.
 #<<define_projects>>
 #<<preprocess_data>>
 
-alpha.init <- 0.95; type <- "exp"
-
 result <- list()
 for(i in names(project)){
   cat("project:",i,"\n")
@@ -686,7 +684,7 @@ for(i in names(project)){
   for(j in seq_len(5)){ # 5 repetitions of 10-fold CV
     set.seed(j)
     codes <- project[[i]]
-    result[[i]][[j]] <- cv.transfer(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"),nfolds=10,alpha=1,alpha.init=alpha.init,type=type,trial=FALSE)
+    result[[i]][[j]] <- cv.transfer(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"))
   }
 }
 save(result,project,file=file.path(path,"results","application.RData"))
