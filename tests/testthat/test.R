@@ -52,13 +52,13 @@ testthat::test_that("binomial link followed by mean function returns identity",{
 
 testthat::test_that("Gaussian deviance equals zero",{
   y <- y_hat <- stats::rnorm(n=100)
-  metric <- calc.metric(y=y,y_hat=y_hat,family="gaussian")
+  metric <- calc_metric(y=y,y_hat=y_hat,family="gaussian")
   testthat::expect_true(metric==0)
 })
 
 testthat::test_that("binomial deviance equals zero",{
   y <- y_hat <- stats::rbinom(n=n,size=1,prob=0.5)
-  metric <- calc.metric(y=y,y_hat=y_hat,family="binomial")
+  metric <- calc_metric(y=y,y_hat=y_hat,family="binomial")
   testthat::expect_true(metric==0)
 })
 
@@ -70,7 +70,7 @@ testthat::test_that("Gaussian deviance increases",{
   metric <- rep(x=NA,times=length(weight))
   for(i in seq_along(weight)){
     y_hat <- (1-weight[i])*signal + weight[i]*noise
-    metric[i] <- calc.metric(y=y,y_hat=y_hat,family="gaussian")
+    metric[i] <- calc_metric(y=y,y_hat=y_hat,family="gaussian")
   }
   testthat::expect_true(all(diff(metric)>0))
 })
@@ -83,7 +83,7 @@ testthat::test_that("binomial deviance increases",{
   metric <- rep(x=NA,times=length(weight))
   for(i in seq_along(weight)){
     y_hat <- sigmoid((1-weight[i])*signal + weight[i]*noise)
-    metric[i] <- calc.metric(y=y,y_hat=y_hat,family="binomial")
+    metric[i] <- calc_metric(y=y,y_hat=y_hat,family="binomial")
   }
   testthat::expect_true(all(diff(metric)>0))
 })
@@ -93,8 +93,8 @@ testthat::test_that("binomial deviance increases",{
 testthat::test_that("folds for multi-task learning match target",{
   q <- 3
   family <- "binomial"
-  y <- sim.data.multiple(family=family,q=q,n0=100)$y_train
-  fold <- make.folds.multi(y,family=family)
+  y <- sim_data_multi(family=family,q=q,n0=100)$y_train
+  fold <- make_folds_multi(y,family=family)
   code <- apply(X=y,MARGIN=1,FUN=function(x) paste0(x,collapse=""))
   for(i in seq_len(q)){
     table <- table(y[,i],fold)
@@ -108,8 +108,8 @@ testthat::test_that("folds for multi-task learning match target",{
 testthat::test_that("folds for transfer learning are balanced",{
   q <- 5
   family <- "binomial"
-  y <- sim.data.transfer(family=family,q=q,n0=c(5,10,15,20,50))$y_train
-  fold <- make.folds.trans(y,family=family)
+  y <- sim_data_trans(family=family,q=q,n0=c(5,10,15,20,50))$y_train
+  fold <- make_folds_trans(y,family=family)
   for(i in seq_len(q)){
     table <- table(y[[i]],fold[[i]])
     colSums <- colSums(table)
@@ -123,9 +123,9 @@ testthat::test_that("folds for transfer learning are balanced",{
 
 testthat::test_that("fusing target works",{
   q <- 5
-  data <- sim.data.multiple(q=q)
+  data <- sim_data_multi(q=q)
   split <- apply(X=data$y_train,MARGIN=2,FUN=function(x) x,simplify=FALSE)
-  fuse <- fuse.data(x=NULL,y=split)
+  fuse <- fuse_data(x=NULL,y=split)
   testthat::expect_true(all(data$y_train==fuse$y))
 })
 

@@ -58,14 +58,14 @@ Trains and tests prediction models
 #--- multi-task learning ---
 \dontrun{
 family <- "gaussian"
-data <- sim.data.multiple(family=family)
+data <- sim_data_multi(family=family)
 result <- traintest(data$y_train,data$X_train,family=family)
 }
 
 #--- transfer learning ---
 \dontrun{
 family <- "gaussian"
-data <- sim.data.transfer(family=family)
+data <- sim_data_trans(family=family)
 result <- traintest(data$y_train,data$X_train,family=family)
 }
 

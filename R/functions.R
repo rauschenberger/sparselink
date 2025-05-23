@@ -96,7 +96,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,c
     p <- ncol(x)
     q <- ncol(y)
     n <- rep(x=nrow(x),times=q)
-    foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
+    foldid <- make_folds_multi(y=y,family=family,nfolds=nfolds)
     y <- apply(y,2,function(x) x,simplify=FALSE)
     x <- replicate(n=q,expr=x,simplify=FALSE)
     foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
@@ -106,7 +106,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,c
     n <- sapply(X=y,FUN=base::length)
     p <- ncol(x[[1]])
     q <- length(x)
-    foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+    foldid <- make_folds_trans(y=y,family=family,nfolds=nfolds)
     mode <- "transfer"
   } else {
     stop("Provide both x and y either as matrices (multi-target learning) or lists (transfer learning).")
@@ -221,13 +221,13 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,c
     metric[[i]] <- list()
     for(l in seq_len(nrow(weight))){
       metric[[i]][[l]] <- apply(X=y_hat[[i]][[l]],MARGIN=2,FUN=function(x)
-        calc.metric(y=y[[i]],y_hat=x,family=family[i]))
+        calc_metric(y=y[[i]],y_hat=x,family=family[i]))
       lambda.ind[l,i] <- which.min(metric[[i]][[l]])
       lambda.min[l,i] <- glm.two.ext[[i]][[l]]$lambda[lambda.ind[l,i]]
     }
     cvm.min[,i] <- sapply(X=metric[[i]],FUN=min)
     #if(trial){
-    #  tryCatch(expr=plotWeight(x=weight,y=cvm.min[,i]),error=function(x) NULL)
+    #  tryCatch(expr=plot_weight(x=weight,y=cvm.min[,i]),error=function(x) NULL)
     #}
   }
   weight.ind <- apply(X=cvm.min,MARGIN=2,FUN=which.min)
@@ -295,8 +295,8 @@ print.sparselink <- function(x,...){
 #'
 #'@examples
 #'family <- "gaussian"
-#'data <- sim.data.transfer(family=family)
-#'#data <- sim.data.multiple(family=family)
+#'data <- sim_data_trans(family=family)
+#'#data <- sim_data_multi(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'coef <- coef(object=object)
 #'
@@ -362,8 +362,8 @@ coef.sparselink <- function(object){
 #'
 #'@examples
 #'family <- "gaussian"
-#'data <- sim.data.transfer(family=family)
-#'#data <- sim.data.multiple(family=family)
+#'data <- sim_data_trans(family=family)
+#'#data <- sim_data_multi(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'y_hat <- predict(object=object,newx=data$X_test)
 #'
@@ -503,14 +503,14 @@ mean_function <- function(eta,family){
 #'family <- "gaussian"
 #'y <- stats::rnorm(n=n)
 #'y_hat <- stats::rnorm(n=n)
-#'calc.metric(y=y,y_hat=y_hat,family=family)
+#'calc_metric(y=y,y_hat=y_hat,family=family)
 #'
 #'family <- "binomial"
 #'y <- stats::rbinom(n=n,size=1,prob=0.5)
 #'y_hat <- stats::runif(n=n)
-#'calc.metric(y=y,y_hat=y_hat,family=family)
+#'calc_metric(y=y,y_hat=y_hat,family=family)
 #'
-calc.metric <- function(y,y_hat,family){
+calc_metric <- function(y,y_hat,family){
   if(length(y)!=length(y_hat)){
     stop("incompatible lengths")  
   }
@@ -543,15 +543,15 @@ calc.metric <- function(y,y_hat,family){
 #'@examples
 #'#--- multi-task learning ---
 #'family <- "binomial"
-#'y <- sim.data.multiple(family=family)$y_train
-#'fold <- make.folds.multi(y=y,family=family)
+#'y <- sim_data_multi(family=family)$y_train
+#'fold <- make_folds_multi(y=y,family=family)
 #'
 #'#--- transfer learning ---
 #'family <- "binomial"
-#'y <- sim.data.transfer(family=family)$y_train
-#'fold <- make.folds.trans(y,family=family)
+#'y <- sim_data_trans(family=family)$y_train
+#'fold <- make_folds_trans(y,family=family)
 #'
-make.folds.multi <- function(y,family,nfolds=10){
+make_folds_multi <- function(y,family,nfolds=10){
   n <- nrow(y)
   q <- ncol(y)
   if(length(family)==1){
@@ -582,10 +582,10 @@ make.folds.multi <- function(y,family,nfolds=10){
   return(foldid)
 }
 
-#'@rdname make.folds.multi
+#'@rdname make_folds_multi
 #'@export
 #'@keywords internal
-make.folds.trans <- function(y,family,nfolds=10){
+make_folds_trans <- function(y,family,nfolds=10){
   q <- length(y)
   if(length(family)==1){
     family <- rep(x=family,times=q) 
@@ -627,10 +627,10 @@ make.folds.trans <- function(y,family,nfolds=10){
 #'and \eqn{p} (scalar, number of features)
 #'
 #'@examples
-#'data <- sim.data.transfer()
-#'get.info(x=data$X_train,y=data$y_train)
+#'data <- sim_data_trans()
+#'get_info(x=data$X_train,y=data$y_train)
 #'
-get.info <- function(x,y){
+get_info <- function(x,y){
   if(length(x)!=length(y)){stop("different q")}
   if(any(sapply(X=x,FUN=base::nrow)!=sapply(X=y,FUN=base::length))){stop("different n")}
   if(any(diff(sapply(X=x,FUN=base::ncol))!=0)){stop("different p")}
@@ -654,15 +654,15 @@ get.info <- function(x,y){
 #'or \code{NULL} (default)
 #'
 #'@examples
-#'data <- sim.data.transfer()
+#'data <- sim_data_trans()
 #'sapply(X=data$y_train,FUN=length)
 #'sapply(X=data$X_train,FUN=dim)
-#'fuse <- fuse.data(x=data$X_train,y=data$y_train)
+#'fuse <- fuse_data(x=data$X_train,y=data$y_train)
 #'length(fuse$y)
 #'dim(fuse$x)
 #'table(fuse$index)
 #'
-fuse.data <- function(x,y=NULL,foldid=NULL){
+fuse_data <- function(x,y=NULL,foldid=NULL){
   list <- list()
   if(!is.null(x)){
     list$x <- do.call(what="rbind",args=x)
@@ -870,7 +870,7 @@ glm.separate <- function(x,y,family,alpha=1,lambda=NULL){
     family <- rep(x=family,times=length(y))
   }
   object <- list()
-  object$info <- get.info(x=x,y=y)
+  object$info <- get_info(x=x,y=y)
   object$cv.glmnet <- list()
   for(i in seq_len(object$info$q)){
     object$cv.glmnet[[i]] <- glmnet::cv.glmnet(x=x[[i]],y=y[[i]],family=family[i],alpha=alpha,lambda=lambda)
@@ -918,8 +918,8 @@ glm.common <- function(x,y,family,alpha=1){
   family <- unique(family)
   if(length(family)>1){stop("requires unique family")}
   object <- list()
-  object$info <- get.info(x=x,y=y)
-  fuse <- fuse.data(x=x,y=y,foldid=NULL)
+  object$info <- get_info(x=x,y=y)
+  fuse <- fuse_data(x=x,y=y,foldid=NULL)
   object$cv.glmnet <- glmnet::cv.glmnet(x=fuse$x,y=fuse$y,family=family,alpha=alpha)
   class(object) <- "glm.common"
   return(object)
@@ -929,7 +929,7 @@ glm.common <- function(x,y,family,alpha=1){
 #'@export
 #'@keywords internal
 predict.glm.common <- function(object,newx){
-  fuse <- fuse.data(x=newx,y=NULL,foldid=NULL)
+  fuse <- fuse_data(x=newx,y=NULL,foldid=NULL)
   temp <- stats::predict(object=object$cv.glmnet,newx=fuse$x,s=object$cv.glmnet$lambda.min,type="response")
   y_hat <- tapply(X=temp,INDEX=fuse$index,FUN=function(x) x)
   return(y_hat)
@@ -1136,14 +1136,14 @@ coef.glm.xrnet <- function(object){
 #'and \code{beta} for effects (\eqn{p \times q} matrix).
 #'
 #'@examples
-#'data <- sim.data.transfer()
+#'data <- sim_data_trans()
 #'sapply(X=data$y_train,FUN=length)
 #'sapply(X=data$X_train,FUN=dim)
 #'sapply(X=data$y_test,FUN=length)
 #'sapply(X=data$X_test,FUN=dim)
 #'dim(data$beta)
 #'
-sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,200),n1=10000,p=200,rho=0.5,family="gaussian"){
+sim_data_trans <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,200),n1=10000,p=200,rho=0.5,family="gaussian"){
   if(length(n0)==1){
     n0 <- rep(x=n0,times=q)
   } else {
@@ -1191,7 +1191,7 @@ sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,10
 #'@export
 #'@keywords internal
 #'
-#'@inheritParams sim.data.transfer
+#'@inheritParams sim_data_trans
 #'
 #'@return
 #'Returns a list with slots
@@ -1202,10 +1202,10 @@ sim.data.transfer <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,10
 #'and \code{beta} (\eqn{p \times q} matrix).
 #'
 #'@examples
-#'data <- sim.data.multiple()
+#'data <- sim_data_multi()
 #'sapply(X=data,FUN=dim)
 #' 
-sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=10000,p=200,rho=0.5,family="gaussian"){
+sim_data_multi <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=10000,p=200,rho=0.5,family="gaussian"){
   n <- n0 + n1
   theta <- stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=prob.common)
   if(rho==0){
@@ -1263,14 +1263,14 @@ sim.data.multiple <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=100,n1=
 #'#--- multi-task learning ---
 #'\dontrun{
 #'family <- "gaussian"
-#'data <- sim.data.multiple(family=family)
+#'data <- sim_data_multi(family=family)
 #'result <- traintest(data$y_train,data$X_train,family=family)
 #'}
 #'
 #'#--- transfer learning ---
 #'\dontrun{
 #'family <- "gaussian"
-#'data <- sim.data.transfer(family=family)
+#'data <- sim_data_trans(family=family)
 #'result <- traintest(data$y_train,data$X_train,family=family)
 #'}
 #'
@@ -1313,7 +1313,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",
       deviance[i,] <- auc[i,] <- NA
     } else {
       for(j in seq_len(q)){
-        deviance[i,j] <- calc.metric(y=y_test[[j]],y_hat=y_hat[[i]][[j]],family=family[j])
+        deviance[i,j] <- calc_metric(y=y_test[[j]],y_hat=y_hat[[i]][[j]],family=family[j])
         if(family[j]=="binomial"){
           auc[i,j] <- pROC::auc(response=y_test[[j]],predictor=as.vector(y_hat[[i]][[j]]),direction="<",levels=c(0,1))
         }
@@ -1332,8 +1332,8 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",
 #'@title Model comparison
 #'
 #'@description
-#'Compares predictive methods for multi-task learning (\code{cv.multiple}) or
-#'transfer learning (\code{cv.transfer}) by \eqn{k}-fold cross-validation.
+#'Compares predictive methods for multi-task learning (\code{cv_multiple}) or
+#'transfer learning (\code{cv_transfer}) by \eqn{k}-fold cross-validation.
 #'
 #'@export
 #'@keywords internal
@@ -1344,20 +1344,20 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",
 #'#--- multi-task learning ---
 #'\dontrun{
 #'family <- "gaussian"
-#'data <- sim.data.multiple(family=family)
-#'metric <- cv.multiple(y=data$y_train,X=data$X_train,family=family)
+#'data <- sim_data_multi(family=family)
+#'metric <- cv_multiple(y=data$y_train,X=data$X_train,family=family)
 #'metric$deviance}
 #'
 #'#--- transfer learning ---
 #'\dontrun{
 #'family <- "gaussian"
-#'data <- sim.data.transfer(family=family)
-#'metric <- cv.transfer(y=data$y_train,X=data$X_train,family=family)
+#'data <- sim_data_trans(family=family)
+#'metric <- cv_transfer(y=data$y_train,X=data$X_train,family=family)
 #'metric$deviance}
 #'
-cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink","glm.spls"),alpha.init=0.95,type="exp",cands=NULL){
+cv_multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.mgaussian","sparselink","glm.spls"),alpha.init=0.95,type="exp",cands=NULL){
   mode <- "multiple"
-  foldid <- make.folds.multi(y=y,family=family,nfolds=nfolds)
+  foldid <- make_folds_multi(y=y,family=family,nfolds=nfolds)
   n <- nrow(y)
   q <- ncol(y)
   
@@ -1381,7 +1381,7 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
   deviance <- auc <- matrix(data=NA,nrow=ncol(y),ncol=length(method),dimnames=list(names(y),method))
   for(j in seq_len(ncol(y))){
     for(k in method){
-      deviance[j,k] <- calc.metric(y=y[,j],y_hat=y_hat[[k]][,j],family=family)
+      deviance[j,k] <- calc_metric(y=y[,j],y_hat=y_hat[[k]][,j],family=family)
       if(family=="binomial"){
         auc[j,k] <- pROC::auc(response=y[,j],predictor=as.vector(y_hat[[k]][,j]),direction="<",levels=c(0,1))
       }
@@ -1394,13 +1394,13 @@ cv.multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
   return(list)
 }
 
-#'@rdname cv.multiple
+#'@rdname cv_multiple
 #'@export
 #'@keywords internal
 #'
-cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"),alpha.init=0.95,type="exp",cands=NULL){
+cv_transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"),alpha.init=0.95,type="exp",cands=NULL){
   mode <- "transfer"
-  foldid <- make.folds.trans(y=y,family=family,nfolds=nfolds)
+  foldid <- make_folds_trans(y=y,family=family,nfolds=nfolds)
   n <- length(y[[1]])
   q <- length(y)
   
@@ -1426,7 +1426,7 @@ cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
   deviance <- auc <- matrix(data=NA,nrow=length(y),ncol=length(method),dimnames=list(names(y),method))
   for(j in seq_along(y)){
     for(k in method){
-      deviance[j,k] <- calc.metric(y=y[[j]],y_hat=y_hat[[j]][,k],family=family)
+      deviance[j,k] <- calc_metric(y=y[[j]],y_hat=y_hat[[j]][,k],family=family)
       if(family=="binomial"){
         auc[j,k] <- pROC::auc(response=y[[j]],predictor=as.vector(y_hat[[j]][,k]),direction="<",levels=c(0,1))
       }
@@ -1440,7 +1440,7 @@ cv.transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("glm.separate","gl
 }
 
 #test <- traintest(y_train,X_train,y_test,X_test,family)
-#test <- cv.transfer(y=y_train,X=X_train,family=family)
+#test <- cv_transfer(y=y_train,X=X_train,family=family)
 
 #'@title Metrics for sign detection
 #'
@@ -1581,9 +1581,9 @@ change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase
 #'values <- seq(from=0,to=1,by=0.2)
 #'x <- expand.grid(source=values,target=values)
 #'y <- stats::rexp(n=length(values)*length(values))
-#'plotWeight(x=x,y=y)
+#'plot_weight(x=x,y=y)
 #'
-plotWeight <- function(x,y){
+plot_weight <- function(x,y){
   if(stats::cor(x$source,x$target)==-1){
     graphics::plot(x=x$source,y=y,type="o",xlab="weight source = 1 - weight target")
   } else {

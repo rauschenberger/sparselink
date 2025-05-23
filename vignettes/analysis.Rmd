@@ -135,11 +135,11 @@ for(mode in c("transfer","multiple")){
     set.seed(seed=grid$seed[i])
     cat("i=",i,"\n")
     if(mode=="transfer"){
-      data <- sim.data.transfer(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i])
+      data <- sim_data_trans(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i])
       method <- c("glm.separate","glm.glmtrans","sparselink","glm.xrnet")
     } else if(mode=="multiple"){
       #--- multi-task learning ---
-      data <- sim.data.multiple(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i])
+      data <- sim_data_multi(prob.common=grid$prob.common[i],prob.separate=grid$prob.separate[i],family=grid$family[i])
       method <- c("glm.separate","glm.mgaussian","sparselink","glm.spls") # add glmnet "mgaussian" (only for linear case) or "MTPS" (not sparse)?
     }
     
@@ -273,10 +273,10 @@ for(mode in c("MTL-size","TL-source","TL-target")){ #,"TL-prop","MTL-prop"
       cat("i=",i,"\n")
       if(mode %in% c("TL-source","TL-target","TL-prop")){
         n0 <- rep(c(grid[[mode]]$n_source[i],grid[[mode]]$n_target[i]),times=c(2,1))
-        data <- sim.data.transfer(prob.common=grid[[mode]]$prob.common[i],prob.separate=grid[[mode]]$prob.separate[i],family=grid[[mode]]$family[i],n0=n0)
+        data <- sim_data_trans(prob.common=grid[[mode]]$prob.common[i],prob.separate=grid[[mode]]$prob.separate[i],family=grid[[mode]]$family[i],n0=n0)
         method <- c("glm.separate","glm.glmtrans","sparselink","glm.xrnet")
       } else if(mode %in% c("MTL-size","MTL-prop")){
-        data <- sim.data.multiple(prob.common=grid[[mode]]$prob.common[i],prob.separate=grid[[mode]]$prob.separate[i],family=grid[[mode]]$family[i],n0=grid[[mode]]$n0[i])
+        data <- sim_data_multi(prob.common=grid[[mode]]$prob.common[i],prob.separate=grid[[mode]]$prob.separate[i],family=grid[[mode]]$family[i],n0=grid[[mode]]$n0[i])
         method <- c("glm.separate","glm.mgaussian","sparselink","glm.spls")
       } else {
         stop("Wrong mode.")
@@ -571,7 +571,7 @@ nfolds <- 10
 codes <- unlist(project)
 coef <- matrix(data=NA,nrow=ncol(x[[1]]),ncol=length(codes),dimnames=list(NULL,codes))
 auc <- auc.pvalue <- matrix(data=NA,nrow=length(codes),ncol=length(codes),dimnames=list(codes,codes))
-foldid <- make.folds.trans(y=y,family="binomial",nfolds=nfolds)
+foldid <- make_folds_trans(y=y,family="binomial",nfolds=nfolds)
 
 ridge <- lasso <- list()
 for(i in seq_along(codes)){
@@ -684,7 +684,7 @@ for(i in names(project)){
   for(j in seq_len(5)){ # 5 repetitions of 10-fold CV
     set.seed(j)
     codes <- project[[i]]
-    result[[i]][[j]] <- cv.transfer(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"))
+    result[[i]][[j]] <- cv_transfer(y=y[codes],X=x[codes],family="binomial",method=c("glm.separate","glm.glmtrans","sparselink","glm.xrnet"))
   }
 }
 save(result,project,file=file.path(path,"results","application.RData"))
@@ -841,7 +841,7 @@ for(i in seq_along(prob_mtl)){
     for(k in seq_len(q)){
       Y[,k] <- abs(y - stats::rbinom(n=n,size=1,prob=prob_mtl[i]))
     }
-    #auc_mtl[[i]][[j]] <- cv.multiple(y=Y,X=x,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp",trial=FALSE)$auc
+    #auc_mtl[[i]][[j]] <- cv_multiple(y=Y,X=x,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp",trial=FALSE)$auc
     auc_mtl[[i]][[j]] <- joinet::cv.joinet(Y=Y,X=x,family="binomial")
   }
 }
@@ -872,7 +872,7 @@ for(i in seq_along(prob_tl)){
     cond[y==1] <- sample(rep(x=c(0,1),times=c(n1,sum(y==1)-n1))) #sample(rep(x=c(0,1),length.out=sum(y==1)))
     Y <- list(y1=y[cond==0],y2=y[cond==1])
     X <- list(x1=x[cond==0,],x2=x[cond==1,])
-    auc_tl[[i]][[j]] <- cv.transfer(y=Y,X=X,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp",trial=FALSE)$auc
+    auc_tl[[i]][[j]] <- cv_transfer(y=Y,X=X,method=c("glm.separate","sparselink"),family="binomial",alpha.init=0.95,alpha=1,type="exp",trial=FALSE)$auc
   }
 }
 
@@ -1021,7 +1021,7 @@ for(k in seq_along(problem)){
   for(i in seq_len(3)){ # 5 repetitions of 10-fold CV
     set.seed(i)
     method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink","glm.spls") #"sparselink" "group.devel"
-    results[[k]][[i]] <-  cv.multiple(y=y[,problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
+    results[[k]][[i]] <-  cv_multiple(y=y[,problem[[k]]],X=x,family="gaussian",method=method,nfolds=10,alpha=alpha,alpha.init=alpha.init,type=type,trial=trial)
   }
 }
 
@@ -1072,7 +1072,7 @@ for(i in seq_len(nrow(setting))){
   vars <- problem[[setting$problem[i]]]
   metric[[i]] <- joinet:::cv.joinet(Y=y[cond,vars],X=x[cond,],family="gaussian",compare="mnorm")
   #method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink")
-  #metric[[i]] <-  cv.multiple(y=y[cond,vars],X=x[cond,],family="gaussian",method=method,nfolds=10,alpha.init=0.95,alpha=1,type="exp",trial=FALSE)
+  #metric[[i]] <-  cv_multiple(y=y[cond,vars],X=x[cond,],family="gaussian",method=method,nfolds=10,alpha.init=0.95,alpha=1,type="exp",trial=FALSE)
 }
 frac <- sapply(X=metric,FUN=function(x) colMeans(t(x)/x["none",]))
 
@@ -1156,7 +1156,7 @@ for(i in seq_along(vars)){
   if(sum(cond)>250){cond[cumsum(cond)>250] <- FALSE} # temporary
   metric[[i]] <- joinet:::cv.joinet(Y=y[cond,cols],X=x[cond,],family="gaussian",compare="mnorm")
   #method <- c("glm.empty","glm.separate","glm.mgaussian","sparselink","devel") # ,"sparselink")
-  #metric[[i]] <- cv.multiple(y=y[cond,cols],X=x[cond,],family="gaussian",method=method,nfolds=10,alpha.init=0.95,alpha=1,type="exp",trial=FALSE)
+  #metric[[i]] <- cv_multiple(y=y[cond,cols],X=x[cond,],family="gaussian",method=method,nfolds=10,alpha.init=0.95,alpha=1,type="exp",trial=FALSE)
 }
 
 #rowMeans(sapply(metric,function(x) colMeans(t(x)/x["none",])))
