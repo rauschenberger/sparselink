@@ -15,8 +15,10 @@ if(FALSE){
 #'Sparse regression for related problems
 #'
 #'@description
-#'Estimates sparse regression models (i.e., selecting few variables)
+#'Estimates sparse regression models (i.e., performing feature selection)
 #'in multi-task learning or transfer learning.
+#'Multi-task learning involves multiple targets,
+#'and transfer learning involves multiple datasets.
 #'
 #'@export
 #'
@@ -36,7 +38,7 @@ if(FALSE){
 #'default: \code{NULL} (\{0, 0.2, 0.4, 0.6, 0.8, 1\})
 #'
 #'@return
-#'Returns an object of class \code{sparselink}, a list with multiple slots.
+#'Returns an object of class \code{sparselink}, a list with multiple slots:
 #'\itemize{
 #'\item Stage 1 regressions (before sharing information):
 #'Slot \code{glm.one} contains \eqn{q} objects of type
@@ -331,11 +333,15 @@ coef.sparselink <- function(object){
 #'with \eqn{n_k} rows (samples) and \eqn{p} columns (variables)
 #'for transfer learning, for each \eqn{k} in \eqn{1,\ldots,q}
 #'
-#'@param weight experimental argument:
+#'@param weight
+#'hyperparameters for scaling external and internal weights:
 #'numeric vector of length 2,
-#'with the first entry for the internal weight,
-#'and the second entry for the external weight,
-#'overwrites the cross-validated weights
+#'with the first entry for the external weights
+#'(prior coefficients from source data),
+#'and the second entry for the internal weights
+#'(prior coefficients from target data),
+#'selected values must be among the candidate values,
+#'default: \code{NULL} (using cross-validated weights)
 #'
 #'@param ... (not applicable)
 #'
@@ -343,6 +349,8 @@ coef.sparselink <- function(object){
 #'Returns predicted values or predicted probabilities.
 #'The output is a list of \eqn{q} column vectors of length \eqn{n_k}
 #'for \eqn{k} in \eqn{1,\ldots,q}.
+#'Each vector corresponds to one target (multi-task learning)
+#'or one dataset (transfer learning).
 #'
 #'@inherit sparselink-package references
 #'
@@ -814,7 +822,7 @@ construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
 #'predict(object,newx=newx)
 #'
 #'@references
-#'See R packages \link[glmnet]{cv.glmnet} (with argument family="mgaussian")
+#'See R packages \link[glmnet]{cv.glmnet} (with argument \code{family="mgaussian"})
 #'\link[spls]{spls}, \link[glmtrans]{glmtrans}, and \link[xrnet]{xrnet}.
 #'
 #'@name methods
@@ -1540,8 +1548,8 @@ change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,increase
 #'@keywords internal
 #'
 #'@description 
-#'Displays values in y in a grey scale (white=lowest, black=highest),
-#'for different combinations of the two variables in x.
+#'Displays values in \code{y} in a grey scale (white=lowest, black=highest),
+#'for different combinations of the two variables in \code{x}.
 #'The lowest value is indicated by a red cross,
 #'and the lowest value on the diagonal is indicated by a red circle.
 #'
