@@ -30,7 +30,9 @@ default: 0.95 (lasso-like elastic net)}
 \item{alpha}{elastic net mixing parameter of final regressions,
 default: 1 (lasso)}
 
-\item{type}{character}
+\item{type}{default \code{"exp"} scales weights with
+\eqn{w_{ext}^{v_{ext}}+w_{int}^{v_{int}}}
+(see internal function \link{construct_pf} for details)}
 
 \item{nfolds}{number of internal cross-validation folds,
 default: 10 (10-fold cross-validation)}
@@ -39,7 +41,7 @@ default: 10 (10-fold cross-validation)}
 default: \code{NULL} (\{0, 0.2, 0.4, 0.6, 0.8, 1\})}
 }
 \value{
-Returns an object of class \code{sparselink}, a list with multiple slots.
+Returns an object of class \code{sparselink}, a list with multiple slots:
 \itemize{
 \item Stage 1 regressions (before sharing information):
 Slot \code{glm.one} contains \eqn{q} objects of type
@@ -60,8 +62,10 @@ regressions.
 }
 }
 \description{
-Estimates sparse regression models (i.e., selecting few variables)
+Estimates sparse regression models (i.e., performing feature selection)
 in multi-task learning or transfer learning.
+Multi-task learning involves multiple targets,
+and transfer learning involves multiple datasets.
 }
 \examples{
 #--- multi-task learning ---

@@ -44,7 +44,9 @@ default: 1 (lasso)}
 \item{alpha.init}{elastic net mixing parameter for initial regressions,
 default: 0.95 (lasso-like elastic net)}
 
-\item{type}{character}
+\item{type}{default \code{"exp"} scales weights with
+\eqn{w_{ext}^{v_{ext}}+w_{int}^{v_{int}}}
+(see internal function \link{construct_pf} for details)}
 
 \item{cands}{candidate values for both scaling parameters,
 default: \code{NULL} (\{0, 0.2, 0.4, 0.6, 0.8, 1\})}

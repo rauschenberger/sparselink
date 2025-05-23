@@ -19,13 +19,32 @@ non-negative scalar}
 \item{v_ext}{exponent or factor for external weights:
 non-negative scalar}
 
-\item{type}{character \code{"geo"}, \code{"exp"}, \code{"rem"} or \code{"ari"}
-(with or without addition of \code{".con"})}
+\item{type}{scaling of weights:
+character \code{"exp"}, \code{"ari"}, \code{"geo"}, or \code{"rem"}
+(with or without addition of \code{".con"}),
+default: \code{"exp"}}
 }
 \description{
-Uses internal and external weights (for negative and positive effects)
-as well as internal and external exponents/factors for these weights
+Uses internal and external weights
+as well as internal and external exponents or factors for these weights
 to construct penalty factors.
+}
+\details{
+While internal weights are from the problem of interest ("supported" problem),
+external weights are from the other problems ("supporting" problems).
+
+Multiple options exist for scaling prior weights:
+\itemize{
+\item \code{"exp"}: \eqn{w_{int}^{v_{int}}+w_{ext}^{v_{ext}}}
+\item \code{"ari"}: \eqn{v_{int} w_{int} + v_{ext} w_{ext}}
+\item \code{"geo"}: \eqn{w_{int}^{v_{int}} w_{ext}^{v_{ext}}}
+\item \code{"rem"}: \eqn{w_{int}^{v_{int}}+w_{ext}^{v_{ext}}-\mathbb{I}(v_{int}=0)-\mathbb{I}(v_{ext}=0))}
+}
+The constrained versions \code{"exp.con"}, \code{"ari.con"},
+\code{"geo.con"}, and \code{"rem.con"} impose \eqn{v_{int}+v_{ext}=1}.
+The penalty factors are the inverse weights.
+Suggested choices are \code{"exp"} for predictivity
+and \code{"ari.con"} for interpretability.
 }
 \examples{
 n <- 10

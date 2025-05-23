@@ -17,11 +17,14 @@ list of \eqn{q} matrices
 with \eqn{n_k} rows (samples) and \eqn{p} columns (variables)
 for transfer learning, for each \eqn{k} in \eqn{1,\ldots,q}}
 
-\item{weight}{experimental argument:
+\item{weight}{hyperparameters for scaling external and internal weights:
 numeric vector of length 2,
-with the first entry for the internal weight,
-and the second entry for the external weight,
-overwrites the cross-validated weights}
+with the first entry for the external weights
+(prior coefficients from source data),
+and the second entry for the internal weights
+(prior coefficients from target data),
+selected values must be among the candidate values,
+default: \code{NULL} (using cross-validated weights)}
 
 \item{...}{(not applicable)}
 }
@@ -29,6 +32,8 @@ overwrites the cross-validated weights}
 Returns predicted values or predicted probabilities.
 The output is a list of \eqn{q} column vectors of length \eqn{n_k}
 for \eqn{k} in \eqn{1,\ldots,q}.
+Each vector corresponds to one target (multi-task learning)
+or one dataset (transfer learning).
 }
 \description{
 Predicts outcomes with a multi-task or transfer learning regression model.

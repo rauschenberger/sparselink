@@ -33,7 +33,9 @@ if(FALSE){
 #'default: 1 (lasso)
 #'@param nfolds number of internal cross-validation folds,
 #'default: 10 (10-fold cross-validation)
-#'@param type character
+#'@param type default \code{"exp"} scales weights with
+#'\eqn{w_{ext}^{v_{ext}}+w_{int}^{v_{int}}}
+#'(see internal function \link{construct_pf} for details)
 #'@param cands candidate values for both scaling parameters,
 #'default: \code{NULL} (\{0, 0.2, 0.4, 0.6, 0.8, 1\})
 #'
@@ -719,9 +721,26 @@ comb_split <- function(coef,id){
 #'@title Construct penalty factors
 #'
 #'@description
-#'Uses internal and external weights (for negative and positive effects)
-#'as well as internal and external exponents/factors for these weights
+#'Uses internal and external weights
+#'as well as internal and external exponents or factors for these weights
 #'to construct penalty factors.
+#'
+#'@details
+#'While internal weights are from the problem of interest ("supported" problem),
+#'external weights are from the other problems ("supporting" problems).
+#'
+#'Multiple options exist for scaling prior weights:
+#'\itemize{
+#'\item \code{"exp"}: \eqn{w_{int}^{v_{int}}+w_{ext}^{v_{ext}}}
+#'\item \code{"ari"}: \eqn{v_{int} w_{int} + v_{ext} w_{ext}}
+#'\item \code{"geo"}: \eqn{w_{int}^{v_{int}} w_{ext}^{v_{ext}}}
+#'\item \code{"rem"}: \eqn{w_{int}^{v_{int}}+w_{ext}^{v_{ext}}-\mathbb{I}(v_{int}=0)-\mathbb{I}(v_{ext}=0))}
+#'}
+#'The constrained versions \code{"exp.con"}, \code{"ari.con"},
+#'\code{"geo.con"}, and \code{"rem.con"} impose \eqn{v_{int}+v_{ext}=1}.
+#'The penalty factors are the inverse weights.
+#'Suggested choices are \code{"exp"} for predictivity
+#'and \code{"ari.con"} for interpretability.
 #'
 #'@export
 #'@keywords internal
@@ -734,8 +753,10 @@ comb_split <- function(coef,id){
 #'non-negative scalar
 #'@param v_ext exponent or factor for external weights:
 #'non-negative scalar
-#'@param type character \code{"geo"}, \code{"exp"}, \code{"rem"} or \code{"ari"}
-#'(with or without addition of \code{".con"})
+#'@param type scaling of weights:
+#'character \code{"exp"}, \code{"ari"}, \code{"geo"}, or \code{"rem"}
+#'(with or without addition of \code{".con"}),
+#'default: \code{"exp"}
 #'
 #'@examples
 #'n <- 10
@@ -744,14 +765,14 @@ comb_split <- function(coef,id){
 #'construct_pf(w_int,w_ext,v_int=0.5,v_ext=0.5,type="exp")
 #'
 construct_pf <- function(w_int,w_ext,v_int,v_ext,type){
-  if(type %in% c("geo","geo.con")){
-    pf <- 1/((w_int^v_int)*(w_ext^v_ext))
-  } else if(type %in% c("exp","exp.con")){
+  if(type %in% c("exp","exp.con")){
     pf <- 1/((w_int^v_int)+(w_ext^v_ext))
-  } else if(type %in% c("rem","rem.con")){ 
-    pf <- 1/((w_int^v_int)+(w_ext^v_ext)-1*(v_int==0)-1*(v_ext==0))
   } else if(type %in% c("ari","ari.con")){
     pf <- 1/(v_int*w_int + v_ext*w_ext)
+  } else if(type %in% c("geo","geo.con")){
+    pf <- 1/((w_int^v_int)*(w_ext^v_ext))
+  } else if(type %in% c("rem","rem.con")){ 
+    pf <- 1/((w_int^v_int)+(w_ext^v_ext)-1*(v_int==0)-1*(v_ext==0))
   }
   if(any(pf<0)){stop("negative pf")}
   return(pf)

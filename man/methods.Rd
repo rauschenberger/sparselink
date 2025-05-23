@@ -148,7 +148,7 @@ predict(object,newx=newx)
 
 }
 \references{
-See R packages \link[glmnet]{cv.glmnet} (with argument family="mgaussian")
+See R packages \link[glmnet]{cv.glmnet} (with argument \code{family="mgaussian"})
 \link[spls]{spls}, \link[glmtrans]{glmtrans}, and \link[xrnet]{xrnet}.
 }
 \keyword{internal}

@@ -12,8 +12,8 @@ plotWeight(x, y)
 \item{y}{numeric vector}
 }
 \description{
-Displays values in y in a grey scale (white=lowest, black=highest),
-for different combinations of the two variables in x.
+Displays values in \code{y} in a grey scale (white=lowest, black=highest),
+for different combinations of the two variables in \code{x}.
 The lowest value is indicated by a red cross,
 and the lowest value on the diagonal is indicated by a red circle.
 }

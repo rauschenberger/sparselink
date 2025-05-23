@@ -11,10 +11,10 @@ fuse.data(x, y = NULL, foldid = NULL)
 and with \eqn{p} columns}
 
 \item{y}{list of \eqn{q} vectors, of length \eqn{n_1,\ldots,n_q},
-or NULL (default)}
+or \code{NULL} (default)}
 
 \item{foldid}{list of \eqn{q} vectors, of length \eqn{n_1,\ldots,n_q},
-or NULL (default)}
+or \code{NULL} (default)}
 }
 \description{
 Data fusion
