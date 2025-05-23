@@ -100,38 +100,29 @@ default: 10 (10-fold cross-validation)</p></dd>
 
 
 <dt id="arg-cands">cands<a class="anchor" aria-label="anchor" href="#arg-cands"></a></dt>
-<dd><p>candidate values for both scaling parameters
-(default <code>NULL</code>: \(\{0, 0.2, 0.4, 0.6, 0.8, 1\}\))</p></dd>
+<dd><p>candidate values for both scaling parameters,
+default: <code>NULL</code> ({0, 0.2, 0.4, 0.6, 0.8, 1})</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Returns an object of class <code>sparselink</code>, a list with multiple slots.</p><dl><dt>Stage 1 regressions (before sharing information)</dt>
-<dd><p>Slot <code>glm.one</code>
-contains \(q\) objects of type <code>cv.glmnet</code> (one for each problem).</p></dd>
-
-<dt>Candidate scaling parameters (exponents)</dt>
-<dd><p>Slot <code>weight</code> contains
-a data frame with \(n\) combinations of exponents
-for the external (source) and internal (target) weights</p></dd>
-
-<dt>Stage 2 regressions (after sharing information)</dt>
-<dd><p>Slot <code>glm.two</code>
-contains \(q\) lists (one for each problem)
+    <p>Returns an object of class <code>sparselink</code>, a list with multiple slots.</p><ul><li><p>Stage 1 regressions (before sharing information):
+Slot <code>glm.one</code> contains \(q\) objects of type
+<code>cv.glmnet</code> (one for each problem).</p></li>
+<li><p>Candidate scaling parameters (exponents):
+Slot <code>weight</code> contains
+a data frame with \(n\) combinations of exponents for the external (source)
+and internal (target) weights</p></li>
+<li><p>Stage 2 regressions (after sharing information):
+Slot <code>glm.two</code> contains \(q\) lists (one for each problem)
 of \(n\) objects of type <code>cv.glmnet</code>
-(one for each combination of exponents).</p></dd>
-
-<dt>Optimal regularisation parameters</dt>
-<dd><p>Slot <code>lambda.min</code>
+(one for each combination of exponents).</p></li>
+<li><p>Optimal regularisation parameters: Slot <code>lambda.min</code>
 contains the cross-validated regularisation parameters for the stage 2
-regressions.</p></dd>
-
-<dt>Optimal scaling parameters</dt>
-<dd><p>Slots <code>weight.ind</code> and
-<code>weight.min</code> indicate or contain the cross-validated scaling parameters.</p></dd>
-
-
-</dl></div>
+regressions.</p></li>
+<li><p>Optimal scaling parameters: Slots <code>weight.ind</code> and
+<code>weight.min</code> indicate or contain the cross-validated scaling parameters.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p><a href="https://orcid.org/0000-0001-6498-4801" class="external-link">Armin Rauschenberger</a>,
