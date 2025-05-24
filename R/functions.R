@@ -1071,7 +1071,7 @@ coef.wrap_spls <- function(object,...){
 #'
 wrap_glmtrans <- function(x,y,family="gaussian",alpha=1){
   family <- unique(family)
-  if(length(family)>1){stop("glmtrans requires unique family")}
+  if(length(family)>1){stop("glmtrans-wrapper requires unique family")}
   q <- length(x)
   source <- list()
   for(i in seq_len(q)){
@@ -1116,7 +1116,7 @@ coef.wrap_glmtrans <- function(object,...){
 #'
 wrap_xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   family <- unique(family)
-  if(length(family)!=1){stop("XRNET requires single family")}
+  if(length(family)!=1){stop("xrnet-wrapper requires single family")}
   q <- length(x)
   p <- ncol(x[[1]])
   #--- stage 1 ---
@@ -1128,13 +1128,20 @@ wrap_xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   #--- stage 2 ---
   object <- list()
   for(i in seq_len(q)){
+    if(family=="binomial"){
+      foldid <- rep(x=NA,times=length(y[[i]]))
+      foldid[y[[i]]==0] <- sample(rep(x=seq_len(nfolds),length.out=sum(y[[i]]==0)))
+      foldid[y[[i]]==1] <- sample(rep(x=seq_len(nfolds),length.out=sum(y[[i]]==1)))
+    } else {
+      foldid <- NULL
+    }
     # use coefficients from other problems as prior information
     cond <- apply(prior,2,stats::sd)>0 & seq_len(q)!=i
     object[[i]] <- xrnet::tune_xrnet(x=x[[i]],y=y[[i]],
                                   external=prior[,cond,drop=FALSE],
                                   penalty_main=xrnet::define_penalty(penalty_type=alpha),
                                   family=family,
-                                  foldid=NULL,
+                                  foldid=foldid, # was NULL
                                   nfolds=nfolds,
                                   loss="deviance")
   }
