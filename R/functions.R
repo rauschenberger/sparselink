@@ -73,7 +73,7 @@ if(FALSE){
 #'n <- 100
 #'p <- 200
 #'q <- 3
-#'\dontshow{n <- 20; p <- 5; q <- 2}
+#'\dontshow{n <- 10; p <- 5; q <- 2}
 #'family <- "gaussian"
 #'x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 #'y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
@@ -300,7 +300,7 @@ print.sparselink <- function(x,...){
 #'@examples
 #'family <- "gaussian"
 #'data <- sim_data_trans(family=family)
-#'\dontshow{data <- sim_data_trans(family=family,n0=10,p=5)}
+#'\dontshow{data <- sim_data_trans(family=family,n0=10,p=3)}
 #'#data <- sim_data_multi(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'coef <- coef(object=object)
@@ -368,7 +368,7 @@ coef.sparselink <- function(object,...){
 #'@examples
 #'family <- "gaussian"
 #'data <- sim_data_multi(family=family)
-#'\dontshow{data <- sim_data_multi(family=family,n0=10,p=5)}
+#'\dontshow{data <- sim_data_multi(family=family,n0=10,p=3)}
 #'#data <- sim_data_trans(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'y_hat <- predict(object=object,newx=data$X_test)

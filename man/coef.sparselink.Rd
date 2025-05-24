@@ -26,7 +26,7 @@ Extracts coefficients from multi-task or transfer learning regression model.
 \examples{
 family <- "gaussian"
 data <- sim_data_trans(family=family)
-\dontshow{data <- sim_data_trans(family=family,n0=10,p=5)}
+\dontshow{data <- sim_data_trans(family=family,n0=10,p=3)}
 #data <- sim_data_multi(family=family)
 object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 coef <- coef(object=object)

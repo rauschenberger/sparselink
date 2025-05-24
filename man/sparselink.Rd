@@ -72,7 +72,7 @@ and transfer learning involves multiple datasets.
 n <- 100
 p <- 200
 q <- 3
-\dontshow{n <- 20; p <- 5; q <- 2}
+\dontshow{n <- 10; p <- 5; q <- 2}
 family <- "gaussian"
 x <- matrix(data=rnorm(n=n*p),nrow=n,ncol=p)
 y <- matrix(data=rnorm(n*q),nrow=n,ncol=q)
