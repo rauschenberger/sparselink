@@ -4,6 +4,7 @@ if(FALSE){
   #install.packages(c("roxygen2","pkgdown","rcmdcheck","usethis","remotes","testthat","devtools"))
   setwd("C:/Users/arauschenberger/Desktop/sparselink/package")
   roxygen2::roxygenise()
+  # usethis::use_mit_license()
   rcmdcheck::rcmdcheck()
   pkgdown::check_pkgdown()
   devtools::build()

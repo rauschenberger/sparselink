@@ -17,8 +17,8 @@ This vignette includes code chunks with a long computation time (e.g., analysing
 
 ```{r eval,eval=TRUE}
 knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
-sim.app <- TRUE # reproduce simulation and application?
-fig.tab <- TRUE # reproduce figures and tables?
+sim.app <- FALSE # reproduce simulation and application?
+fig.tab <- FALSE # reproduce figures and tables?
 ```
 
 This chunk verifies the working environment. The working directory, specified by the object `path`, must contain the R functions in "package/R/functions.R" as well as the folders "results" and "manuscript". Alternatively, the R functions can be loaded from the R package `sparselink`. This chunk also installs missing R packages from CRAN or Bioconductor.
