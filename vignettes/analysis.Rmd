@@ -684,13 +684,19 @@ for(i in names(project)){
   for(j in seq_len(5)){ # 5 repetitions of 10-fold CV
     set.seed(j)
     codes <- project[[i]]
-    result[[i]][[j]] <- cv_transfer(y=y[codes],X=x[codes],family="binomial",method=c("wrap_separate","wrap_glmtrans","sparselink","wrap_xrnet"))
+    result[[i]][[j]] <- cv_transfer(y=y[codes],X=x[codes],family="binomial",method=c("wrap_separate","wrap_glmtrans","sparselink","wrap_xrnet")) # alpha.init=ifelse(i=="RA",0,0.95)
   }
 }
 save(result,project,file=file.path(path,"results","application.RData"))
 
 writeLines(text=capture.output(utils::sessionInfo(),cat("\n"),
       sessioninfo::session_info()),con=paste0(path,"/results/info_app.txt"))
+
+# debugging
+if(FALSE){
+set.seed(j)
+  
+}
 ```
 
 This chunk generates the figure on the predictive performance.
