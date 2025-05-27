@@ -1129,22 +1129,30 @@ wrap_xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   #--- stage 2 ---
   object <- list()
   for(i in seq_len(q)){
-    if(family=="binomial"){
-      foldid <- rep(x=NA,times=length(y[[i]]))
-      foldid[y[[i]]==0] <- sample(rep(x=seq_len(nfolds),length.out=sum(y[[i]]==0)))
-      foldid[y[[i]]==1] <- sample(rep(x=seq_len(nfolds),length.out=sum(y[[i]]==1)))
-    } else {
-      foldid <- NULL
-    }
+    #if(family=="binomial"){
+    #  foldid <- rep(x=NA,times=length(y[[i]]))
+    #  foldid[y[[i]]==0] <- sample(rep(x=seq_len(nfolds),length.out=sum(y[[i]]==0)))
+    #  foldid[y[[i]]==1] <- sample(rep(x=seq_len(nfolds),length.out=sum(y[[i]]==1)))
+    #} else {
+    #  foldid <- NULL
+    #}
     # use coefficients from other problems as prior information
     cond <- apply(prior,2,stats::sd)>0 & seq_len(q)!=i
-    object[[i]] <- xrnet::tune_xrnet(x=x[[i]],y=y[[i]],
+    for(j in 1:2){
+      temp <- tryCatch(expr=xrnet::tune_xrnet(x=x[[i]],y=y[[i]],
                                   external=prior[,cond,drop=FALSE],
                                   penalty_main=xrnet::define_penalty(penalty_type=alpha),
                                   family=family,
-                                  foldid=foldid, # was NULL
+                                  #foldid=foldid, # was NULL
+                                  standardize=c(j==1,j==1),
                                   nfolds=nfolds,
-                                  loss="deviance")
+                                  loss="deviance"),error=function(x) NULL)
+      #if(is.null(temp)){
+      #  cat("Run",j,"returns NULL.\n")
+      #}
+      if(!is.null(temp)){break}
+    }
+    object[[i]] <- temp
   }
   class(object) <- "wrap_xrnet"
   return(object)
