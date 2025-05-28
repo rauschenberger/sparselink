@@ -76,7 +76,7 @@ This chunk generates the figure for the methods section.
 ```{r method_figure,eval=fig.tab}
 #<<setup>>
 
-grDevices::postscript(file=file.path(path,"manuscript","fig_flow.eps"),width=6,height=2.5)
+grDevices::postscript(file=file.path(path,"manuscript","fig_flow.eps"),width=6,height=2.5,horizontal=FALSE,onefile=FALSE,paper="special")
 graphics::par(mfrow=c(1,1),mar=c(0,0,0,0))
 graphics::plot.new()
 graphics::plot.window(xlim=c(-0.2,1.0),ylim=c(0.0,1.0))
@@ -214,7 +214,7 @@ figure_change <- function(model0,model1="sparselink",model2){
   
 }
 
-grDevices::postscript(file=file.path(path,"manuscript","fig_sim_multiple.eps"),width=6.5,height=6)
+grDevices::postscript(file=file.path(path,"manuscript","fig_sim_multiple.eps"),width=6.5,height=6,horizontal=FALSE,onefile=FALSE,paper="special")
 load(file.path(path,paste0("results/simulation_multiple.RData")),verbose=TRUE)
 #model.ref <- "wrap_mgaussian"
 #model.own <- "sparselink"
@@ -225,7 +225,7 @@ runtime <- rowSums(sapply(time,function(x) x))
 round(runtime/runtime["wrap_separate"],digits=2)
 grDevices::dev.off()
 
-grDevices::postscript(file=file.path(path,"manuscript","fig_sim_transfer.eps"),width=6.5,height=6)
+grDevices::postscript(file=file.path(path,"manuscript","fig_sim_transfer.eps"),width=6.5,height=6,horizontal=FALSE,onefile=FALSE,paper="special")
 load(file.path(path,paste0("results/simulation_transfer.RData")))
 #model.ref <- "wrap_glmtrans"
 #model.own <- "sparselink"
@@ -293,7 +293,7 @@ save(grid,metric,file=file.path(path,"results","simulation_devel.RData"))
 #<<setup>>
 load(file.path(path,"results","simulation_devel.RData"))
 
-grDevices::postscript(file=file.path(path,"manuscript","fig_sim_extra.eps"),width=6.5,height=3)
+grDevices::postscript(file=file.path(path,"manuscript","fig_sim_extra.eps"),width=6.5,height=3,horizontal=FALSE,onefile=FALSE,paper="special")
 cex <- 0.8
 graphics::par(mfrow=c(1,3),mar=c(4.5,4.5,1.5,1),oma=c(0,0,0,0))
 #graphics::layout(mat=matrix(data=c(1,1,2,2,3,3,0,4,4,0,5,5),ncol=2))
@@ -712,7 +712,7 @@ This chunk generates the figure on the predictive performance.
 ```{r transfer_figure,eval=fig.tab}
 #<<setup>>
 
-grDevices::postscript(file=file.path(path,"manuscript","fig_app.eps"),width=6.5,height=4)
+grDevices::postscript(file=file.path(path,"manuscript","fig_app.eps"),width=6.5,height=4,horizontal=FALSE,onefile=FALSE,paper="special")
 graphics::par(mfrow=c(2,1),mar=c(4,2,1,1),oma=c(0,0,0,0))
 load(file.path(path,paste0("results/application.RData")),verbose=TRUE)
 
@@ -790,7 +790,7 @@ table <- Reduce(f="+",x=coefs)/5
 
 cex <- 0.7
 
-grDevices::postscript(file=file.path(path,"manuscript","fig_coef.eps"),width=7,height=4)
+grDevices::postscript(file=file.path(path,"manuscript","fig_coef.eps"),width=7,height=4,horizontal=FALSE,onefile=FALSE,paper="special")
 graphics::par(mfrow=c(1,1),mar=c(2.5,4.5,0.5,1.5),oma=c(0,0,0,0))
 graphics::plot.new()
 graphics::plot.window(xlim=c(0.6,ncol(table)+0.4),ylim=c(0.5,nrow(table)+0.5))
