@@ -646,7 +646,7 @@ table[!star] <- paste0(table[!star],"\\phantom{$^\\star$}")
 diag(table) <- "-"
 table <- insert.space(table=table,cut=5)
 xtable <- xtable::xtable(x=table,align="rccccccccc",caption="Spearman correlation coefficients between the ridge regression coefficients from different datasets. Pairwise combinations of datasets with significantly correlated regression coefficients are highlighted, with black colour for nominal significance ($p$-value $\\leq 0.05$) and stars for adjusted significance ($p$-value $\\leq 0.05/28$). We expect a correlation coefficient close to $0$ for unrelated problems and close to $1$ for identical problems.",label="tab_cor")
-xtable::print.xtable(x=xtable,sanitize.text.function=identity,rotate.colnames=TRUE,caption.placement="top",hline.after=c(0,nrow(table)),comment=FALSE,file=file.path(path,"manuscript","tab_cor.tex")) #add.to.row=list(pos=list(5),command="\\hdashline \n")
+xtable::print.xtable(x=xtable,sanitize.text.function=identity,rotate.colnames=TRUE,caption.placement="top",hline.after=c(0,nrow(table)),comment=FALSE,file=file.path(path,"manuscript","tab_cor.tex"),floating.environment="table*") #add.to.row=list(pos=list(5),command="\\hdashline \n")
 
 table <- auc
 rownames(table) <- colnames(table) <- names
@@ -659,7 +659,7 @@ table[star] <- paste0(table[star],"$^\\star$")
 table[!star] <- paste0(table[!star],"\\phantom{$^\\star$}")
 table <- insert.space(table=table,cut=5)
 xtable <- xtable::xtable(x=table,align="rccccccccc",caption="Out-of-sample area under the receiver operating characteristic curve (\\textsc{roc-auc}) from logistic ridge regression trained on the dataset in the row and tested on the dataset in the column (off-diagonal entries), or cross-validated \\textsc{roc-auc} from logistic lasso regression trained and tested on the same dataset by $10$-fold external cross-validation (diagonal entries, between brackets). The \\textsc{roc-auc} of a random classifier is $0.5$, while that of a perfect classifier is $1.0$. Entries on and off the diagonal are not comparable. Predictions that are significantly better than random predictions (according to the one-sided Mann-Whitney $U$ test for testing whether the ranks of the predicted probabilities are significantly higher for the cases than for the controls) are highlighted, with black colour for nominal significance ($p$-value $\\leq 0.05$) and stars for adjusted significance ($p$-value $\\leq 0.05/64$).",label="tab_auc")
-xtable::print.xtable(x=xtable,sanitize.text.function=identity,rotate.colnames=TRUE,caption.placement="top",hline.after=c(0,nrow(table)),comment=FALSE,file=file.path(path,"manuscript","tab_auc.tex"))
+xtable::print.xtable(x=xtable,sanitize.text.function=identity,rotate.colnames=TRUE,caption.placement="top",hline.after=c(0,nrow(table)),comment=FALSE,file=file.path(path,"manuscript","tab_auc.tex"),floating.environment="table*")
 ```
 
 ## Transfer learning
