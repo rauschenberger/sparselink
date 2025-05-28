@@ -287,6 +287,8 @@ for(mode in c("MTL-size","TL-source","TL-target")){ #,"TL-prop","MTL-prop"
 }
 
 save(grid,metric,file=file.path(path,"results","simulation_devel.RData"))
+
+writeLines(text=capture.output(utils::sessionInfo(),cat("\n"),      sessioninfo::session_info()),con=paste0(path,"/results/info_sim_extra.txt"))
 ```
 
 ```{r sim_extra_figure,eval=fig.tab}
