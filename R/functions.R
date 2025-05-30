@@ -95,7 +95,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,c
   alpha.one <- alpha.init
   alpha.two <- alpha
   
-  cat(paste0("alpha.init=",alpha.init,", alpha=",alpha,", type=",type,"\n"))
+  message(paste0("alpha.init=",alpha.init," (",ifelse(alpha.init==0,"ridge",ifelse(alpha.init==1,"lasso","elastic net")),"), alpha=",alpha," (",ifelse(alpha==0,"ridge",ifelse(alpha==1,"lasso","elastic net")),")"))
   
   if(is.matrix(y) & is.matrix(x)){
     message("mode: multi-target learning")
@@ -1170,9 +1170,6 @@ wrap_xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
                                   standardize=c(j==1,j==1),
                                   nfolds=nfolds,
                                   loss="deviance"),error=function(x) NULL)
-      #if(is.null(temp)){
-      #  cat("Run",j,"returns NULL.\n")
-      #}
       if(!is.null(temp)){break}
     }
     object[[i]] <- temp
@@ -1389,7 +1386,7 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",
   deviance <- auc <- matrix(data=NA,nrow=length(method),ncol=q,dimnames=list(method,NULL))
   coef <- y_hat <- list()
   for(i in seq_along(method)){
-    cat("method",method[i],"\n")
+    message(paste("method:",method[i]))
     func <- eval(parse(text=paste0(method[i])))
     start <- Sys.time()
     hyperpar <- NULL
@@ -1466,7 +1463,7 @@ cv_multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("wrap_separate","w
   }
   
   for(i in seq_len(nfolds)){
-    cat("fold",i,"\n")
+    message(paste("fold",i))
     y_train <- y[foldid!=i,]
     y_test <- y[foldid==i,]
     X_train <- X[foldid!=i,,drop=FALSE]
@@ -1487,7 +1484,7 @@ cv_multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("wrap_separate","w
     }
   }
   # refit model on all folds
-  #cat("refit on all folds","\n")
+  #message("refit on all folds")
   #refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha)
   list <- list(deviance=deviance,auc=auc)
   return(list)
@@ -1508,7 +1505,7 @@ cv_transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("wrap_separate","w
     y_hat[[j]] <- matrix(data=NA,nrow=length(y[[j]]),ncol=length(method),dimnames=list(NULL,method))
   }
   for(i in seq_len(nfolds)){
-    cat("fold",i,"\n")
+    message(paste("fold",i))
     y_train <- X_train <- X_test <- list()
     for(j in seq_len(q)){
       y_train[[j]] <- y[[j]][foldid[[j]]!=i]
@@ -1532,7 +1529,7 @@ cv_transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("wrap_separate","w
     }
   }
   # refit model on all folds
-  cat("refit on all folds","\n")
+  message("refit on all folds")
   refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha,cands=cands)
   list <- list(deviance=deviance,auc=auc,refit=refit)
   return(list)
