@@ -1636,6 +1636,8 @@ plot_change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,inc
     graphics::points(x=rep(i+dist,times=sum(cond)),y=y2[cond],col="red",pch=16,cex=0.8)
   }
   graphics::title(main=main,line=0,cex.main=cex.main)
+  oldpar <- graphics::par(no.readonly=TRUE)
+  on.exit(graphics::par(oldpar))
   graphics::par(xpd=TRUE)
   usr <- graphics::par("usr")
   margin <- 0.1*diff(usr[3:4])
@@ -1656,7 +1658,6 @@ plot_change <- function(x,y0,y1,y2,dist=0.15,main="",cex.axis=0.5,cex.main=1,inc
                    y1=superior+2*margin.superior,lwd=2,length=0.08,col="grey")
   graphics::text(x=pos,y=inferior+1*margin.inferior,labels="-",col="red",font=2,cex=1.2)
   graphics::text(x=pos,y=superior+1*margin.superior,labels="+",col="blue",font=2,cex=1.2)
-  graphics::par(xpd=FALSE)
 }
 
 #'@title Visualise metric that depends on two parameters
