@@ -1507,7 +1507,7 @@ cv_multiple <- function(y,X,family,alpha=1,nfolds=10,method=c("wrap_separate","w
   }
   # refit model on all folds
   message("refit on all folds")
-  traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha,cands=cands)
+  refit <- traintest(y_train=y,X_train=X,family=family,method=method,alpha.init=alpha.init,type=type,alpha=alpha,cands=cands)
   list <- list(deviance=deviance,auc=auc,refit=refit)
   return(list)
 }
