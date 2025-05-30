@@ -808,7 +808,7 @@ table <- Reduce(f="+",x=coefs)/5
 
 cex <- 0.7
 
-grDevices::postscript(file=file.path(path,"manuscript","fig_coef.eps"),width=7,height=4,horizontal=FALSE,onefile=FALSE,paper="special")
+grDevices::postscript(file=file.path(path,"manuscript","fig_coef.eps"),width=7,height=5,horizontal=FALSE,onefile=FALSE,paper="special")
 graphics::par(mfrow=c(1,1),mar=c(2.5,4.5,0.5,1.5),oma=c(0,0,0,0))
 graphics::plot.new()
 graphics::plot.window(xlim=c(0.6,ncol(table)+0.4),ylim=c(0.5,nrow(table)+0.5))
