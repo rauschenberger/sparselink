@@ -13,11 +13,14 @@ make_folds_trans(y, family, nfolds = 10)
 \item{y}{multi-task learning:
 y matrix with \eqn{n} rows (samples) and \eqn{q} columns (outcomes)
 transfer learning:
-list of \eqn{q} numeric vectors}
+list of \eqn{q} numeric vectors of length \eqn{n_1,\ldots,n_q}}
 
 \item{family}{character \code{"gaussian"} or \code{"binomial"}}
 
 \item{nfolds}{integer between 2 and \eqn{n}}
+}
+\value{
+Returns the fold identifiers in a vector of length \eqn{n} with entries 1,\eqn{\ldots},\code{nfolds} (multi-task learning) on in a list of \eqn{q} vectors of lengths \eqn{n_1,\ldots,n_q} (transfer learning).
 }
 \description{
 Create folds for multi-task and transfer learning

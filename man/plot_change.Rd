@@ -35,6 +35,9 @@ plot_change(
 
 \item{increase}{change to arrow NULL, up, down}
 }
+\value{
+Returns \code{NULL}. Generates a plot.
+}
 \description{
 Visualises differences within sets of three values in different settings.
 }

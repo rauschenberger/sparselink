@@ -51,20 +51,25 @@ default: 0.95 (lasso-like elastic net)}
 \item{cands}{candidate values for both scaling parameters,
 default: \code{NULL} (\{0, 0.2, 0.4, 0.6, 0.8, 1\})}
 }
+\value{
+Returns a list with slots \code{deviance},
+\code{auc} (only relevant if \code{family="binomial"}),
+and \code{refit}.
+}
 \description{
 Compares predictive methods for multi-task learning (\code{cv_multiple}) or
 transfer learning (\code{cv_transfer}) by \eqn{k}-fold cross-validation.
 }
 \examples{
 #--- multi-task learning ---
-\dontrun{
+\donttest{
 family <- "gaussian"
 data <- sim_data_multi(family=family)
 metric <- cv_multiple(y=data$y_train,X=data$X_train,family=family)
 metric$deviance}
 
 #--- transfer learning ---
-\dontrun{
+\donttest{
 family <- "gaussian"
 data <- sim_data_trans(family=family)
 metric <- cv_transfer(y=data$y_train,X=data$X_train,family=family)

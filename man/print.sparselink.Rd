@@ -12,6 +12,9 @@
 
 \item{...}{(not applicable)}
 }
+\value{
+Returns \code{NULL}. Writes information on the \code{sparselink}-object to the console.
+}
 \description{
 Prints an object of class \code{sparselink}
 }

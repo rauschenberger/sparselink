@@ -11,6 +11,9 @@ plot_weight(x, y)
 
 \item{y}{numeric vector}
 }
+\value{
+Returns \code{NULL}. Generates a plot.
+}
 \description{
 Displays values in \code{y} in a grey scale (white=lowest, black=highest),
 for different combinations of the two variables in \code{x}.

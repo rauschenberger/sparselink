@@ -67,7 +67,7 @@ and \code{beta} for effects (\eqn{p \times q} matrix).
 Simulates data for multi-task learning and transfer learning.
 }
 \examples{
-#--- multit-task learning ---
+#--- multi-task learning ---
 data <- sim_data_multi()
 sapply(X=data,FUN=dim)
 

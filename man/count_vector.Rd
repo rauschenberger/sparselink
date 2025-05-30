@@ -16,6 +16,9 @@ count_matrix(truth, estim)
 \item{estim}{(i) vector of length \eqn{p} or
 (ii) \eqn{n \times p} matrix with entries -1, 0, 1}
 }
+\value{
+Returns a named vector of length 3.
+}
 \description{
 Calculates sensitivity, specificity and precision for ternary data
 (with -1 for negative effect, 0 for no effect, 1 for positive effect).

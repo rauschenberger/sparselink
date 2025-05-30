@@ -9,6 +9,9 @@ sigmoid(x)
 \arguments{
 \item{x}{numeric vector}
 }
+\value{
+Returns a numeric vector of the transformed values.
+}
 \description{
 Sigmoid function
 }

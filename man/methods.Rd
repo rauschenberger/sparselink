@@ -133,9 +133,16 @@ x <- matrix(data=rnorm(n=n_train*p),nrow=n_train,ncol=p)
 newx <- matrix(data=rnorm(n=n_test*p),nrow=n_test,ncol=p)
 y <- matrix(data=rnorm(n_train*q),nrow=n_train,ncol=q)
 object <- wrap_empty(x=x,y=y,family=family)
-#object <- wrap_separate(x=x,y=y,family=family)
-#object <- wrap_mgaussian(x=x,y=y,family=family)
-#object <- wrap_spls(x=x,y=y,family=family)
+model <- "empty" # try "empty", "separate", "mgaussian" or "spls"
+if(model=="empty"){
+  object <- wrap_empty(x=x,y=y,family=family)
+} else if(model=="separate"){
+  object <- wrap_separate(x=x,y=y,family=family)
+} else if(model=="mgaussian"){
+  object <- wrap_mgaussian(x=x,y=y,family=family)
+} else if(model=="spls"){
+  object <- wrap_spls(x=x,y=y,family=family)
+}
 coef(object)
 predict(object,newx=newx)
 
@@ -147,11 +154,18 @@ x <- lapply(X=n_train,function(n) matrix(data=stats::rnorm(n*p),nrow=n,ncol=p))
 newx <- lapply(X=n_test,function(n) matrix(data=stats::rnorm(n*p),nrow=n,ncol=p))
 y <- lapply(X=n_train,function(n) stats::rnorm(n))
 family <- "gaussian"
-object <- wrap_empty(x=x,y=y,family=family)
-#object <- wrap_separate(x=x,y=y,family=family)
-#object <- wrap_common(x=x,y=y,family=family)
-#object <- wrap_glmtrans(x=x,y=y,family=family)
-#object <- wrap_xrnet(x=x,y=y,family=family)
+model <- "empty" # try "empty", "separate", "common", "glmtrans", or "xrnet"
+if(model=="empty"){
+ object <- wrap_empty(x=x,y=y,family=family)
+} else if(model=="separate"){
+ object <- wrap_separate(x=x,y=y,family=family)
+} else if(model=="common"){
+ object <- wrap_common(x=x,y=y,family=family)
+} else if(model=="glmtrans"){
+ object <- wrap_glmtrans(x=x,y=y,family=family)
+} else if(model=="xrnet"){
+ object <- wrap_xrnet(x=x,y=y,family=family)
+}
 coef(object)
 predict(object,newx=newx)
 

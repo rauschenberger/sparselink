@@ -16,6 +16,9 @@ or \code{NULL} (default)}
 \item{foldid}{list of \eqn{q} vectors, of length \eqn{n_1,\ldots,n_q},
 or \code{NULL} (default)}
 }
+\value{
+Returns a list with the concatenated feature matrices in slot \code{x} (\eqn{(\sum_i^q n_i) \times p} matrix), the concatenated target vectors in slot \code{y} (vector of length \eqn{(\sum_i^q n_i)}), and the indices of the problems in slot \code{index} (vector of length \eqn{(\sum_i^q n_i)} with entries \eqn{1,\ldots,q}).
+}
 \description{
 Data fusion
 }

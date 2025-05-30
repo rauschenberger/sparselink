@@ -51,23 +51,24 @@ default: 0.95 (lasso-like elastic net)}
 \item{cands}{candidate values for both scaling parameters,
 default: \code{NULL} (\{0, 0.2, 0.4, 0.6, 0.8, 1\})}
 }
+\value{
+Returns a list with the computation time in slot \code{time}, the out-of-sample deviance in slot \code{deviance}, the out-of-sample ROC-AUC in slot \code{auc}, the coefficients in slot \code{coef}, the predicted value in slot \code{y_hat}, and the optimal hyperparameters in slot \code{hyperpar}.
+}
 \description{
 Trains and tests prediction models
 }
 \examples{
 #--- multi-task learning ---
-\dontrun{
+\donttest{
 family <- "gaussian"
 data <- sim_data_multi(family=family)
-result <- traintest(data$y_train,data$X_train,family=family)
-}
+result <- traintest(data$y_train,data$X_train,family=family)}
 
 #--- transfer learning ---
-\dontrun{
+\donttest{
 family <- "gaussian"
 data <- sim_data_trans(family=family)
-result <- traintest(data$y_train,data$X_train,family=family)
-}
+result <- traintest(data$y_train,data$X_train,family=family)}
 
 }
 \keyword{internal}

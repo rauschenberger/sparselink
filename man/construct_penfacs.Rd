@@ -24,6 +24,9 @@ character \code{"exp"}, \code{"ari"}, \code{"geo"}, or \code{"rem"}
 (with or without addition of \code{".con"}),
 default: \code{"exp"}}
 }
+\value{
+Returns a vector of length \eqn{q} (non-negative entries).
+}
 \description{
 Uses internal and external weights
 as well as internal and external exponents or factors for these weights

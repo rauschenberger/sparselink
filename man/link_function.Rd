@@ -11,6 +11,9 @@ link_function(mu, family)
 
 \item{family}{character \code{"gaussian"} or \code{"binomial"}}
 }
+\value{
+Returns a numeric vector of the transformed values.
+}
 \description{
 Applies the link function.
 }

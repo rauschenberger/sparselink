@@ -13,6 +13,9 @@ calc_metric(y, y_hat, family)
 
 \item{family}{character \code{"gaussian"} or \code{"binomial"}}
 }
+\value{
+Returns a scalar.
+}
 \description{
 Calculates Gaussian deviance (mean-squared error) and binomial deviance.
 }

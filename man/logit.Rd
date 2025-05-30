@@ -9,6 +9,9 @@ logit(x)
 \arguments{
 \item{x}{numeric vector with values in unit interval}
 }
+\value{
+Returns a numeric vector of the transformed values.
+}
 \description{
 logit function
 }
