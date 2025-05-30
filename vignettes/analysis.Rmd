@@ -821,7 +821,6 @@ grDevices::dev.off()
 ## Data-based simulation (under development)
 
 ```{r,eval=FALSE}
-rm(list=ls())
 <<setup>>
 <<define_projects>>
 <<preprocess_data>>
@@ -911,7 +910,6 @@ graphics::abline(h=0.5,lty=2,col="grey")
 ## Multi-task learning (under development)
 
 ```{r multi-task,eval=FALSE}
-rm(list=ls())
 <<setup>>
 <<define_projects>>
 <<preprocess_data>>
