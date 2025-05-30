@@ -1338,14 +1338,14 @@ sim_data_trans <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,2
 #'
 #'@examples
 #'#--- multi-task learning ---
-#'\dontrun{
+#'\donttest{
 #'family <- "gaussian"
 #'data <- sim_data_multi(family=family)
 #'result <- traintest(data$y_train,data$X_train,family=family)
 #'}
 #'
 #'#--- transfer learning ---
-#'\dontrun{
+#'\donttest{
 #'family <- "gaussian"
 #'data <- sim_data_trans(family=family)
 #'result <- traintest(data$y_train,data$X_train,family=family)
@@ -1420,14 +1420,14 @@ traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",
 #'
 #'@examples
 #'#--- multi-task learning ---
-#'\dontrun{
+#'\donttest{
 #'family <- "gaussian"
 #'data <- sim_data_multi(family=family)
 #'metric <- cv_multiple(y=data$y_train,X=data$X_train,family=family)
 #'metric$deviance}
 #'
 #'#--- transfer learning ---
-#'\dontrun{
+#'\donttest{
 #'family <- "gaussian"
 #'data <- sim_data_trans(family=family)
 #'metric <- cv_transfer(y=data$y_train,X=data$X_train,family=family)
