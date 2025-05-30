@@ -517,7 +517,7 @@ mean_function <- function(eta,family){
 #'@param family character \code{"gaussian"} or \code{"binomial"}
 #'
 #'@return
-#'Returns a scalar.
+#'Returns the deviance (scalar).
 #'
 #'@examples
 #'n <- 100
@@ -1564,16 +1564,25 @@ cv_transfer <- function(y,X,family,alpha=1,nfolds=10,method=c("wrap_separate","w
 #'@param truth (i) vector of length \eqn{p} or
 #'(ii) \eqn{n \times p} matrix with entries in -1, 0, 1
 #'@param estim (i) vector of length \eqn{p} or
-#'(ii) \eqn{n \times p} matrix with entries -1, 0, 1
+#'(ii) \eqn{p \times n} matrix with entries -1, 0, 1
 #'
 #'@return
-#'Returns a named vector of length 3.
+#'Returns a vector of length 3 (with names "sensitivity", "specificity" and "precision") or a matrix with 3 rows (with names "sensitivity", "specificity" and "precision") and \eqn{n} columns.
 #'
 #'@examples
-#'truth <- sample(x=c(-1,0,1),size=20,replace=TRUE)
-#'estim <- sample(x=c(-1,0,1),size=20,replace=TRUE)
+#'#--- vector ---
+#'p <- 20
+#'truth <- sample(x=c(-1,0,1),size=p,replace=TRUE)
+#'estim <- sample(x=c(-1,0,1),size=p,replace=TRUE)
 #'table(truth,estim)
 #'count_vector(truth,estim)
+#'
+#'#--- matrix ---
+#'p <- 20
+#'n <- 5
+#'truth <- matrix(sample(x=c(-1,0,1),size=n*p,replace=TRUE),nrow=p,ncol=n)
+#'estim <- matrix(sample(x=c(-1,0,1),size=n*p,replace=TRUE),nrow=p,ncol=n)
+#'count_matrix(truth,estim)
 #'
 count_vector <- function(truth,estim){
   if(!is.vector(truth)){stop()}
