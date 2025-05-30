@@ -114,22 +114,184 @@ default: 0.95 (lasso-like elastic net)</p></dd>
 default: <code>NULL</code> ({0, 0.2, 0.4, 0.6, 0.8, 1})</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>Returns a list with slots <code>deviance</code>,
+<code>auc</code> (only relevant if <code>family="binomial"</code>),
+and <code>refit</code>.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#--- multi-task learning ---</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">family</span> <span class="op">&lt;-</span> <span class="st">"gaussian"</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim_data_multi.html">sim_data_multi</a></span><span class="op">(</span>family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">metric</span> <span class="op">&lt;-</span> <span class="fu">cv_multiple</span><span class="op">(</span>y<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">y_train</span>,X<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">X_train</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">metric</span><span class="op">$</span><span class="va">deviance</span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 2</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 4</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 5</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 6</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 7</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 8</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 9</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 10</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> refit on all folds</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_mgaussian</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: multi-target learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
+<span class="r-in"><span><span class="va">metric</span><span class="op">$</span><span class="va">deviance</span><span class="co"># }</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      wrap_separate wrap_mgaussian sparselink wrap_spls</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]      1.786007       1.563429   1.341154  1.847301</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]      1.990516       2.132396   1.875813  2.790048</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]      1.871850       2.455214   1.408095  4.112216</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#--- transfer learning ---</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">family</span> <span class="op">&lt;-</span> <span class="st">"gaussian"</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim_data_multi.html">sim_data_trans</a></span><span class="op">(</span>family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">metric</span> <span class="op">&lt;-</span> <span class="fu">cv_transfer</span><span class="op">(</span>y<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">y_train</span>,X<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">X_train</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">metric</span><span class="op">$</span><span class="va">deviance</span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Registered S3 methods overwritten by 'caret':</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   method         from</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   predict.splsda spls</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   print.splsda   spls</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 2</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 4</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 5</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 6</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 7</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 8</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 9</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> fold 10</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> refit on all folds</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
+<span class="r-in"><span><span class="va">metric</span><span class="op">$</span><span class="va">deviance</span><span class="co"># }</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      wrap_separate wrap_glmtrans sparselink wrap_xrnet</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]      4.878054      5.951404   2.311250   4.571539</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]      3.789215      3.662247   2.853324   4.158388</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]      1.338142      1.462901   1.135744   1.398073</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

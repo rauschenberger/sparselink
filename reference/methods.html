@@ -222,12 +222,19 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-in"><span><span class="va">newx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n<span class="op">=</span><span class="va">n_test</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">n_test</span>,ncol<span class="op">=</span><span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_train</span><span class="op">*</span><span class="va">q</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">n_train</span>,ncol<span class="op">=</span><span class="va">q</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_empty</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- wrap_separate(x=x,y=y,family=family)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- wrap_mgaussian(x=x,y=y,family=family)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- wrap_spls(x=x,y=y,family=family)</span></span></span>
+<span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="st">"empty"</span> <span class="co"># try "empty", "separate", "mgaussian" or "spls"</span></span></span>
+<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="va">model</span><span class="op">==</span><span class="st">"empty"</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_empty</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="va">model</span><span class="op">==</span><span class="st">"separate"</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_separate</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="va">model</span><span class="op">==</span><span class="st">"mgaussian"</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_mgaussian</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="va">model</span><span class="op">==</span><span class="st">"spls"</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_spls</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alpha</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.09975255  0.04447040 -0.16149201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.10581259  0.15089275  0.00960871</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1] [,2] [,3]</span>
@@ -284,43 +291,43 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>,newx<span class="op">=</span><span class="va">newx</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.09975255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.09975255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.09975255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.09975255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.09975255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.09975255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.09975255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.09975255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.09975255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.09975255</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.1058126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.1058126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.1058126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.1058126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.1058126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.1058126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.1058126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.1058126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.1058126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.1058126</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  0.0444704</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  0.0444704</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  0.0444704</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.0444704</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  0.0444704</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  0.0444704</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  0.0444704</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  0.0444704</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  0.0444704</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  0.0444704</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  0.1508927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  0.1508927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  0.1508927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.1508927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  0.1508927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  0.1508927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  0.1508927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  0.1508927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  0.1508927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  0.1508927</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[3]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  -0.161492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  -0.161492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  -0.161492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  -0.161492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  -0.161492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  -0.161492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  -0.161492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  -0.161492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  -0.161492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  -0.161492</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.00960871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.00960871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.00960871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.00960871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.00960871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.00960871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.00960871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.00960871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.00960871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.00960871</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#--- transfer learning ---</span></span></span>
@@ -331,14 +338,21 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-in"><span><span class="va">newx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span>X<span class="op">=</span><span class="va">n_test</span>,<span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">n</span>,ncol<span class="op">=</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span>X<span class="op">=</span><span class="va">n_train</span>,<span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">family</span> <span class="op">&lt;-</span> <span class="st">"gaussian"</span></span></span>
-<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_empty</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- wrap_separate(x=x,y=y,family=family)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- wrap_common(x=x,y=y,family=family)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- wrap_glmtrans(x=x,y=y,family=family)</span></span></span>
-<span class="r-in"><span><span class="co">#object &lt;- wrap_xrnet(x=x,y=y,family=family)</span></span></span>
+<span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="st">"empty"</span> <span class="co"># try "empty", "separate", "common", "glmtrans", or "xrnet"</span></span></span>
+<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="va">model</span><span class="op">==</span><span class="st">"empty"</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span> <span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_empty</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="va">model</span><span class="op">==</span><span class="st">"separate"</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span> <span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_separate</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="va">model</span><span class="op">==</span><span class="st">"common"</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span> <span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_common</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="va">model</span><span class="op">==</span><span class="st">"glmtrans"</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span> <span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_glmtrans</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="va">model</span><span class="op">==</span><span class="st">"xrnet"</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span> <span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">wrap_xrnet</span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,family<span class="op">=</span><span class="va">family</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alpha</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.08812748 -0.17183954</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.03171024 -0.21167258</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1] [,2]</span>
@@ -395,30 +409,30 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>,newx<span class="op">=</span><span class="va">newx</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.08812748</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.08812748</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.08812748</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.08812748</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.08812748</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.08812748</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.08812748</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.08812748</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.08812748</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.08812748</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        lambda.min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.03171024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.03171024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.03171024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.03171024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.03171024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.03171024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.03171024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.03171024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.03171024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.03171024</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.1718395</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.1718395</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.1718395</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.1718395</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.1718395</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.1718395</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.1718395</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.1718395</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.1718395</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.1718395</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.2116726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.2116726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.2116726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.2116726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.2116726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.2116726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.2116726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.2116726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.2116726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.2116726</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

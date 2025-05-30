@@ -60,7 +60,7 @@
 <dd><p>multi-task learning:
 y matrix with \(n\) rows (samples) and \(q\) columns (outcomes)
 transfer learning:
-list of \(q\) numeric vectors</p></dd>
+list of \(q\) numeric vectors of length \(n_1,\ldots,n_q\)</p></dd>
 
 
 <dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
@@ -71,6 +71,10 @@ list of \(q\) numeric vectors</p></dd>
 <dd><p>integer between 2 and \(n\)</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>Returns the fold identifiers in a vector of length \(n\) with entries 1,\(\ldots\),<code>nfolds</code> (multi-task learning) on in a list of \(q\) vectors of lengths \(n_1,\ldots,n_q\) (transfer learning).</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
