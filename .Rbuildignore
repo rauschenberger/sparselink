@@ -12,3 +12,4 @@ appveyor.yml
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
 ^LICENSE\.md$
+package-development.R
