@@ -1166,13 +1166,6 @@ wrap_xrnet <- function(x,y,alpha.init=0.95,alpha=1,nfolds=10,family="gaussian"){
   #--- stage 2 ---
   object <- list()
   for(i in seq_len(q)){
-    #if(family=="binomial"){
-    #  foldid <- rep(x=NA,times=length(y[[i]]))
-    #  foldid[y[[i]]==0] <- sample(rep(x=seq_len(nfolds),length.out=sum(y[[i]]==0)))
-    #  foldid[y[[i]]==1] <- sample(rep(x=seq_len(nfolds),length.out=sum(y[[i]]==1)))
-    #} else {
-    #  foldid <- NULL
-    #}
     # use coefficients from other problems as prior information
     cond <- apply(prior,2,stats::sd)>0 & seq_len(q)!=i
     for(j in 1:2){
