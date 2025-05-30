@@ -300,11 +300,11 @@ print.sparselink <- function(x,...){
 #'
 #'@examples
 #'family <- "gaussian"
-#'type <- "transfer" #  try "transfer" or "multiple"
-#'if(type=="transfer"){
-#'  data <- sim_data_trans(family=family)
-#'} else if(type=="multiple"){
+#'type <- "multiple" #  try "multiple" or "transfer"
+#'if(type=="multiple"){
 #'  data <- sim_data_multi(family=family)
+#'} else if(type=="transfer"){
+#'  data <- sim_data_trans(family=family)
 #'}
 #'\dontshow{data <- sim_data_trans(family=family,n0=10,p=3)}
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
@@ -372,9 +372,13 @@ coef.sparselink <- function(object,...){
 #'
 #'@examples
 #'family <- "gaussian"
-#'data <- sim_data_multi(family=family)
+#'type <- "multiple" # try "multiple" or "transfer"
+#'if(type=="multiple"){
+#'  data <- sim_data_multi(family=family)
+#'} else if(type=="transfer"){
+#'  data <- sim_data_trans(family=family)
+#'}
 #'\dontshow{data <- sim_data_multi(family=family,n0=10,p=3)}
-#'#data <- sim_data_trans(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'y_hat <- predict(object=object,newx=data$X_test)
 #'
@@ -1359,15 +1363,13 @@ sim_data_trans <- function(prob.common=0.05,prob.separate=0.05,q=3,n0=c(50,100,2
 #'\donttest{
 #'family <- "gaussian"
 #'data <- sim_data_multi(family=family)
-#'result <- traintest(data$y_train,data$X_train,family=family)
-#'}
+#'result <- traintest(data$y_train,data$X_train,family=family)}
 #'
 #'#--- transfer learning ---
 #'\donttest{
 #'family <- "gaussian"
 #'data <- sim_data_trans(family=family)
-#'result <- traintest(data$y_train,data$X_train,family=family)
-#'}
+#'result <- traintest(data$y_train,data$X_train,family=family)}
 #'
 traintest <- function(y_train,X_train,y_test=NULL,X_test=NULL,family="gaussian",alpha=1,method=c("wrap_empty","wrap_separate","sparselink"),alpha.init=0.95,type="exp",cands=NULL){
   if(is.list(y_train)){
