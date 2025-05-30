@@ -95,10 +95,10 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,c
   alpha.one <- alpha.init
   alpha.two <- alpha
   
-  message(paste0("alpha.init=",alpha.init," (",ifelse(alpha.init==0,"ridge",ifelse(alpha.init==1,"lasso","elastic net")),"), alpha=",alpha," (",ifelse(alpha==0,"ridge",ifelse(alpha==1,"lasso","elastic net")),")"))
+  info <- paste0("alpha.init=",alpha.init," (",ifelse(alpha.init==0,"ridge",ifelse(alpha.init==1,"lasso","elastic net")),"), alpha=",alpha," (",ifelse(alpha==0,"ridge",ifelse(alpha==1,"lasso","elastic net")),")")
   
   if(is.matrix(y) & is.matrix(x)){
-    message("mode: multi-target learning")
+    message("mode: multi-target learning, ",info)
     p <- ncol(x)
     q <- ncol(y)
     n <- rep(x=nrow(x),times=q)
@@ -108,7 +108,7 @@ sparselink <- function(x,y,family,alpha.init=0.95,alpha=1,type="exp",nfolds=10,c
     foldid <- replicate(n=q,expr=foldid,simplify=FALSE)
     mode <- "multiple"
   } else if(is.list(y) & is.list(x)){
-    message("mode: transfer learning")
+    message("mode: transfer learning, ",info)
     n <- sapply(X=y,FUN=base::length)
     p <- ncol(x[[1]])
     q <- length(x)
