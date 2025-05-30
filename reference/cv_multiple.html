@@ -196,9 +196,9 @@ and <code>refit</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_spls</span>
 <span class="r-in"><span><span class="va">metric</span><span class="op">$</span><span class="va">deviance</span><span class="co"># }</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      wrap_separate wrap_mgaussian sparselink wrap_spls</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]      1.786007       1.563429   1.341154  1.847301</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]      1.990516       2.132396   1.875813  2.790048</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]      1.871850       2.455214   1.408095  4.112216</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]      2.662426       2.178143   2.712249  3.536392</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]      4.393651       3.372834   2.950362  4.439447</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]      2.007589       1.446400   1.385281  1.889839</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#--- transfer learning ---</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
@@ -212,8 +212,6 @@ and <code>refit</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   method         from</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   predict.splsda spls</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   print.splsda   spls</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
@@ -227,7 +225,6 @@ and <code>refit</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> fold 3</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
@@ -235,13 +232,13 @@ and <code>refit</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> fold 5</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
@@ -255,7 +252,6 @@ and <code>refit</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> fold 7</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
@@ -269,15 +265,12 @@ and <code>refit</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> fold 9</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> fold 10</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_separate</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_glmtrans</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: sparselink</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> mode: transfer learning, alpha.init=0.95 (elastic net), alpha=1 (lasso)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
@@ -289,9 +282,9 @@ and <code>refit</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> method: wrap_xrnet</span>
 <span class="r-in"><span><span class="va">metric</span><span class="op">$</span><span class="va">deviance</span><span class="co"># }</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      wrap_separate wrap_glmtrans sparselink wrap_xrnet</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]      4.878054      5.951404   2.311250   4.571539</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]      3.789215      3.662247   2.853324   4.158388</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]      1.338142      1.462901   1.135744   1.398073</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]     10.924619      3.906340   4.473771   4.836102</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]      2.263707      2.471004   1.538593   2.240509</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]      1.789421      1.986591   1.463384   1.845089</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
