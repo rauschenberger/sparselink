@@ -14,20 +14,29 @@ count_matrix(truth, estim)
 (ii) \eqn{n \times p} matrix with entries in -1, 0, 1}
 
 \item{estim}{(i) vector of length \eqn{p} or
-(ii) \eqn{n \times p} matrix with entries -1, 0, 1}
+(ii) \eqn{p \times n} matrix with entries -1, 0, 1}
 }
 \value{
-Returns a named vector of length 3.
+Returns a vector of length 3 (with names "sensitivity", "specificity" and "precision") or a matrix with 3 rows (with names "sensitivity", "specificity" and "precision") and \eqn{n} columns.
 }
 \description{
 Calculates sensitivity, specificity and precision for ternary data
 (with -1 for negative effect, 0 for no effect, 1 for positive effect).
 }
 \examples{
-truth <- sample(x=c(-1,0,1),size=20,replace=TRUE)
-estim <- sample(x=c(-1,0,1),size=20,replace=TRUE)
+#--- vector ---
+p <- 20
+truth <- sample(x=c(-1,0,1),size=p,replace=TRUE)
+estim <- sample(x=c(-1,0,1),size=p,replace=TRUE)
 table(truth,estim)
 count_vector(truth,estim)
+
+#--- matrix ---
+p <- 20
+n <- 5
+truth <- matrix(sample(x=c(-1,0,1),size=n*p,replace=TRUE),nrow=p,ncol=n)
+estim <- matrix(sample(x=c(-1,0,1),size=n*p,replace=TRUE),nrow=p,ncol=n)
+count_matrix(truth,estim)
 
 }
 \keyword{internal}
