@@ -300,9 +300,13 @@ print.sparselink <- function(x,...){
 #'
 #'@examples
 #'family <- "gaussian"
-#'data <- sim_data_trans(family=family)
+#'type <- "transfer" #  try "transfer" or "multiple"
+#'if(type=="transfer"){
+#'  data <- sim_data_trans(family=family)
+#'} else if(type=="multiple"){
+#'  data <- sim_data_multi(family=family)
+#'}
 #'\dontshow{data <- sim_data_trans(family=family,n0=10,p=3)}
-#'#data <- sim_data_multi(family=family)
 #'object <- sparselink(x=data$X_train,y=data$y_train,family=family)
 #'coef <- coef(object=object)
 #'
