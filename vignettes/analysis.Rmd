@@ -181,7 +181,7 @@ figure_change <- function(model0,model1="sparselink",model2){
   
   mode <- paste0(100*grid$prob.common,"%\n",100*grid$prob.separate,"%")
   
-  graphics::par(mfrow=c(3,1),mar=c(3,3,1,1))
+  graphics::par(mfrow=c(3,1),mar=c(3,3,1,0))
   
   label <- function(){
     cex <- 0.5
@@ -834,6 +834,8 @@ grDevices::dev.off()
 
 # human-readable list of genes
 paste0(names(which(any)),collapse=", ")
+# start computation on 2025-05-30 at 18:15
+# list on 2025-05-30 (morning): "KIAA0319L, PGM1, CR2, EPC1, FAR1, SPON1, CD59, CASP5, OAS3, SUDS3, MLXIP, SOS2, MAZ, CTD-2545G14.7, CALCOCO2, SGTA, YWHAQ, LPIN1, TUBA4A, SLC5A3, SIK1, LGALS2, NBEAL2, SLC39A8, ITGA2, ERBIN, POM121, EIF4H, CD36, SORBS3, LCN2, SH3KBP1"
 ```
 
 <!--
