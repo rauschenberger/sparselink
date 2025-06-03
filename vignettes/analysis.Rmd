@@ -270,11 +270,10 @@ for(mode in c("MTL-size","TL-source","TL-target","TL-prop","MTL-prop")){ #
     stop("Wrong mode.")
   }
   grid[[mode]] <- grid[[mode]][rep(seq_len(nrow(grid[[mode]])),each=repetitions),]
-  #grid[[mode]]$seed <- seq_len(nrow(grid[[mode]]))
   grid[[mode]]$seed <- rep(x=seq_len(repetitions),times=length(cand))
   grid[[mode]]$family <- as.character(grid[[mode]]$family)
   cond <- is.na(grid[[mode]]$prob.separate)
-  grid[[mode]]$prob.separate[cond] <- 0.5*grid[[mode]]$prob.common[cond]
+  grid[[mode]]$prob.separate[cond] <- 0.5*grid[[mode]]$prob.common[cond] # This means that there are twice more shared effects than specific effects. Otherwise, the competing methods might not work well.
   
   for(i in seq(from=1,to=nrow(grid[[mode]]))){
       set.seed(seed=grid$seed[i])
