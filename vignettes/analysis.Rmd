@@ -768,16 +768,19 @@ grDevices::dev.off()
 disease <- ifelse(rownames(metric) %in% project$IBD,"IBD",ifelse(rownames(metric) %in% project$RA,"RA",NA))
 
 #round(100*colMeans(metric)-100,digits=2)
-round(100*colMeans(metric[disease=="IBD",])-100,digits=2)
-round(100*colMeans(metric[disease=="RA",])-100,digits=2)
+#round(100*colMeans(metric[disease=="IBD",])-100,digits=2)
+#round(100*colMeans(metric[disease=="RA",])-100,digits=2)
 
-colMeans(nzero)
+#colMeans(nzero)
 colMeans(nzero[disease=="IBD",])
-colMeans(nzero[disease=="RA",])
+#colMeans(nzero[disease=="RA",])
 
 #--- revision: report AUC ---
-Reduce(f="+",x=lapply(result$IBD,function(x) x$auc))/length(result$IBD)
-lapply(result,function(x) round(colMeans(Reduce(f="+",x=lapply(x,function(x) x$auc))/length(result$IBD)),digits=2))
+lapply(result,function(x) round(colMeans(Reduce(f="+",x=lapply(x,function(x) x$auc))/length(x)),digits=2))
+
+mean <- Reduce(f="+",x=lapply(result$IBD,function(x) x$auc))/length(result$IBD)
+#order <- order(mean[,"sparselink"]-mean[,"wrap_separate"],decreasing=TRUE)
+paste0(names(project$IBD),": ",round(mean[,"wrap_separate"],digits=2),"-",round(mean[,"sparselink"],digits=2))
 ```
 
 This chunk generates the figure on feature selection.
