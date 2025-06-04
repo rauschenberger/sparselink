@@ -730,7 +730,7 @@ This chunk generates the figure on the predictive performance.
 #<<setup>>
 
 grDevices::postscript(file=file.path(path,"manuscript","fig_app.eps"),width=6.5,height=4,horizontal=FALSE,onefile=FALSE,paper="special")
-graphics::par(mfrow=c(2,1),mar=c(4,2,1,1),oma=c(0,0,0,0))
+graphics::par(mfrow=c(2,1),mar=c(2.5,2,1,1),oma=c(0,0,0,0))
 load(file.path(path,paste0("results/application.RData")),verbose=TRUE)
 
 model0 <- "wrap_glmtrans"
@@ -740,9 +740,7 @@ model2 <- "wrap_xrnet"
 # predictivity
 metric <- lapply(result,function(x) do.call(what="rbind",args=lapply(x,function(x) x$auc))) # DEV and AUC need different directions (increase=FALSE/TRUE)!
 metric <- do.call(what="rbind",args=metric)
-metric <- metric/metric[,"wrap_separate"]
-#xlab <- refs[rownames(metric)]
-#names <- gsub(pattern="",replacement="\n",x=unlist(project))
+#metric <- metric/metric[,"wrap_separate"] # compare with standard lasso
 
 label <- gsub(pattern="IBD.|RA.",replacement="",x=gsub(pattern=" ",replacement="\n",x=names(unlist(project))))
 index <- match(x=rownames(metric),table=unlist(project))
@@ -750,7 +748,10 @@ index <- match(x=rownames(metric),table=unlist(project))
 xlab <- label[index]
 plot_change(x=xlab,y0=metric[,model0],y1=metric[,model1],y2=metric[,model2],main="metric",increase=TRUE,cex.main=0.8)
 graphics::axis(side=1,at=length(project$IBD)+0.5,labels="|",tick=FALSE,line=-0.25,font=2)
-graphics::abline(h=0.5,lty=2,col="grey")
+for(i in seq_along(index)){
+  graphics::segments(x0=i-0.3,y0=mean(metric[index==i,"wrap_separate"]),x1=i+0.3,col="grey",lty=2)
+}
+#graphics::abline(h=0.5,lty=2,col="grey")
 graphics::abline(h=1,lty=2,col="grey")
 
 # sparsity
