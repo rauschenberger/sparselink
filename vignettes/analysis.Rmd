@@ -808,6 +808,7 @@ for(i in seq_along(result$IBD)){
   coefs[[i]] <- coefs[[i]][any,]
 }
 table <- Reduce(f="+",x=coefs)/5
+count <- Reduce(f="+",x=lapply(coefs,function(x) x!=0))
 
 cex <- 0.7
 
@@ -820,7 +821,8 @@ colnames <- gsub(x=colnames(table),pattern=" ",replacement="\n")
 graphics::mtext(text=colnames,side=1,at=seq_len(ncol(table)),cex=cex,line=1)
 rownames <- rownames(table)
 graphics::mtext(text=rownames,side=2,at=seq_len(nrow(table)),las=2,cex=cex,line=0.7,col=col)
-star <- rowSums(table!=0)>1
+#star <- rowSums(table!=0)>1
+star <- apply(count[,-5],1,function(x) any(x>=3))
 graphics::mtext(text="*",side=2,at=which(star),line=-0.3)
 graphics::mtext(text=ifelse(col=="blue","-",ifelse(col=="red","+",".")),side=4,at=seq_len(nrow(table)),las=2,cex=cex,line=0.5,col=col)
 for(i in seq_len(nrow(table))){
@@ -836,9 +838,8 @@ graphics::abline(v=seq(from=0.5,to=5.5,by=1))
 grDevices::dev.off()
 
 # human-readable list of genes
-paste0(names(which(any)),collapse=", ")
-# start computation on 2025-05-30 at 18:15
-# list on 2025-05-30 (morning): "KIAA0319L, PGM1, CR2, EPC1, FAR1, SPON1, CD59, CASP5, OAS3, SUDS3, MLXIP, SOS2, MAZ, CTD-2545G14.7, CALCOCO2, SGTA, YWHAQ, LPIN1, TUBA4A, SLC5A3, SIK1, LGALS2, NBEAL2, SLC39A8, ITGA2, ERBIN, POM121, EIF4H, CD36, SORBS3, LCN2, SH3KBP1"
+paste0(names(which(star)),collapse=", ")
+# "PGM1, CR2, EPC1, MLXIP, SOS2, SLC5A3, SIK1, EIF4H, SORBS3"
 ```
 
 <!--
