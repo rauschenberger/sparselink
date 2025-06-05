@@ -838,7 +838,7 @@ graphics::abline(v=seq(from=0.5,to=5.5,by=1))
 grDevices::dev.off()
 
 # human-readable list of genes
-paste0(names(which(star)),collapse=", ")
+paste0(rev(names(which(star))),collapse=", ")
 # "PGM1, CR2, EPC1, MLXIP, SOS2, SLC5A3, SIK1, EIF4H, SORBS3"
 ```
 
