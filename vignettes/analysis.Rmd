@@ -222,7 +222,7 @@ figure_change(model0="wrap_mgaussian",model1="sparselink",model2="wrap_spls")
 rowMeans(sapply(deviance,function(x) rank(rowMeans(x))))
 rowMeans(sapply(deviance,function(x) colMeans(t(x)/x["wrap_separate",])))
 runtime <- rowSums(sapply(time,function(x) x))
-round(runtime/runtime["wrap_separate"],digits=2)
+round(runtime/runtime["wrap_separate"],digits=1)
 grDevices::dev.off()
 
 grDevices::postscript(file=file.path(path,"manuscript","fig_sim_transfer.eps"),width=6.5,height=6,horizontal=FALSE,onefile=FALSE,paper="special")
@@ -233,7 +233,7 @@ figure_change(model0="wrap_glmtrans",model1="sparselink",model2="wrap_xrnet")
 rowMeans(sapply(deviance,function(x) rank(rowMeans(x))))
 rowMeans(sapply(deviance,function(x) colMeans(t(x)/x["wrap_separate",])))
 runtime <- rowSums(sapply(time,function(x) x))
-round(runtime/runtime["wrap_separate"],digits=2)
+round(runtime/runtime["wrap_separate"],digits=1)
 grDevices::dev.off()
 ```
 
