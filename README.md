@@ -13,7 +13,7 @@ Install the current release from
 [CRAN](https://CRAN.R-project.org/package=sparselink):
 
 ``` r
-#install.packages("sparselink") # not yet available
+install.packages("sparselink")
 ```
 
 or the latest development version from [GitHub](https://github.com/rauschenberger/sparselink):
