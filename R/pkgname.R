@@ -33,7 +33,7 @@
 #' \href{https://orcid.org/0000-0003-3977-7469}{Enrico Glaab}
 #' (2025).
 #' "Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation".
-#' \emph{Under revision}. \url{https://hdl.handle.net/10993/63425}
+#' \emph{Bioinformatics}. \doi{10.1093/bioinformatics/btaf406}
 #' 
 #' @examples
 #' ?sparselink

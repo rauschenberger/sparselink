@@ -36,7 +36,7 @@ Petr V. Nazarov
 and Enrico Glaab
 [![EG](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png)](https://orcid.org/0000-0003-3977-7469) (2025).
 "Estimating sparse regression models in multi-task learning and transfer learning through adaptive penalisation".
-*Manuscript in preparation*.
+*Bioinformatics*. [doi: 10.1093/bioinformatics/btaf406](https://doi.org/10.1093/bioinformatics/btaf406)
 
 ## Reproducibility
 

@@ -1,7 +1,7 @@
 Package: sparselink
 Version: 1.0.0
 Title: Sparse Regression for Related Problems
-Description: Estimates sparse regression models (i.e., with few non-zero coefficients) in high-dimensional multi-task learning and transfer learning settings, as proposed by Rauschenberger et al. (2025) <https://orbilu.uni.lu/handle/10993/63425>.
+Description: Estimates sparse regression models (i.e., with few non-zero coefficients) in high-dimensional multi-task learning and transfer learning settings, as proposed by Rauschenberger et al. (2025) <doi:10.1093/bioinformatics/btaf406>.
 Depends: R (>= 3.0.0)
 Imports: glmnet, pROC, stats, mvtnorm, spls, xrnet
 Suggests: knitr, testthat, remotes, glmtrans, rmarkdown
