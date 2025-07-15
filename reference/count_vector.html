@@ -83,12 +83,12 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">truth</span>,<span class="va">estim</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      estim</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> truth -1 0 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    -1  0 1 5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    0   3 4 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    1   4 3 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    -1  1 1 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    0   3 3 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    1   4 3 1</span>
 <span class="r-in"><span><span class="fu">count_vector</span><span class="op">(</span><span class="va">truth</span>,<span class="va">estim</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> sensitivity specificity   precision </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.0000000   0.5714286   0.0000000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.1666667   0.3750000   0.1538462 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#--- matrix ---</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
@@ -96,10 +96,10 @@
 <span class="r-in"><span><span class="va">truth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span>,size<span class="op">=</span><span class="va">n</span><span class="op">*</span><span class="va">p</span>,replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">p</span>,ncol<span class="op">=</span><span class="va">n</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">estim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span>,size<span class="op">=</span><span class="va">n</span><span class="op">*</span><span class="va">p</span>,replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>,nrow<span class="op">=</span><span class="va">p</span>,ncol<span class="op">=</span><span class="va">n</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">count_matrix</span><span class="op">(</span><span class="va">truth</span>,<span class="va">estim</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]      [,2]      [,3]  [,4]      [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sensitivity  0.3 0.3076923 0.5454545 0.625 0.5454545</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> specificity  0.5 0.5714286 0.0000000 0.250 0.4444444</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> precision    0.3 0.4000000 0.3529412 0.625 0.4615385</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  [,1]      [,2]      [,3]      [,4] [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sensitivity 0.1111111 0.4000000 0.6875000 0.4285714  0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> specificity 0.4545455 0.3000000 0.0000000 0.3333333  0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> precision   0.1111111 0.3076923 0.6470588 0.4285714  0.5</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

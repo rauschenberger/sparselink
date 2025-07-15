@@ -180,7 +180,7 @@ return coefficients or predicted values in a standardised format.</p>
 <em>arXiv</em> (Preprint).
 <a href="https://doi.org/10.48550/arXiv.1311.6529" class="external-link">doi:10.48550/arXiv.1311.6529</a>
 .
-(<a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a>)</p>
+(<a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">cv.glmnet</a>)</p>
 <p>Hyonho Chun and Sündüz Keleş (2010).
 "Sparse Partial Least Squares Regression for Simultaneous Dimension Reduction and Variable Selection".
 <em>Journal of the Royal Statistical Society Series B: Statistical Methodology</em>
@@ -206,7 +206,7 @@ return coefficients or predicted values in a standardised format.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>See original functions
-<a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a> (with argument <code>family="mgaussian"</code>)
+<a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">cv.glmnet</a> (with argument <code>family="mgaussian"</code>)
 <a href="https://rdrr.io/pkg/spls/man/spls.html" class="external-link">spls</a>, <a href="https://rdrr.io/pkg/glmtrans/man/glmtrans.html" class="external-link">glmtrans</a>, and <a href="https://uscbiostats.github.io/xrnet/reference/xrnet.html" class="external-link">xrnet</a>.</p></div>
     </div>
 
@@ -234,7 +234,7 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alpha</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.19476255 -0.01088519  0.05476666</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.0625940314 -0.0005838964  0.0181799997</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1] [,2] [,3]</span>
@@ -291,43 +291,43 @@ return coefficients or predicted values in a standardised format.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>,newx<span class="op">=</span><span class="va">newx</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  0.1947626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  0.1947626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  0.1947626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.1947626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  0.1947626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  0.1947626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  0.1947626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  0.1947626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  0.1947626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  0.1947626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        lambda.min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.06259403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.06259403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.06259403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.06259403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.06259403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.06259403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.06259403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.06259403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.06259403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.06259403</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.01088519</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.01088519</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.01088519</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.01088519</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.01088519</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.01088519</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.01088519</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.01088519</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.01088519</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.01088519</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          lambda.min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.0005838964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.0005838964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.0005838964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -0.0005838964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.0005838964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.0005838964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.0005838964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.0005838964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.0005838964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.0005838964</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[3]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       lambda.min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.05476666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.05476666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.05476666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.05476666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.05476666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.05476666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.05476666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.05476666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.05476666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.05476666</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]    0.01818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]    0.01818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]    0.01818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]    0.01818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]    0.01818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]    0.01818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]    0.01818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]    0.01818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]    0.01818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]    0.01818</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#--- transfer learning ---</span></span></span>
