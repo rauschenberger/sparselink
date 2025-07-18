@@ -2,6 +2,9 @@
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/rauschenberger/sparselink?svg=true)](https://ci.appveyor.com/project/rauschenberger/sparselink)
 [![R-CMD-check](https://github.com/rauschenberger/sparselink/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rauschenberger/sparselink/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/rauschenberger/sparselink/graph/badge.svg)](https://app.codecov.io/gh/rauschenberger/sparselink)
+[![CRAN version](https://www.r-pkg.org/badges/version/sparselink)](https://CRAN.R-project.org/package=sparselink)
+[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/sparselink)](https://CRAN.R-project.org/package=sparselink)
+[![Total CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/sparselink)](https://CRAN.R-project.org/package=sparselink)
 
 # Sparse regression for related problems
 
@@ -41,12 +44,6 @@ and Enrico Glaab
 ## Reproducibility
 
 The code for reproducing the simulations and applications shown in the manuscript is available in a vignette ([analysis](https://rauschenberger.github.io/sparselink/articles/analysis.html)). After installing the package with `remotes::install_github("rauschenberger/sparselink",build_vignettes=TRUE)` and restarting R, the vignette can also be loaded with `vignette(topic="analysis",package="sparselink")`.
-
-<!--
-[![CRAN version](https://www.r-pkg.org/badges/version/sparselink)](https://CRAN.R-project.org/package=sparselink)
-[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/sparselink)](https://CRAN.R-project.org/package=sparselink)
-[![Total CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/sparselink)](https://CRAN.R-project.org/package=sparselink)
--->
 
 ## Disclaimer
 
